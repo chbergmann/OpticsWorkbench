@@ -12,7 +12,6 @@ from FreeCAD import Vector
 import Part
 
 __dir__ = os.path.dirname(__file__)
-__iconpath__ = os.path.join(__dir__, 'ray.svg')
     
 INFINITY = 1e7  
 EPSILON = 1e-7  
@@ -20,18 +19,15 @@ EPSILON = 1e-7
 class RayWorker:
     def __init__(self, 
                  fp,    # an instance of Part::FeaturePython
-                 position = Vector(0, 0, 0),
                  direction = Vector(1, 0, 0),
                  power = True,
-                 maxIterations = 10000):
-        fp.addProperty("App::PropertyVector", "Position",  "Ray",  "This object will be modified by this feature").Position = position
+                 maxIterations = 1000):
         fp.addProperty("App::PropertyVector", "Direction", "Ray",  "Colorize the feature green").Direction = direction
         fp.addProperty("App::PropertyBool", "Power", "Ray",  "On or Off").Power = power
-        fp.addProperty("App::PropertyQuantity", "MaxIterations", "Ray",  "maximum number of reflections").MaxIterations = maxIterations
+        fp.addProperty("App::PropertyQuantity", "MaxNumberRays", "Ray",  "maximum number of reflections").MaxNumberRays = maxIterations
         
         fp.Proxy = self
         self.iter = 0
-        self.fp = fp
     
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
@@ -39,24 +35,31 @@ class RayWorker:
         
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        if prop == "Position" or prop == "Direction" or prop == "Power":
+        proplist = ["Direction", "Power", "MaxNumberRays"]
+        if prop in proplist:
             self.redrawRay(fp)
             
     def redrawRay(self, fp):
-        
-            
+        self.iter = 0
+        pl = fp.Placement  
+        pos =  pl.Base
         if fp.Power == False:   
-            fp.Shape = Part.makeLine(fp.Position, fp.Direction)
-            fp.ViewObject.LineColor = (0.2, 0.2, 0.00)
+            fp.Shape = Part.makeLine(Vector(0, 0, 0), fp.Direction)
+            fp.Placement = pl
+            fp.ViewObject.LineColor = (0.5, 0.5, 0.00)
             return          
         
-        linearray = [ Part.makeLine(fp.Position, fp.Direction * INFINITY) ] 
-        self.traceRay(fp.Position, linearray)
+        linearray = [ Part.makeLine(pos, pos + fp.Direction * INFINITY) ] 
+        self.traceRay(fp, pos, linearray)
+        
+        for line in linearray:
+            line.Placement.Base = line.Placement.Base - pl.Base
         
         fp.Shape = Part.makeCompound(linearray)
+        fp.Placement = pl
         fp.ViewObject.LineColor = (1.00,1.00,0.00)
         
-    def traceRay(self, origin, linearray):
+    def traceRay(self, fp, origin, linearray):
         if len(linearray) == 0: return
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_point = None
@@ -64,13 +67,13 @@ class RayWorker:
         line = linearray[len(linearray) - 1]
         
         for obj in FreeCAD.ActiveDocument.Objects:
-            if obj.Name != "Ray":
+            if not hasattr(obj, 'MaxNumberRays'):
                 for edge in obj.Shape.Edges:
                     isec = line.Curve.intersect(edge.Curve)
                     for p in isec:
                         dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
                         vert=Part.Vertex(p)
-                        if vert.distToShape(edge)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                        if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
                             nearest = dist
                             nearest_point = p
                             nearest_part = edge
@@ -80,19 +83,39 @@ class RayWorker:
             neworigin = PointVec(nearest_point)
             shortline = Part.makeLine(origin, neworigin)
             linearray[len(linearray) - 1] = shortline
-            v = nearest_part.Vertexes[1]
-            tangent = Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
+                
+            self.iter = self.iter + 1
+            if self.iter > fp.MaxNumberRays: return
+            
+            tangent = self.findTangent(nearest_part, neworigin)
             newedge = shortline.mirror(neworigin, tangent)
-            vend = PointVec(newedge.Vertexes[0])
+            vend = PointVec(newedge.Vertexes[0])         
             newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
             linearray.append(newline)
-            self.iter = self.iter + 1
-            if self.iter > self.fp.MaxIterations: return
-            self.traceRay(neworigin, linearray)
+            try:
+                self.traceRay(fp, neworigin, linearray)
+            except Exception as ex:
+                print(ex)
             
-        return
         
+    def findTangent(self, shape, point):
+        inc = (shape.LastParameter - shape.FirstParameter) / 10000
+        if inc == 0: return
+        nearest = shape.FirstParameter
+        minlen = INFINITY
+        p = shape.FirstParameter
+        while p <= shape.LastParameter:
+            v = shape.valueAt(p)
+            if (point - v).Length < minlen:
+                minlen = (point - v).Length
+                nearest = p
                 
+            p = p + inc
+            
+        return shape.tangentAt(nearest)   
+            
+         #   tangent = Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
+                    
                   
 def PointVec(point):
     """Converts a Part::Point to a FreeCAD::Vector"""
@@ -107,7 +130,7 @@ class RayViewProvider:
             
     def getIcon(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return __iconpath__
+        return os.path.join(__dir__, 'ray.svg')
 
     def attach(self, vobj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
@@ -162,9 +185,61 @@ class Ray():
         
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : __iconpath__,
+        return {'Pixmap'  : os.path.join(__dir__, 'ray.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': "Ray",
                 'ToolTip' : __doc__ }
 
+class RedrawAll():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
+      
+    def Activated(self):
+        '''Will be called when the feature is executed.'''
+        # Generate commands in the FreeCAD python console to create Ray
+        FreeCADGui.doCommand("import OpticsWorkbench")
+        FreeCADGui.doCommand("OpticsWorkbench.restartAll()")
+                  
+
+    def IsActive(self):
+        """Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional."""
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+        
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(__dir__, 'Anonymous_Lightbulb_Lit.svg'),
+                'Accel' : "", # a default shortcut (optional)
+                'MenuText': "(Re)start simulation",
+                'ToolTip' : __doc__ }
+                
+class AllOff():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
+      
+    def Activated(self):
+        '''Will be called when the feature is executed.'''
+        # Generate commands in the FreeCAD python console to create Ray
+        FreeCADGui.doCommand("import OpticsWorkbench")
+        FreeCADGui.doCommand("OpticsWorkbench.allOff()")
+                  
+
+    def IsActive(self):
+        """Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional."""
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+        
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(__dir__, 'Anonymous_Lightbulb_Off.svg'),
+                'Accel' : "", # a default shortcut (optional)
+                'MenuText': "Switch off lights",
+                'ToolTip' : __doc__ }
+
 FreeCADGui.addCommand('Ray', Ray())
+FreeCADGui.addCommand('Start', RedrawAll())
+FreeCADGui.addCommand('Off', AllOff())

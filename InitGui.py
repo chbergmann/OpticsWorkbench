@@ -11,7 +11,7 @@ class OpticsWorkbench (Workbench):
     def __init__(self):
         import os
         import OpticsWorkbench
-        self.__class__.MenuText = "OpticsWorkbench"
+        self.__class__.MenuText = "Optics"
         self.__class__.ToolTip = "Ray Tracing Simulation"
         self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), "freecad.svg")
 
@@ -20,9 +20,9 @@ class OpticsWorkbench (Workbench):
         # import here all the needed files that create your FreeCAD commands
         import Ray
         
-        self.list = ["Ray"] # A list of command names created in the line above
-        self.appendToolbar("OpticsWorkbench", self.list) # creates a new toolbar with your commands
-        self.appendMenu("OpticsWorkbench", self.list) # creates a new menu
+        self.list = ["Ray", "Start", "Off"] # A list of command names created in the line above
+        self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands
+        self.appendMenu(self.__class__.MenuText, self.list) # creates a new menu
 
     def Activated(self):
         "This function is executed when the workbench is activated"

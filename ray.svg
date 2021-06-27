@@ -84,7 +84,7 @@
             <dc:title>[triplus]</dc:title>
           </cc:Agent>
         </dc:creator>
-        <dc:title></dc:title>
+        <dc:title />
         <dc:date>2016-02-26</dc:date>
         <dc:relation>http://www.freecadweb.org/wiki/index.php?title=Artwork</dc:relation>
         <dc:publisher>
@@ -112,13 +112,13 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       style="fill:none;stroke:#ffcc00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 9.939637,32.204357 53.990027,0.171281"
        id="path849"
        inkscape:path-effect="#path-effect851"
        inkscape:original-d="m 9.939637,32.204357 53.990027,0.171281" />
     <circle
-       style="fill:#ffcc00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
+       style="fill:#ffff00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
        id="path853"
        cx="9.528821"
        cy="32.413795"

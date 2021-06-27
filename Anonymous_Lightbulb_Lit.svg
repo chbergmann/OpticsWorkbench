@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" xmlns:cc="http://web.resource.org/cc/" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:svg="http://www.w3.org/2000/svg" id="svg1" height="317pt" width="168pt">
+  <defs id="defs3">
+    <linearGradient id="linearGradient2430" y2="180.23" gradientUnits="userSpaceOnUse" y1="277.84" gradientTransform="matrix(.81852 0 0 1.2217 -246.17 -76.297)" x2="357.71" x1="543.08">
+      <stop id="stop1704" stop-color="#f2ff00" offset="0"/>
+      <stop id="stop1705" stop-color="#ffffb8" offset="1"/>
+    </linearGradient>
+  </defs>
+  <g id="layer1">
+    <g id="g2420" stroke="#000" stroke-width="8.75" transform="translate(-15.836 -7.1981)">
+      <g id="g1712" stroke-linecap="round" transform="translate(-252.27 -133.3)" fill="none">
+        <path id="path1708" d="m405.14 449.07l-72.28 25.45"/>
+        <path id="path1709" d="m405.14 468.75l-72.28 25.45"/>
+        <path id="path1710" d="m405.14 488.43l-72.28 25.45"/>
+        <path id="path1711" d="m405.14 429.39l-72.28 25.45"/>
+      </g>
+      <path id="path1691" stroke-linejoin="round" d="m168.43 306.31c-0.72-110.85 23.75-127.05 33.11-139.28 14.45-18.87 26.18-64.95 0.72-105.09-32.81-51.993-105.47-66.772-156.91-10.077-31.919 35.504-22.182 86.367-4.322 114.45 4.705 6.9 30.231 28.79 30.231 139.64 0 0.72 97.171 0.36 97.171 0.36z" fill="url(#linearGradient2430)" fill-rule="evenodd"/>
+      <path id="path1080" d="m153.31 40.347c-71.974-28.072-138.2 43.187-98.606 116.6" stroke-linecap="round" fill="none"/>
+      <path id="path1702" d="m169.87 53.303c15.11 10.077 23.03 25.912 26.63 38.148" stroke-linecap="round" fill="none"/>
+      <path id="path1717" d="m101.46 388.21s4.06 9.26 15.27 9.16c10.22-0.09 14.25-9.16 14.25-9.16" stroke-linecap="round" fill="none"/>
+    </g>
+  </g>
+  <metadata>
+    <rdf:RDF>
+      <cc:Work>
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/publicdomain/"/>
+        <dc:publisher>
+          <cc:Agent rdf:about="http://openclipart.org/">
+            <dc:title>Openclipart</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:title>Lightbulb Lit</dc:title>
+        <dc:date>2009-05-24T00:37:06</dc:date>
+        <dc:description>A lit lightbulb by Benji Park. From old OCAL site.</dc:description>
+        <dc:source>http://openclipart.org/detail/26219/lightbulb-lit-by-anonymous</dc:source>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Anonymous</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>bulb</rdf:li>
+            <rdf:li>clip art</rdf:li>
+            <rdf:li>clipart</rdf:li>
+            <rdf:li>image</rdf:li>
+            <rdf:li>media</rdf:li>
+            <rdf:li>public domain</rdf:li>
+            <rdf:li>svg</rdf:li>
+            <rdf:li>technology</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+      <cc:License rdf:about="http://creativecommons.org/licenses/publicdomain/">
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Reproduction"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#Distribution"/>
+        <cc:permits rdf:resource="http://creativecommons.org/ns#DerivativeWorks"/>
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+</svg>

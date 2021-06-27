@@ -19,8 +19,19 @@ def makeRay(position = Vector(0, 0, 0), direction = Vector(1, 0, 0), power=True)
     import Ray      
     reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Ray")
-    Ray.RayWorker(fp, position, direction, power)
+    fp.Placement.Base = position
+    Ray.RayWorker(fp, direction, power)
     vp = Ray.RayViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
     
+def restartAll():
+    for obj in FreeCAD.ActiveDocument.Objects:
+        if hasattr(obj, 'MaxNumberRays'):
+            obj.Power = False
+            obj.Power = True
+            
+def allOff():
+    for obj in FreeCAD.ActiveDocument.Objects:
+        if hasattr(obj, 'MaxNumberRays'):
+            obj.Power = False
