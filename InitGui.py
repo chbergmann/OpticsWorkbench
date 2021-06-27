@@ -13,7 +13,7 @@ class OpticsWorkbench (Workbench):
         import OpticsWorkbench
         self.__class__.MenuText = "Optics"
         self.__class__.ToolTip = "Ray Tracing Simulation"
-        self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), "freecad.svg")
+        self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), "pyrate_logo_icon.svg")
 
     def Initialize(self):
         "This function is executed when FreeCAD starts"
