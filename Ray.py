@@ -9,21 +9,29 @@ import os
 import FreeCADGui
 import FreeCAD
 from FreeCAD import Vector
+import Part
 
 __dir__ = os.path.dirname(__file__)
 __iconpath__ = os.path.join(__dir__, 'ray.svg')
+    
+INFINITY = 1e7  
+EPSILON = 1e-7  
     
 class RayWorker:
     def __init__(self, 
                  fp,    # an instance of Part::FeaturePython
                  position = Vector(0, 0, 0),
                  direction = Vector(1, 0, 0),
-                 power = True):
+                 power = True,
+                 maxIterations = 10000):
         fp.addProperty("App::PropertyVector", "Position",  "Ray",  "This object will be modified by this feature").Position = position
         fp.addProperty("App::PropertyVector", "Direction", "Ray",  "Colorize the feature green").Direction = direction
         fp.addProperty("App::PropertyBool", "Power", "Ray",  "On or Off").Power = power
+        fp.addProperty("App::PropertyQuantity", "MaxIterations", "Ray",  "maximum number of reflections").MaxIterations = maxIterations
         
         fp.Proxy = self
+        self.iter = 0
+        self.fp = fp
     
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
@@ -35,15 +43,61 @@ class RayWorker:
             self.redrawRay(fp)
             
     def redrawRay(self, fp):
-        # check plausibility of all parameters
-        fp.Shape.Edges.clear()
+        
             
-        if fp.Power == False:
-            return
+        if fp.Power == False:   
+            fp.Shape = Part.makeLine(fp.Position, fp.Direction)
+            fp.ViewObject.LineColor = (0.2, 0.2, 0.00)
+            return          
         
+        linearray = [ Part.makeLine(fp.Position, fp.Direction * INFINITY) ] 
+        self.traceRay(fp.Position, linearray)
         
+        fp.Shape = Part.makeCompound(linearray)
+        fp.ViewObject.LineColor = (1.00,1.00,0.00)
         
+    def traceRay(self, origin, linearray):
+        if len(linearray) == 0: return
+        nearest = Vector(INFINITY, INFINITY, INFINITY)
+        nearest_point = None
+        nearest_part = None
+        line = linearray[len(linearray) - 1]
         
+        for obj in FreeCAD.ActiveDocument.Objects:
+            if obj.Name != "Ray":
+                for edge in obj.Shape.Edges:
+                    isec = line.Curve.intersect(edge.Curve)
+                    for p in isec:
+                        dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
+                        vert=Part.Vertex(p)
+                        if vert.distToShape(edge)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                            nearest = dist
+                            nearest_point = p
+                            nearest_part = edge
+                            
+                        
+        if nearest_part:
+            neworigin = PointVec(nearest_point)
+            shortline = Part.makeLine(origin, neworigin)
+            linearray[len(linearray) - 1] = shortline
+            v = nearest_part.Vertexes[1]
+            tangent = Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
+            newedge = shortline.mirror(neworigin, tangent)
+            vend = PointVec(newedge.Vertexes[0])
+            newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
+            linearray.append(newline)
+            self.iter = self.iter + 1
+            if self.iter > self.fp.MaxIterations: return
+            self.traceRay(neworigin, linearray)
+            
+        return
+        
+                
+                  
+def PointVec(point):
+    """Converts a Part::Point to a FreeCAD::Vector"""
+    return Vector(point.X, point.Y, point.Z)
+         
 
 class RayViewProvider:
     def __init__(self, vobj):
