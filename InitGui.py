@@ -13,14 +13,15 @@ class OpticsWorkbench (Workbench):
         import OpticsWorkbench
         self.__class__.MenuText = "Optics"
         self.__class__.ToolTip = "Ray Tracing Simulation"
-        self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), "pyrate_logo_icon.svg")
+        self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), 'icons', 'pyrate_logo_icon.svg')
 
     def Initialize(self):
         "This function is executed when FreeCAD starts"
         # import here all the needed files that create your FreeCAD commands
         import Ray
+        import OpticalObject
         
-        self.list = ["Ray", "Start", "Off"] # A list of command names created in the line above
+        self.list = ["Ray", "2D Beam", "Mirror", "Absorber", "Off", "Start"] # A list of command names created in the line above
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands
         self.appendMenu(self.__class__.MenuText, self.list) # creates a new menu
 

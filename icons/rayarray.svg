@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="64px"
+   height="64px"
+   id="svg2980"
+   sodipodi:version="0.32"
+   inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
+   sodipodi:docname="rayarray.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.1">
+  <defs
+     id="defs2982">
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect907"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect892"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect877"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect862"
+       is_visible="true"
+       lpeversion="1" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect851"
+       is_visible="true"
+       lpeversion="1" />
+    <linearGradient
+       id="linearGradient3864">
+      <stop
+         id="stop3866"
+         offset="0"
+         style="stop-color:#71b2f8;stop-opacity:1;" />
+      <stop
+         id="stop3868"
+         offset="1"
+         style="stop-color:#002795;stop-opacity:1;" />
+    </linearGradient>
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 32 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="64 : 32 : 1"
+       inkscape:persp3d-origin="32 : 21.333333 : 1"
+       id="perspective2988" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="6.8105468"
+     inkscape:cx="27.728608"
+     inkscape:cy="40.744929"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:document-units="px"
+     inkscape:grid-bbox="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1013"
+     inkscape:window-x="0"
+     inkscape:window-y="36"
+     inkscape:snap-bbox="true"
+     inkscape:snap-nodes="false"
+     inkscape:window-maximized="1"
+     inkscape:document-rotation="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2991"
+       empspacing="2"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata2985">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>[triplus]</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:title></dc:title>
+        <dc:date>2016-02-26</dc:date>
+        <dc:relation>http://www.freecadweb.org/wiki/index.php?title=Artwork</dc:relation>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>FreeCAD</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:identifier>FreeCAD/src/Mod/Part/Gui/Resources/icons/PartWorkbench.svg</dc:identifier>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>FreeCAD LGPL2+</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <cc:license>https://www.gnu.org/copyleft/lesser.html</cc:license>
+        <dc:contributor>
+          <cc:Agent>
+            <dc:title>[agryson] Alexander Gryson</dc:title>
+          </cc:Agent>
+        </dc:contributor>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer">
+    <path
+       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.939637,32.204357 53.990027,0.171281"
+       id="path849"
+       inkscape:path-effect="#path-effect851"
+       inkscape:original-d="m 9.939637,32.204357 53.990027,0.171281" />
+    <circle
+       style="fill:#ffff00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
+       id="path853"
+       cx="9.528821"
+       cy="32.413795"
+       r="6" />
+    <path
+       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.8987889,44.121621 63.888816,44.292902"
+       id="path849-3"
+       inkscape:path-effect="#path-effect862"
+       inkscape:original-d="M 9.8987889,44.121621 63.888816,44.292902" />
+    <circle
+       style="fill:#ffff00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
+       id="path853-6"
+       cx="9.4879732"
+       cy="44.331059"
+       r="6" />
+    <path
+       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.994824,56.45295 53.990027,0.171281"
+       id="path849-7"
+       inkscape:path-effect="#path-effect877"
+       inkscape:original-d="m 9.994824,56.45295 53.990027,0.171281" />
+    <circle
+       style="fill:#ffff00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
+       id="path853-5"
+       cx="9.5840073"
+       cy="56.662388"
+       r="6" />
+    <path
+       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.8391477,20.239913 63.829175,20.411194"
+       id="path849-35"
+       inkscape:path-effect="#path-effect892"
+       inkscape:original-d="M 9.8391477,20.239913 63.829175,20.411194" />
+    <circle
+       style="fill:#ffff00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
+       id="path853-62"
+       cx="9.4283314"
+       cy="20.44935"
+       r="6" />
+    <path
+       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 9.7693438,8.4212249 63.759371,8.5925059"
+       id="path849-9"
+       inkscape:path-effect="#path-effect907"
+       inkscape:original-d="M 9.7693438,8.4212249 63.759371,8.5925059" />
+    <circle
+       style="fill:#ffff00;stroke:#d4aa00;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dashoffset:75.5906"
+       id="path853-1"
+       cx="9.3585281"
+       cy="8.6306629"
+       r="6" />
+  </g>
+</svg>
