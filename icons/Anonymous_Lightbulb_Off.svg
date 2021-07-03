@@ -8,8 +8,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg1"
-   height="64pt"
-   width="64pt"
+   height="64"
+   width="64"
    version="1.1"
    sodipodi:docname="Anonymous_Lightbulb_Off.svg"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)">
@@ -32,7 +32,9 @@
      inkscape:window-x="0"
      inkscape:window-y="36"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1" />
+     inkscape:current-layer="svg1"
+     inkscape:document-rotation="0"
+     units="px" />
   <defs
      id="defs3">
     <linearGradient
@@ -55,7 +57,7 @@
   </defs>
   <g
      id="layer1"
-     transform="matrix(0.21779846,0,0,0.21779846,19.783845,-0.07261938)">
+     transform="matrix(0.15998506,0,0,0.15998506,15.844244,0.57988443)">
     <g
        id="g2363"
        stroke="#000000"
