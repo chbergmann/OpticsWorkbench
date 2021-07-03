@@ -1,8 +1,14 @@
-# Optics Workbench
-
-![WorkbenchIcon](./freecad.svg)  
+# ![WorkbenchIcon](./icons/pyrate_logo_icon.svg) Optics Workbench
     
-Simple raytracing for FreeCAD
+Geometrical optics for FreeCAD.  
+Performs simple raytracing through your FreeCAD objects.
+
+![screenshot](./examples/screenshot.jpg)
+
+## Work in progress !
+The current version only supports 2D objects
+
+
   
 ## Installation
 
@@ -22,11 +28,23 @@ When you restart FreeCAD, "Optics Workbench" workbench should now show up in the
 ## Getting started
 
 ## Tools
-### ![RayIcon](./Ray/feature1.svg) Ray
+### ![RayIcon](./icons/ray.svg) Ray
 A single ray for raytracing
 
-#### Parameters
+### ![2D Beam](./icons/rayarray.svg) 2D Beam
+A row of multiple rays for raytracing
 
+### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
+The selected FreeCAD objects will act as mirrors
+
+### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
+The selected FreeCAD objects will swallow the rays of light
+
+### ![Off](./icons/Anonymous_Lightbulb_Lit.svg) Switch off lights
+Switches off all Rays and Beams
+
+### ![Off](./icons/Anonymous_Lightbulb_Off.svg) (Re)start simulation
+Switches on and recalculates all Rays and Beams
 
 ## Discussion
 Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org).

@@ -73,6 +73,9 @@ class OpticalObjectViewProvider:
         pass                    
         
 def findTangent(shape, point):
+    if shape.Curve.TypeId == 'Part::GeomLine':
+        return Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
+        
     inc = (shape.LastParameter - shape.FirstParameter) / 10000
     if inc == 0: return
     nearest = shape.FirstParameter
@@ -88,8 +91,6 @@ def findTangent(shape, point):
         
     return shape.tangentAt(nearest)   
             
-         #   tangent = Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
-
     
                 
 class OpticalMirror():

@@ -22,8 +22,12 @@ def makeRay(position = Vector(0, 0, 0),
             beamDistance = 0.1):
     '''Python command to create a light ray.'''
     import Ray      
-    reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
-    fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Ray")
+    reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.
+    name = 'Ray'
+    if beamNrColumns * beamNrRows > 1:
+        name = 'Beam'
+        
+    fp = FreeCAD.ActiveDocument.addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     Ray.RayWorker(fp, direction, power, beamNrColumns, beamNrRows, beamDistance)
     vp = Ray.RayViewProvider(fp.ViewObject)
