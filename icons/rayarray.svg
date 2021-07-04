@@ -75,8 +75,8 @@
      showgrid="true"
      inkscape:document-units="px"
      inkscape:grid-bbox="true"
-     inkscape:window-width="1920"
-     inkscape:window-height="1013"
+     inkscape:window-width="3840"
+     inkscape:window-height="2093"
      inkscape:window-x="0"
      inkscape:window-y="36"
      inkscape:snap-bbox="true"
@@ -104,7 +104,7 @@
             <dc:title>[triplus]</dc:title>
           </cc:Agent>
         </dc:creator>
-        <dc:title></dc:title>
+        <dc:title />
         <dc:date>2016-02-26</dc:date>
         <dc:relation>http://www.freecadweb.org/wiki/index.php?title=Artwork</dc:relation>
         <dc:publisher>
@@ -132,7 +132,7 @@
      inkscape:label="Layer 1"
      inkscape:groupmode="layer">
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#ffd42a;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 9.939637,32.204357 53.990027,0.171281"
        id="path849"
        inkscape:path-effect="#path-effect851"
@@ -144,7 +144,7 @@
        cy="32.413795"
        r="6" />
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#ffd42a;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 9.8987889,44.121621 63.888816,44.292902"
        id="path849-3"
        inkscape:path-effect="#path-effect862"
@@ -156,7 +156,7 @@
        cy="44.331059"
        r="6" />
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#ffd42a;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 9.994824,56.45295 53.990027,0.171281"
        id="path849-7"
        inkscape:path-effect="#path-effect877"
@@ -168,7 +168,7 @@
        cy="56.662388"
        r="6" />
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#ffd42a;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 9.8391477,20.239913 63.829175,20.411194"
        id="path849-35"
        inkscape:path-effect="#path-effect892"
@@ -180,7 +180,7 @@
        cy="20.44935"
        r="6" />
     <path
-       style="fill:none;stroke:#ffff00;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:none;stroke:#ffd42a;stroke-width:4.11271;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 9.7693438,8.4212249 63.759371,8.5925059"
        id="path849-9"
        inkscape:path-effect="#path-effect907"

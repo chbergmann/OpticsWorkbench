@@ -8,8 +8,9 @@ __doc__ = "A single ray for raytracing"
 import os
 import FreeCADGui
 import FreeCAD
-from FreeCAD import Vector
+from FreeCAD import Vector, Rotation
 import Part
+import math
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
     
@@ -47,23 +48,27 @@ class RayWorker:
             
     def redrawRay(self, fp):
         self.iter = 0
-        pl = fp.Placement  
-        pos = Vector(pl.Base)
-        dir = pl.Rotation.multVec(fp.Direction)
-        dir = dir / dir.Length
-        if fp.Power == False or fp.BeamNrColumns * fp.BeamNrRows == 0:   
-            fp.Shape = Part.makeLine(Vector(0, 0, 0), dir)
-            fp.Placement = pl
-            fp.ViewObject.LineColor = (0.5, 0.5, 0.00)
-            fp.ViewObject.Transparency = 50
-            return          
+        pl = fp.Placement       
         
         linearray = []
-        for n in range(0, int(fp.BeamNrColumns)):
-            linearray.append(Part.makeLine(pos, pos + dir * INFINITY)) 
-            self.traceRay(fp, pos, linearray)
-            pos.y = pos.y + fp.BeamDistance
-        
+        for n in range(0, int(fp.BeamNrColumns)): 
+            if fp.Direction.Length > EPSILON:
+                newpos = Vector(0, fp.BeamDistance * n, 0)
+                pos = pl.Base + pl.Rotation.multVec(newpos)
+                dir = pl.Rotation.multVec(fp.Direction)
+            else:
+                r = Rotation()
+                r.Axis = Vector(0, 0, 1)
+                r. Angle = n * 2 * math.pi / fp.BeamNrColumns
+                pos = pl.Base
+                dir = r.multVec(Vector(1,0,0))
+                   
+            if fp.Power == True: 
+                linearray.append(Part.makeLine(pos, pos + dir * INFINITY))
+                self.traceRay(fp, pos, linearray)
+            else:
+                linearray.append(Part.makeLine(pos, pos + dir))                
+                         
         for line in linearray:
             r2 = FreeCAD.Rotation(pl.Rotation)
             r2.invert()
@@ -72,7 +77,11 @@ class RayWorker:
         
         fp.Shape = Part.makeCompound(linearray)
         fp.Placement = pl
-        fp.ViewObject.LineColor = (1.00,1.00,0.00)
+        if fp.Power == False:
+            fp.ViewObject.LineColor = (0.5, 0.5, 0.00)
+        else:
+            fp.ViewObject.LineColor = (1.00,1.00,0.00)
+            
         fp.ViewObject.Transparency = 50
         
         
@@ -185,6 +194,8 @@ class RayViewProvider:
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         if self.Object.BeamNrColumns * self.Object.BeamNrRows <= 1:
             return os.path.join(_icondir_, 'ray.svg')
+        elif self.Object.Direction.Length < EPSILON:
+            return os.path.join(_icondir_, 'sun.svg')
         else:
             return os.path.join(_icondir_, 'rayarray.svg')
 
@@ -270,6 +281,31 @@ class Beam2D():
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': "2D Beam",
                 'ToolTip' : __doc__ }
+                
+class RadialBeam2D():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
+      
+    def Activated(self):
+        '''Will be called when the feature is executed.'''
+        # Generate commands in the FreeCAD python console to create Ray
+        FreeCADGui.doCommand("import OpticsWorkbench")
+        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=64, direction=FreeCAD.Vector(0, 0, 0))")
+                  
+
+    def IsActive(self):
+        """Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional."""
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+        
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(_icondir_, 'sun.svg'),
+                'Accel' : "", # a default shortcut (optional)
+                'MenuText': "2D Radial Beam",
+                'ToolTip' : __doc__ }
 
 class RedrawAll():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -323,5 +359,6 @@ class AllOff():
 
 FreeCADGui.addCommand('Ray', Ray())
 FreeCADGui.addCommand('2D Beam', Beam2D())
+FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
 FreeCADGui.addCommand('Start', RedrawAll())
 FreeCADGui.addCommand('Off', AllOff())
