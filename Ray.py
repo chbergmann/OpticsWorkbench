@@ -65,10 +65,10 @@ class RayWorker:
             pos.y = pos.y + fp.BeamDistance
         
         for line in linearray:
-            line.Placement.Base = line.Placement.Base - pl.Base
             r2 = FreeCAD.Rotation(pl.Rotation)
             r2.invert()
             line.Placement.Rotation = r2
+            line.Placement.Base = r2.multVec(line.Placement.Base - pl.Base)
         
         fp.Shape = Part.makeCompound(linearray)
         fp.Placement = pl
@@ -86,24 +86,32 @@ class RayWorker:
         
         for obj in FreeCAD.ActiveDocument.Objects:
             if obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType'):
-                isSketch = obj.TypeId == 'Sketcher::SketchObject'
                 for edge in obj.Shape.Edges:
-                    if isSketch:
-                        plane = Part.Plane(obj.Placement.Base, getNormal(obj))
-                        isec = isec = line.Curve.intersect2d(edge.Curve, plane)
+                    normal = self.check2D([line, edge])
+                    if normal.Length == 1:
+                        plane = Part.Plane(obj.Placement.Base, normal)
+                        isec = line.Curve.intersect2d(edge.Curve, plane)
                     else:
-                        isec = line.Curve.intersectCC(edge.Curve)
+                        isec = line.Curve.intersect(edge.Curve)
 
                     if isec:
                         for p in isec:
-                            if isSketch:
+                            if normal == Vector(0, 0, 1):
                                 vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0))
                                 dist = vec - origin
                                 p = Part.Point(vec)
+                            elif normal == Vector(0, 1, 0):
+                                vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1]))
+                                dist = vec - origin
+                                p = Part.Point(vec)
+                            elif normal == Vector(1, 0, 0):
+                                vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1]))
+                                dist = vec - origin
+                                p = Part.Point(vec)
                             else:
-                                dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
+                                dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
                                 
-                            vert=Part.Vertex(p)
+                            vert=Part.Vertex(p)                            
                             if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
                                 nearest = dist
                                 nearest_point = p
@@ -132,6 +140,9 @@ class RayWorker:
             
         
     def findTangent(self, shape, point):
+        if shape.Curve.TypeId == 'Part::GeomLine':
+            return PointVec(shape.Vertexes[1]) - PointVec(shape.Vertexes[0])
+        
         inc = (shape.LastParameter - shape.FirstParameter) / 10000
         if inc == 0: return
         nearest = shape.FirstParameter
@@ -145,10 +156,19 @@ class RayWorker:
                 
             p = p + inc
             
-        return shape.tangentAt(nearest)   
+        return shape.tangentAt(nearest)
+
+
+    def check2D(self, objlist):
+        nvec = Vector(1, 1, 1)
+        for obj in objlist:
+            bbox = obj.BoundBox
+            if bbox.XLength > EPSILON: nvec.x = 0
+            if bbox.YLength > EPSILON: nvec.y = 0
+            if bbox.ZLength > EPSILON: nvec.z = 0
             
-         #   tangent = Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
-                    
+        return nvec
+             
                   
 def PointVec(point):
     """Converts a Part::Point to a FreeCAD::Vector"""

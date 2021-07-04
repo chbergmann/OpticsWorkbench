@@ -70,27 +70,7 @@ class OpticalObjectViewProvider:
     
     def onChanged(self, fp, prop):
         '''Here we can do something when a single property got changed'''
-        pass                    
-        
-def findTangent(shape, point):
-    if shape.Curve.TypeId == 'Part::GeomLine':
-        return Vector(v.X - nearest_point.X, v.Y - nearest_point.Y, v.Z - nearest_point.Z)
-        
-    inc = (shape.LastParameter - shape.FirstParameter) / 10000
-    if inc == 0: return
-    nearest = shape.FirstParameter
-    minlen = INFINITY
-    p = shape.FirstParameter
-    while p <= shape.LastParameter:
-        v = shape.valueAt(p)
-        if (point - v).Length < minlen:
-            minlen = (point - v).Length
-            nearest = p
-            
-        p = p + inc
-        
-    return shape.tangentAt(nearest)   
-            
+        pass            
     
                 
 class OpticalMirror():
