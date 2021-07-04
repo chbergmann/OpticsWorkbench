@@ -3,6 +3,8 @@
 Geometrical optics for FreeCAD.  
 Performs simple raytracing through your FreeCAD objects.
 
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/chbergmann/OpticsWorkbench.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chbergmann/OpticsWorkbench/alerts/)
+
 ![screenshot](./examples/screenshot.jpg)
 
 ## Work in progress !
@@ -42,8 +44,11 @@ Switches off all Rays and Beams
 ### ![On](./icons/Anonymous_Lightbulb_Lit.svg) (Re)start simulation
 Switches on and recalculates all Rays and Beams
 
+### ![Example](./icons/pyrate_logo_icon.svg) Example 1
+generates the screenshot above
+
 ## Discussion
-Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org/viewtopic.php?t=7748).
+Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=59860).
 
 ## License
 GNU Lesser General Public License v3.0

@@ -30,7 +30,7 @@ def makeRay(position = Vector(0, 0, 0),
     fp = FreeCAD.ActiveDocument.addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     Ray.RayWorker(fp, direction, power, beamNrColumns, beamNrRows, beamDistance)
-    vp = Ray.RayViewProvider(fp.ViewObject)
+    Ray.RayViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
     
@@ -51,7 +51,7 @@ def makeMirror(base = []):
     reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Mirror")
     OpticalObject.OpticalObjectWorker(fp, base)
-    vp = OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
+    OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
     
@@ -61,6 +61,6 @@ def makeAbsorber(base = []):
     reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Absorber")
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
-    vp = OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
+    OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
