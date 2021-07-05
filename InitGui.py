@@ -20,10 +20,10 @@ class OpticsWorkbench (Workbench):
         # import here all the needed files that create your FreeCAD commands
         import Ray
         import OpticalObject
-        from examples import example1
+        from examples import example1, example3D
         
         self.list = ["Ray", "2D Beam", "2D Radial Beam", "Mirror", "Absorber", "Off", "Start"] # A list of command names created in the line above
-        self.menu = self.list + ["Example1"]
+        self.menu = self.list + ["Example1", 'Example3D']
         
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands
         self.appendMenu(self.__class__.MenuText, self.menu) # creates a new menu

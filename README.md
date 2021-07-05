@@ -9,9 +9,9 @@ Performs simple raytracing through your FreeCAD objects.
 ![screenshot](./examples/screenshot.jpg)
 
 ## Work in progress !
-The current version only supports 2D objects
-
-
+- The current version works for 2D objects
+- Reflections on curved 3D objects are calculated, but they are inaccurate !
+- Lenses are not yet implemented
   
 ## Installation
 

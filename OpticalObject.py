@@ -26,15 +26,10 @@ class OpticalObjectWorker:
         fp.Proxy = self
     
     def execute(self, fp):
-        shapes = []
-        for obj in fp.Base:
-            shapes.append(obj.Shape)
-            
-        fp.Shape = Part.makeCompound(shapes)
+        pass
         
     def onChanged(self, fp, prop):
-        if prop == "Base":
-            self.execute(fp)
+        pass
             
     
 class OpticalObjectViewProvider:

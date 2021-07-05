@@ -90,57 +90,85 @@ class RayWorker:
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_point = None
         nearest_part = None
-        nearest_obj = None
+        nearest_obj = ""
         line = linearray[len(linearray) - 1]
-        
-        for obj in FreeCAD.ActiveDocument.Objects:
-            if obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType'):
-                for edge in obj.Shape.Edges:
-                    normal = self.check2D([line, edge])
-                    if normal.Length == 1:
-                        plane = Part.Plane(obj.Placement.Base, normal)
-                        isec = line.Curve.intersect2d(edge.Curve, plane)
-                    else:
-                        isec = line.Curve.intersect(edge.Curve)
-
-                    if isec:
-                        for p in isec:
-                            if normal == Vector(0, 0, 1):
-                                vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0))
-                                dist = vec - origin
-                                p = Part.Point(vec)
-                            elif normal == Vector(0, 1, 0):
-                                vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1]))
-                                dist = vec - origin
-                                p = Part.Point(vec)
-                            elif normal == Vector(1, 0, 0):
-                                vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1]))
-                                dist = vec - origin
-                                p = Part.Point(vec)
+        for optobj in FreeCAD.ActiveDocument.Objects:
+            if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and hasattr(optobj, 'Base'):
+                for obj in optobj.Base:
+                    if len(obj.Shape.Shells) == 0 and len(obj.Shape.Solids) == 0:
+                        for edge in obj.Shape.Edges:
+                            normal = self.check2D([line, edge])
+                            isec = None
+                            if normal.Length == 1:
+                                plane = Part.Plane(obj.Placement.Base, normal)
+                                isec = line.Curve.intersect2d(edge.Curve, plane)
                             else:
-                                dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
-                                
-                            vert=Part.Vertex(p)                            
-                            if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
-                                nearest = dist
-                                nearest_point = p
-                                nearest_part = edge
-                                nearest_obj = obj
+                                try:
+                                    isec = line.Curve.intersect(edge.Curve)
+                                except Exception as ex:
+                                    print(ex)
+                                    
+                            if isec:
+                                for p in isec:
+                                    if normal == Vector(0, 0, 1):
+                                        vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0))
+                                        dist = vec - origin
+                                        p = Part.Point(vec)
+                                    elif normal == Vector(0, 1, 0):
+                                        vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1]))
+                                        dist = vec - origin
+                                        p = Part.Point(vec)
+                                    elif normal == Vector(1, 0, 0):
+                                        vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1]))
+                                        dist = vec - origin
+                                        p = Part.Point(vec)
+                                    else:
+                                        dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
+                                        
+                                    vert=Part.Vertex(p)                            
+                                    if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                                        nearest = dist
+                                        nearest_point = p
+                                        nearest_part = edge
+                                        nearest_obj = optobj.OpticalType
+                      
+                    for face in obj.Shape.Faces:
+                        isec = None
+                        try:
+                            isec = line.Curve.intersect(face.Surface) 
+                        except Exception as ex:
+                            print(ex)
                             
-                        
+                        if isec:
+                            for p in isec[0]: 
+                                dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
+                                vert=Part.Vertex(p)            
+                                if vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                                    nearest = dist
+                                    nearest_point = p
+                                    nearest_part = face
+                                    nearest_obj = optobj.OpticalType
+                  
         if nearest_part:
             neworigin = PointVec(nearest_point)
             shortline = Part.makeLine(origin, neworigin)
             linearray[len(linearray) - 1] = shortline
             
-            if nearest_obj.OpticalType == 'mirror':           
+            if nearest_obj == 'mirror':           
                 self.iter = self.iter + 1
                 if self.iter > fp.MaxNumberRays: return
                 
-                tangent = self.findTangent(nearest_part, neworigin)
-                newedge = shortline.mirror(neworigin, tangent)
-                vend = PointVec(newedge.Vertexes[0])         
-                newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
+                if hasattr(nearest_part, 'Curve'):
+                    tangent = self.findTangent(nearest_part, neworigin)
+                    newedge = shortline.mirror(neworigin, tangent)
+                    vend = PointVec(newedge.Vertexes[0])
+                    newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
+                else:
+                    normal = self.findNormal(nearest_part, neworigin)
+                    dB = PointVec(shortline.Vertexes[0]) - neworigin
+                    dA = -dB + 2*normal*(dB*normal)
+                    newline = Part.makeLine(neworigin, neworigin + dA * INFINITY)
+                            
                 linearray.append(newline)
                 try:
                     self.traceRay(fp, neworigin, linearray)
@@ -166,7 +194,22 @@ class RayWorker:
             p = p + inc
             
         return shape.tangentAt(nearest)
-
+    
+    def findNormal(self, shape, point):   
+        if shape.Surface.TypeId == 'Part::GeomPlane':
+            return shape.normalAt(0,0)
+                
+        uvnodes = shape.getUVNodes()
+        nearest = uvnodes[0]
+        minlen = INFINITY
+        for uv in uvnodes:
+            v = shape.valueAt(uv[0], uv[1])   
+            if (point - v).Length < minlen:
+                minlen = (point - v).Length
+                nearest = uv
+        
+        print("error=" + str((point - shape.valueAt(nearest[0], nearest[1])).Length))     
+        return shape.normalAt(nearest[0], nearest[1])      
 
     def check2D(self, objlist):
         nvec = Vector(1, 1, 1)
@@ -175,7 +218,7 @@ class RayWorker:
             if bbox.XLength > EPSILON: nvec.x = 0
             if bbox.YLength > EPSILON: nvec.y = 0
             if bbox.ZLength > EPSILON: nvec.z = 0
-            
+                        
         return nvec
              
                   
