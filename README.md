@@ -9,8 +9,6 @@ Performs simple raytracing through your FreeCAD objects.
 ![screenshot](./examples/screenshot.jpg)
 
 ## Work in progress !
-- The current version works for 2D objects
-- Reflections on curved 3D objects are calculated, but they are inaccurate !
 - Lenses are not yet implemented
   
 ## Installation
@@ -47,6 +45,9 @@ Switches on and recalculates all Rays and Beams
 
 ### ![Example](./icons/pyrate_logo_icon.svg) Example 1
 generates the screenshot above
+
+### ![Example](./icons/pyrate_logo_icon.svg) Example 3D
+![screenshot](./examples/screenshot3D.png)
 
 ## Discussion
 Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=59860).

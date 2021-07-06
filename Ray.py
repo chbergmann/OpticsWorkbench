@@ -158,13 +158,15 @@ class RayWorker:
                 self.iter = self.iter + 1
                 if self.iter > fp.MaxNumberRays: return
                 
-                if hasattr(nearest_part, 'Curve'):
-                    tangent = self.findTangent(nearest_part, neworigin)
+                if hasattr(nearest_part, 'Curve'):                    
+                    param = nearest_part.Curve.parameter(neworigin)     
+                    tangent = nearest_part.tangentAt(param)
                     newedge = shortline.mirror(neworigin, tangent)
                     vend = PointVec(newedge.Vertexes[0])
                     newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
-                else:
-                    normal = self.findNormal(nearest_part, neworigin)
+                else:                    
+                    uv = nearest_part.Surface.parameter(neworigin)         
+                    normal = nearest_part.normalAt(uv[0], uv[1]) 
                     dB = PointVec(shortline.Vertexes[0]) - neworigin
                     dA = -dB + 2*normal*(dB*normal)
                     newline = Part.makeLine(neworigin, neworigin + dA * INFINITY)
@@ -174,42 +176,8 @@ class RayWorker:
                     self.traceRay(fp, neworigin, linearray)
                 except Exception as ex:
                     print(ex)
-            
         
-    def findTangent(self, shape, point):
-        if shape.Curve.TypeId == 'Part::GeomLine':
-            return PointVec(shape.Vertexes[1]) - PointVec(shape.Vertexes[0])
-        
-        inc = (shape.LastParameter - shape.FirstParameter) / 10000
-        if inc == 0: return
-        nearest = shape.FirstParameter
-        minlen = INFINITY
-        p = shape.FirstParameter
-        while p <= shape.LastParameter:
-            v = shape.valueAt(p)
-            if (point - v).Length < minlen:
-                minlen = (point - v).Length
-                nearest = p
-                
-            p = p + inc
-            
-        return shape.tangentAt(nearest)
-    
-    def findNormal(self, shape, point):   
-        if shape.Surface.TypeId == 'Part::GeomPlane':
-            return shape.normalAt(0,0)
-                
-        uvnodes = shape.getUVNodes()
-        nearest = uvnodes[0]
-        minlen = INFINITY
-        for uv in uvnodes:
-            v = shape.valueAt(uv[0], uv[1])   
-            if (point - v).Length < minlen:
-                minlen = (point - v).Length
-                nearest = uv
-        
-        print("error=" + str((point - shape.valueAt(nearest[0], nearest[1])).Length))     
-        return shape.normalAt(nearest[0], nearest[1])      
+             
 
     def check2D(self, objlist):
         nvec = Vector(1, 1, 1)

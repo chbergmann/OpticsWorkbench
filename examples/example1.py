@@ -1,4 +1,4 @@
-from FreeCAD import Vector, Placement, Rotation
+from FreeCAD import Vector
 import Sketcher
 import Part
 import FreeCAD as App

@@ -1,6 +1,4 @@
 from FreeCAD import Vector, Placement, Rotation
-import Sketcher
-import Part
 import FreeCAD as App
 import FreeCADGui as Gui
 import OpticsWorkbench
