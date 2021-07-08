@@ -22,7 +22,7 @@ def make_Test3D():
     Cone.Placement = Placement(Vector(26.00, -23.00, 28.00), Rotation (0.0, 0.0, 0.0, 1.0))
 
     Torus = doc.addObject('Part::Torus', 'Torus')
-    Torus.Placement = Placement(Vector(-44.00, -29.00, 64.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Torus.Placement = Placement(Vector(-44.00, -29.00, -1.50), Rotation (0.0, 0.0, 0.0, 1.0))
 
     Cylinder001 = doc.addObject('Part::Cylinder', 'Cylinder001')
     Cylinder001.Radius = 5.0
@@ -36,15 +36,24 @@ def make_Test3D():
 
     Tube = doc.addObject('Part::Cut', 'Tube')
     Tube.Base = Cylinder001
-    Tube.Placement = Placement(Vector(0.00, -32.00, 39.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Tube.Placement = Placement(Vector(0.00, -3.00, 41.00), Rotation (0.0, 0.0, 0.0, 1.0))
     Tube.Tool = Cylinder002
     Tube.ViewObject.DiffuseColor = [(0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00)]
-    Tube.ViewObject.Transparency = 50
+    Tube.ViewObject.Transparency = 70
     
     OpticsWorkbench.makeMirror([Cube, Cylinder, Sphere, Cone, Torus, Tube])
     
+    Cube001 = doc.addObject('Part::Box', 'Cube001')
+    Cube001.Height = 100.0
+    Cube001.Length = 200.0
+    Cube001.Placement = Placement(Vector(-122.0, -100.0, -10.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cube001.Width = 200.0
+    Cube001.ViewObject.Transparency = 80
+     
+    OpticsWorkbench.makeAbsorber([Cube001])
+    
     doc.recompute()
-    OpticsWorkbench.makeRay(beamNrColumns=20)
+    OpticsWorkbench.makeRay(beamNrColumns=30)
     
     doc.recompute()
 

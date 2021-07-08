@@ -90,7 +90,7 @@ class Example1():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'pyrate_logo_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': 'Example 1',
+                'MenuText': 'Example 2D',
                 'ToolTip' : '' }
                 
-Gui.addCommand('Example1', Example1())
+Gui.addCommand('Example2D', Example1())

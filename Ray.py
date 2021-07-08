@@ -51,23 +51,24 @@ class RayWorker:
         pl = fp.Placement       
         
         linearray = []
-        for n in range(0, int(fp.BeamNrColumns)): 
-            if fp.Direction.Length > EPSILON:
-                newpos = Vector(0, fp.BeamDistance * n, 0)
-                pos = pl.Base + pl.Rotation.multVec(newpos)
-                dir = pl.Rotation.multVec(fp.Direction)
-            else:
-                r = Rotation()
-                r.Axis = Vector(0, 0, 1)
-                r. Angle = n * 2 * math.pi / fp.BeamNrColumns
-                pos = pl.Base
-                dir = r.multVec(Vector(1,0,0))
-                   
-            if fp.Power == True: 
-                linearray.append(Part.makeLine(pos, pos + dir * INFINITY))
-                self.traceRay(fp, pos, linearray)
-            else:
-                linearray.append(Part.makeLine(pos, pos + dir))                
+        for row in range(0, int(fp.BeamNrRows)): 
+            for n in range(0, int(fp.BeamNrColumns)): 
+                if fp.Direction.Length > EPSILON:
+                    newpos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
+                    pos = pl.Base + pl.Rotation.multVec(newpos)
+                    dir = pl.Rotation.multVec(fp.Direction)
+                else:
+                    r = Rotation()
+                    r.Axis = Vector(0, 0, 1)
+                    r. Angle = n * 2 * math.pi / fp.BeamNrColumns
+                    pos = pl.Base
+                    dir = r.multVec(Vector(1,0,0))
+                       
+                if fp.Power == True: 
+                    linearray.append(Part.makeLine(pos, pos + dir * INFINITY))
+                    self.traceRay(fp, pos, linearray)
+                else:
+                    linearray.append(Part.makeLine(pos, pos + dir))                
                          
         for line in linearray:
             r2 = FreeCAD.Rotation(pl.Rotation)
@@ -291,7 +292,7 @@ class Beam2D():
         return {'Pixmap'  : os.path.join(_icondir_, 'rayarray.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': "2D Beam",
-                'ToolTip' : __doc__ }
+                'ToolTip' : "A row of multiple rays for raytracing" }
                 
 class RadialBeam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -316,7 +317,7 @@ class RadialBeam2D():
         return {'Pixmap'  : os.path.join(_icondir_, 'sun.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': "2D Radial Beam",
-                'ToolTip' : __doc__ }
+                'ToolTip' : "Rays coming from one point going to all directions in a 2D plane" }
 
 class RedrawAll():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  

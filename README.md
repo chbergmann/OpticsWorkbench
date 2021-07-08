@@ -31,6 +31,9 @@ A single ray for raytracing
 ### ![2D Beam](./icons/rayarray.svg) 2D Beam
 A row of multiple rays for raytracing
 
+### ![Radial Beam](./icons/sun.svg) 2D Radial Beam
+Rays coming from one point going to all directions in a 2D plane
+
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The selected FreeCAD objects will act as mirrors
 
@@ -43,7 +46,7 @@ Switches off all Rays and Beams
 ### ![On](./icons/Anonymous_Lightbulb_Lit.svg) (Re)start simulation
 Switches on and recalculates all Rays and Beams
 
-### ![Example](./icons/pyrate_logo_icon.svg) Example 1
+### ![Example](./icons/pyrate_logo_icon.svg) Example 2D
 generates the screenshot above
 
 ### ![Example](./icons/pyrate_logo_icon.svg) Example 3D
