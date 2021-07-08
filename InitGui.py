@@ -22,7 +22,7 @@ class OpticsWorkbench (Workbench):
         import OpticalObject
         from examples import example1, example3D
         
-        self.list = ["Ray", "2D Beam", "2D Radial Beam", "Mirror", "Absorber", "Off", "Start"] # A list of command names created in the line above
+        self.list = ["Ray", "2D Beam", "2D Radial Beam", "Spherical Beam", "Mirror", "Absorber", "Off", "Start"] # A list of command names created in the line above
         self.menu = self.list + ["Example2D", 'Example3D']
         
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands

@@ -62,7 +62,11 @@ class RayWorker:
                     r.Axis = Vector(0, 0, 1)
                     r. Angle = n * 2 * math.pi / fp.BeamNrColumns
                     pos = pl.Base
-                    dir = r.multVec(Vector(1,0,0))
+                    dir1 = r.multVec(Vector(1,0,0))
+                    
+                    r.Axis = Vector(0, 1, 0)
+                    r. Angle = row * math.pi / fp.BeamNrRows
+                    dir = r.multVec(dir1)
                        
                 if fp.Power == True: 
                     linearray.append(Part.makeLine(pos, pos + dir * INFINITY))
@@ -318,6 +322,33 @@ class RadialBeam2D():
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': "2D Radial Beam",
                 'ToolTip' : "Rays coming from one point going to all directions in a 2D plane" }
+                
+                
+class SphericalBeam():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
+      
+    def Activated(self):
+        '''Will be called when the feature is executed.'''
+        # Generate commands in the FreeCAD python console to create Ray
+        FreeCADGui.doCommand("import OpticsWorkbench")
+        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, direction=FreeCAD.Vector(0, 0, 0))")
+                  
+
+    def IsActive(self):
+        """Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional."""
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+        
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(_icondir_, 'sun3D.svg'),
+                'Accel' : "", # a default shortcut (optional)
+                'MenuText': "Spherical Beam",
+                'ToolTip' : "Rays coming from one point going to all directions" }
+                            
 
 class RedrawAll():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -372,5 +403,6 @@ class AllOff():
 FreeCADGui.addCommand('Ray', Ray())
 FreeCADGui.addCommand('2D Beam', Beam2D())
 FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
+FreeCADGui.addCommand('Spherical Beam', SphericalBeam())
 FreeCADGui.addCommand('Start', RedrawAll())
 FreeCADGui.addCommand('Off', AllOff())

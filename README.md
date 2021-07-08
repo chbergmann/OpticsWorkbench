@@ -34,6 +34,9 @@ A row of multiple rays for raytracing
 ### ![Radial Beam](./icons/sun.svg) 2D Radial Beam
 Rays coming from one point going to all directions in a 2D plane
 
+### ![Spherical Beam](./icons/sun3D.svg) Spherical Beam
+Rays coming from one point going to all directions
+
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The selected FreeCAD objects will act as mirrors
 
