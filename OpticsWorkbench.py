@@ -46,7 +46,7 @@ def allOff():
             obj.Power = False
 
 def makeMirror(base = []):
-    '''Python command to create a light ray.'''
+    '''All FreeCAD objects in base will be optical mirrors.'''
     import OpticalObject      
     reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Mirror")
@@ -56,11 +56,21 @@ def makeMirror(base = []):
     return fp
     
 def makeAbsorber(base = []):
-    '''Python command to create a light ray.'''
+    '''All FreeCAD objects in base will be optical light absorbers.'''
     import OpticalObject      
     reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Absorber")
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
+    OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
+    FreeCAD.ActiveDocument.recompute()
+    return fp
+
+def makeLens(base = [], RefractionIndex = 0, material = 'Flint glass'):
+    '''All FreeCAD objects in base will be optical lenses.'''
+    import OpticalObject      
+    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
+    fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Lens")
+    OpticalObject.LensWorker(fp, base, RefractionIndex, material)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp

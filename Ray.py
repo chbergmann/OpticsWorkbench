@@ -35,6 +35,7 @@ class RayWorker:
         
         fp.Proxy = self
         self.iter = 0
+        self.lastRefIdx = 1
     
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
@@ -64,13 +65,26 @@ class RayWorker:
                     pos = pl.Base
                     dir1 = r.multVec(Vector(1,0,0))
                     
-                    r.Axis = Vector(0, 1, 0)
+                    if row % 2 == 0:
+                        r.Axis = Vector(0, 1, 0)
+                    else:
+                        r.Axis = Vector(1, 0, 0)
+                        
                     r. Angle = row * math.pi / fp.BeamNrRows
                     dir = r.multVec(dir1)
                        
-                if fp.Power == True: 
-                    linearray.append(Part.makeLine(pos, pos + dir * INFINITY))
-                    self.traceRay(fp, pos, linearray)
+                if fp.Power == True:
+                    ray = Part.makeLine(pos, pos + dir * INFINITY)
+                    linearray.append(ray)
+                    self.lastRefIdx = 1
+                    insiders = self.isInsideLens(ray.Vertexes[0])
+                    if len(insiders) > 0:
+                        self.lastRefIdx = insiders[0].RefractionIndex
+                    
+                    try:
+                        self.traceRay(fp, pos, linearray)                        
+                    except Exception as ex:
+                        print(ex)
                 else:
                     linearray.append(Part.makeLine(pos, pos + dir))                
                          
@@ -95,11 +109,11 @@ class RayWorker:
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_point = None
         nearest_part = None
-        nearest_obj = ""
+        nearest_obj = None
         line = linearray[len(linearray) - 1]
         for optobj in FreeCAD.ActiveDocument.Objects:
             if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and hasattr(optobj, 'Base'):
-                for obj in optobj.Base:
+                for obj in optobj.Base:                   
                     if len(obj.Shape.Shells) == 0 and len(obj.Shape.Solids) == 0:
                         for edge in obj.Shape.Edges:
                             normal = self.check2D([line, edge])
@@ -135,7 +149,7 @@ class RayWorker:
                                         nearest = dist
                                         nearest_point = p
                                         nearest_part = edge
-                                        nearest_obj = optobj.OpticalType
+                                        nearest_obj = optobj
                       
                     for face in obj.Shape.Faces:
                         isec = None
@@ -152,37 +166,85 @@ class RayWorker:
                                     nearest = dist
                                     nearest_point = p
                                     nearest_part = face
-                                    nearest_obj = optobj.OpticalType
+                                    nearest_obj = optobj
                   
         if nearest_part:
             neworigin = PointVec(nearest_point)
             shortline = Part.makeLine(origin, neworigin)
             linearray[len(linearray) - 1] = shortline
+            newline = None
+        
+            if nearest_obj.OpticalType == 'mirror':      
+                newline = self.mirror(shortline, nearest_part)  
+                linearray.append(newline)                                   
+            elif nearest_obj.OpticalType == 'lens':      
+                newline = self.lenssoup(shortline, nearest_obj, nearest_part) 
+                linearray.append(newline)  
+            else: return
             
-            if nearest_obj == 'mirror':           
+            if newline:
                 self.iter = self.iter + 1
                 if self.iter > fp.MaxNumberRays: return
-                
-                if hasattr(nearest_part, 'Curve'):                    
-                    param = nearest_part.Curve.parameter(neworigin)     
-                    tangent = nearest_part.tangentAt(param)
-                    newedge = shortline.mirror(neworigin, tangent)
-                    vend = PointVec(newedge.Vertexes[0])
-                    newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
-                else:                    
-                    uv = nearest_part.Surface.parameter(neworigin)         
-                    normal = nearest_part.normalAt(uv[0], uv[1]) 
-                    dB = PointVec(shortline.Vertexes[0]) - neworigin
-                    dA = -dB + 2*normal*(dB*normal)
-                    newline = Part.makeLine(neworigin, neworigin + dA * INFINITY)
-                            
-                linearray.append(newline)
-                try:
-                    self.traceRay(fp, neworigin, linearray)
-                except Exception as ex:
-                    print(ex)
+                self.traceRay(fp, neworigin, linearray)
+            
+    def mirror(self, ray, nearest_part):  
+        neworigin = PointVec(ray.Vertexes[1])                 
+        if hasattr(nearest_part, 'Curve'):                    
+            param = nearest_part.Curve.parameter(neworigin)     
+            tangent = nearest_part.tangentAt(param)
+            newedge = ray.mirror(neworigin, tangent)
+            vend = PointVec(newedge.Vertexes[0])
+            newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
+        elif hasattr(nearest_part, 'Surface'):    
+            uv = nearest_part.Surface.parameter(neworigin)         
+            normal = nearest_part.normalAt(uv[0], uv[1]) 
+            dB = PointVec(ray.Vertexes[0]) - neworigin
+            dA = -dB + 2*normal*(dB*normal)
+            newline = Part.makeLine(neworigin, neworigin + dA * INFINITY)
+        else:
+            print("Cannot determine the normal on " + nearest_obj.Label)
+            return None
         
-             
+        return newline         
+        
+    
+    def lenssoup(self, ray, nearest_obj, nearest_part):
+        neworigin = PointVec(ray.Vertexes[1])        
+        if hasattr(nearest_part, 'Curve'):                   
+            param = nearest_part.Curve.parameter(neworigin)
+            if nearest_part.curvatureAt(param) < EPSILON:
+                tangent = nearest_part.tangentAt(param)
+                r = FreeCAD.Rotation(nearest_obj.Placement.Rotation)
+                r.Angle = r.Angle + math.radians(90)
+                normal = -r.multVec(tangent)
+            else:   
+                normal = nearest_part.normalAt(param)
+                
+        elif hasattr(nearest_part, 'Surface'):               
+            uv = nearest_part.Surface.parameter(neworigin)         
+            normal = nearest_part.normalAt(uv[0], uv[1])
+        else:
+            print("Cannot determine the normal on " + nearest_obj.Label)
+            return None
+        
+        if nearest_obj in self.isInsideLens(ray.Vertexes[0]):
+            oldRefIdx = nearest_obj.RefractionIndex
+            newRefIdx = self.lastRefIdx
+        else:
+            oldRefIdx = self.lastRefIdx
+            newRefIdx = nearest_obj.RefractionIndex
+              
+        ray1 = neworigin - PointVec(ray.Vertexes[0])
+        ray1 = ray1 / ray1.Length
+        ray2 = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+        newline = Part.makeLine(neworigin, neworigin + ray2 * INFINITY) 
+        return newline
+        
+        
+    def snellsLaw(self, ray, n1, n2, normal):
+        #print("snell " + str(n1) + "/" + str(n2))
+        return n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(1 - n1/n2 * normal.cross(ray) * normal.cross(ray))         
+
 
     def check2D(self, objlist):
         nvec = Vector(1, 1, 1)
@@ -193,7 +255,17 @@ class RayWorker:
             if bbox.ZLength > EPSILON: nvec.z = 0
                         
         return nvec
+        
+    def isInsideLens(self, vertex):
+        ret = []
+        for optobj in FreeCAD.ActiveDocument.Objects:
+            if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and optobj.OpticalType == "lens":
+                for obj in optobj.Base:
+                    if obj.Shape.distToShape(vertex)[0] < EPSILON:
+                        ret.append(optobj)            
              
+        return ret
+        
                   
 def PointVec(point):
     """Converts a Part::Point to a FreeCAD::Vector"""
@@ -401,7 +473,7 @@ class AllOff():
                 'ToolTip' : __doc__ }
 
 FreeCADGui.addCommand('Ray', Ray())
-FreeCADGui.addCommand('2D Beam', Beam2D())
+FreeCADGui.addCommand('Beam', Beam2D())
 FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
 FreeCADGui.addCommand('Spherical Beam', SphericalBeam())
 FreeCADGui.addCommand('Start', RedrawAll())
