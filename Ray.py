@@ -173,77 +173,73 @@ class RayWorker:
             shortline = Part.makeLine(origin, neworigin)
             linearray[len(linearray) - 1] = shortline
             newline = None
-        
+            dRay = neworigin - origin
+            
+            normal = self.getNormal(nearest_obj, nearest_part, origin, neworigin)        
+            if normal.Length == 0:
+                print("Cannot determine the normal on " + nearest_obj.Label)
+                return
+                    
             if nearest_obj.OpticalType == 'mirror':      
-                newline = self.mirror(shortline, nearest_part)  
-                linearray.append(newline)                                   
-            elif nearest_obj.OpticalType == 'lens':      
-                newline = self.lenssoup(shortline, nearest_obj, nearest_part) 
-                linearray.append(newline)  
+                dNewRay = self.mirror(dRay, normal)   
+                                                
+            elif nearest_obj.OpticalType == 'lens':                              
+                if nearest_obj in self.isInsideLens(shortline.Vertexes[0]):
+                    oldRefIdx = nearest_obj.RefractionIndex
+                    newRefIdx = self.lastRefIdx
+                else:
+                    oldRefIdx = self.lastRefIdx
+                    newRefIdx = nearest_obj.RefractionIndex
+                      
+                ray1 = dRay / dRay.Length
+                dNewRay = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+
             else: return
             
+            newline = Part.makeLine(neworigin, neworigin - dNewRay * INFINITY)
+            linearray.append(newline)  
             if newline:
                 self.iter = self.iter + 1
                 if self.iter > fp.MaxNumberRays: return
                 self.traceRay(fp, neworigin, linearray)
-            
-    def mirror(self, ray, nearest_part):  
-        neworigin = PointVec(ray.Vertexes[1])                 
-        if hasattr(nearest_part, 'Curve'):                    
-            param = nearest_part.Curve.parameter(neworigin)     
-            tangent = nearest_part.tangentAt(param)
-            newedge = ray.mirror(neworigin, tangent)
-            vend = PointVec(newedge.Vertexes[0])
-            newline = Part.makeLine(neworigin, vend + (vend - neworigin) * INFINITY)
-        elif hasattr(nearest_part, 'Surface'):    
-            uv = nearest_part.Surface.parameter(neworigin)         
-            normal = nearest_part.normalAt(uv[0], uv[1]) 
-            dB = PointVec(ray.Vertexes[0]) - neworigin
-            dA = -dB + 2*normal*(dB*normal)
-            newline = Part.makeLine(neworigin, neworigin + dA * INFINITY)
-        else:
-            print("Cannot determine the normal on " + nearest_obj.Label)
-            return None
-        
-        return newline         
-        
-    
-    def lenssoup(self, ray, nearest_obj, nearest_part):
-        neworigin = PointVec(ray.Vertexes[1])        
+                
+
+    def getNormal(self, nearest_obj, nearest_part, origin, neworigin):
         if hasattr(nearest_part, 'Curve'):                   
             param = nearest_part.Curve.parameter(neworigin)
             if nearest_part.curvatureAt(param) < EPSILON:
                 tangent = nearest_part.tangentAt(param)
                 r = FreeCAD.Rotation(nearest_obj.Placement.Rotation)
                 r.Angle = r.Angle + math.radians(90)
-                normal = -r.multVec(tangent)
+                normal = r.multVec(tangent)
             else:   
                 normal = nearest_part.normalAt(param)
-                
+            
         elif hasattr(nearest_part, 'Surface'):               
             uv = nearest_part.Surface.parameter(neworigin)         
             normal = nearest_part.normalAt(uv[0], uv[1])
         else:
-            print("Cannot determine the normal on " + nearest_obj.Label)
-            return None
+            return Vector(0, 0, 0)
+               
+        dRay = neworigin - origin
+        cosangle = dRay * normal / (dRay.Length * normal.Length)
+        if cosangle < 0:
+            normal = -normal
+            
+        return normal
         
-        if nearest_obj in self.isInsideLens(ray.Vertexes[0]):
-            oldRefIdx = nearest_obj.RefractionIndex
-            newRefIdx = self.lastRefIdx
-        else:
-            oldRefIdx = self.lastRefIdx
-            newRefIdx = nearest_obj.RefractionIndex
-              
-        ray1 = neworigin - PointVec(ray.Vertexes[0])
-        ray1 = ray1 / ray1.Length
-        ray2 = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-        newline = Part.makeLine(neworigin, neworigin + ray2 * INFINITY) 
-        return newline
         
+    def mirror(self, dRay, normal):
+        return -dRay + 2 * normal * (dRay * normal)         
+         
         
     def snellsLaw(self, ray, n1, n2, normal):
         #print("snell " + str(n1) + "/" + str(n2))
-        return n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(1 - n1/n2 * normal.cross(ray) * normal.cross(ray))         
+        root = 1 - n1/n2 * normal.cross(ray) * normal.cross(ray)        
+        if root < 0: # total reflection
+            return self.mirror(ray, normal)
+            
+        return -n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root)       
 
 
     def check2D(self, objlist):
@@ -255,6 +251,7 @@ class RayWorker:
             if bbox.ZLength > EPSILON: nvec.z = 0
                         
         return nvec
+        
         
     def isInsideLens(self, vertex):
         ret = []

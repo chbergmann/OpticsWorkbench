@@ -6,10 +6,7 @@ Performs simple raytracing through your FreeCAD objects.
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/chbergmann/OpticsWorkbench.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chbergmann/OpticsWorkbench/alerts/)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/chbergmann/OpticsWorkbench.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chbergmann/OpticsWorkbench/context:python)
 
-![screenshot](./examples/screenshot.jpg)
-
-## Work in progress !
-- Lenses are not yet implemented
+![screenshot](./examples/example2D.png)
   
 ## Installation
 
@@ -42,6 +39,10 @@ The selected FreeCAD objects will act as mirrors
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The selected FreeCAD objects will swallow the rays of light
+
+### ![Optical Lens](./icons/lens.svg) Optical Lens
+The selected FreeCAD objects will act as lenses  
+The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights
 Switches off all Rays and Beams
