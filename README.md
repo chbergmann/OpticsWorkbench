@@ -20,28 +20,47 @@ git clone https://github.com/chbergmann/OpticsWorkbench.git
 When you restart FreeCAD, "Optics Workbench" workbench should now show up in the [workbench dropdown list](https://freecadweb.org/wiki/Std_Workbench).
   
 ## Getting started
+- Create some FreeCAD design objects. For 2D simulation Sketches will do the job.
+- Select one or more of your design objects and then create Optical Mirror to let your objects act as mirrors
+- Select one or more of your design objects and then create Optical Absorber to let your objects act as black walls for the light rays
+- Select one or more of your design objects and then create Optical Lenses to let your objects act as lenses. Lenses should be closed shapes. 
+Select a material in the Lens properties or provide a refraction index.
+- Add some source of light (Ray, Beam). 
 
 ## Tools
 ### ![RayIcon](./icons/ray.svg) Ray
-A single ray for raytracing
+A single ray for raytracing  
+Parameters:
+- Power: On or Off  
+- Direction: Direction vector of the ray. Set this value to (0, 0, 0) to get a radial or sperical beam.
+- BeamNrColumns: Number of rays in a beam per row
+- BeamNrRows: Number of rays in a beam per column
+- BeamDistance: Distance between two beams
+- MaxNumberRays: Maximum number of reflections per ray (prevents infinite loops)
 
 ### ![2D Beam](./icons/rayarray.svg) 2D Beam
-A row of multiple rays for raytracing
+A row of multiple rays for raytracing  
+Parameters: see Ray. BeamNrColumns must be > 1 to get a beam
 
 ### ![Radial Beam](./icons/sun.svg) 2D Radial Beam
-Rays coming from one point going to all directions in a 2D plane
+Rays coming from one point going to all directions in a 2D plane  
+Parameters: see Ray. BeamNrColumns must be > 1 and Direction = (0, 0, 0) to get a radial beam
 
 ### ![Spherical Beam](./icons/sun3D.svg) Spherical Beam
-Rays coming from one point going to all directions
+Rays coming from one point going to all directions  
+Parameters: see Ray. BeamNrColumns and BeamNrRows must be > 1 and Direction = (0, 0, 0) to get a spherical beam
 
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
-The selected FreeCAD objects will act as mirrors
+The FreeCAD objects in parameter Base will act as mirrors  
+Select some FreeCAD objects, then create Optical Mirror
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
-The selected FreeCAD objects will swallow the rays of light
+The FreeCAD objects in parameter Base will swallow the rays of light  
+Select some FreeCAD objects, then create Optical Absorber
 
 ### ![Optical Lens](./icons/lens.svg) Optical Lens
-The selected FreeCAD objects will act as lenses  
+The FreeCAD objects in parameter Base will act as lenses  
+Select some FreeCAD objects, then create Optical Lens  
 The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights

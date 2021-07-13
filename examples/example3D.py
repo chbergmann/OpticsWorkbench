@@ -1,59 +1,55 @@
 from FreeCAD import Vector, Placement, Rotation
-import FreeCAD as App
-import FreeCADGui as Gui
-import OpticsWorkbench
-import os
+import Sketcher
+import Part
+import FreeCAD as app
 
-_icondir_ = os.path.join(os.path.dirname(__file__), '..', 'icons')
 
 def make_Test3D():
-    doc = App.activeDocument()
+    doc = app.activeDocument()
 
     Cube = doc.addObject('Part::Box', 'Cube')
-    Cube.Placement = Placement(Vector(20.00, -6.00, -2.00), Rotation (0.0, 0.0, 0.13052619222005157, 0.9914448613738104))
-
-    Cylinder = doc.addObject('Part::Cylinder', 'Cylinder')
-    Cylinder.Placement = Placement(Vector(-18.00, -22.00, -4.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cube.Placement = Placement(Vector(20.00, -3.17, -2.00), Rotation (-0.0, -0.0, 0.25881904510252074, 0.9659258262890684))
 
     Sphere = doc.addObject('Part::Sphere', 'Sphere')
-    Sphere.Placement = Placement(Vector(-16.00, 0.00, -2.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Sphere.Placement = Placement(Vector(3.00, -19.00, 0.00), Rotation (0.0, 0.0, 0.0, 1.0))
 
     Cone = doc.addObject('Part::Cone', 'Cone')
-    Cone.Placement = Placement(Vector(26.00, -23.00, 28.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cone.Placement = Placement(Vector(68.90, -46.50, -2.30), Rotation (0.0, 0.0, 0.0, 1.0))
 
-    Torus = doc.addObject('Part::Torus', 'Torus')
-    Torus.Placement = Placement(Vector(-44.00, -29.00, -1.50), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cylinder = doc.addObject('Part::Cylinder', 'Cylinder')
+    Cylinder.Height = 50.0
+    Cylinder.Placement = Placement(Vector(40.00, -26.00, -19.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cylinder.Radius = 50.0
+    Cylinder.ViewObject.Transparency = 90
 
-    Cylinder001 = doc.addObject('Part::Cylinder', 'Cylinder001')
-    Cylinder001.Radius = 5.0
-    Cylinder001.Visibility = False
-    Cylinder001.ViewObject.Visibility = False
+    Sphere001 = doc.addObject('Part::Sphere', 'Sphere001')
+    Sphere001.Radius = 20.0
+    Sphere001.Visibility = False
+    Sphere001.ViewObject.Visibility = False
 
-    Cylinder002 = doc.addObject('Part::Cylinder', 'Cylinder002')
-    Cylinder002.Radius = 4.0
-    Cylinder002.Visibility = False
-    Cylinder002.ViewObject.Visibility = False
+    Cube002 = doc.addObject('Part::Box', 'Cube002')
+    Cube002.Height = 40.0
+    Cube002.Length = 40.0
+    Cube002.Placement = Placement(Vector(-20.00, -25.00, -20.00), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cube002.Visibility = False
+    Cube002.Width = 40.0
+    Cube002.ViewObject.Visibility = False
 
-    Tube = doc.addObject('Part::Cut', 'Tube')
-    Tube.Base = Cylinder001
-    Tube.Placement = Placement(Vector(0.00, -3.00, 41.00), Rotation (0.0, 0.0, 0.0, 1.0))
-    Tube.Tool = Cylinder002
-    Tube.ViewObject.DiffuseColor = [(0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00)]
-    Tube.ViewObject.Transparency = 70
-    
-    OpticsWorkbench.makeMirror([Cube, Cylinder, Sphere, Cone, Torus, Tube])
-    
-    Cube001 = doc.addObject('Part::Box', 'Cube001')
-    Cube001.Height = 100.0
-    Cube001.Length = 200.0
-    Cube001.Placement = Placement(Vector(-122.0, -100.0, -10.00), Rotation (0.0, 0.0, 0.0, 1.0))
-    Cube001.Width = 200.0
-    Cube001.ViewObject.Transparency = 80
-     
-    OpticsWorkbench.makeAbsorber([Cube001])
+    HalfSphere = doc.addObject('Part::Cut', 'HalfSphere')
+    HalfSphere.Base = Sphere001
+    HalfSphere.Placement = Placement(Vector(25.86, -24.61, 0.00), Rotation (0.0, 0.0, -0.793353340291235, 0.6087614290087205))
+    HalfSphere.Tool = Cube002
+    HalfSphere.ViewObject.DiffuseColor = [(0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00)]
+    HalfSphere.ViewObject.Transparency = 75
     
     doc.recompute()
-    OpticsWorkbench.makeRay(beamNrColumns=30)
+
+    OpticsWorkbench.makeMirror([Cube, Sphere, Cone])
+    OpticsWorkbench.makeAbsorber([Cylinder])
+    OpticsWorkbench.makeLens([HalfSphere])
+    
+    doc.recompute()
+    OpticsWorkbench.makeRay(beamNrColumns=20, beamNrRows=10, beamDistance=0.05)
     
     doc.recompute()
 
