@@ -48,7 +48,6 @@ class RayWorker:
             self.redrawRay(fp)
             
     def redrawRay(self, fp):
-        self.iter = 0
         pl = fp.Placement       
         
         linearray = []
@@ -74,6 +73,7 @@ class RayWorker:
                     dir = r.multVec(dir1)
                        
                 if fp.Power == True:
+                    self.iter = 0
                     ray = Part.makeLine(pos, pos + dir * INFINITY)
                     linearray.append(ray)
                     self.lastRefIdx = 1
