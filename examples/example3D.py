@@ -1,8 +1,13 @@
+import FreeCAD as App
+import FreeCADGui as Gui
+import os
 from FreeCAD import Vector, Placement, Rotation
 import Sketcher
 import Part
 import FreeCAD as app
+import OpticsWorkbench
 
+_icondir_ = os.path.join(os.path.dirname(__file__), '..', 'icons')
 
 def make_Test3D():
     doc = app.activeDocument()
