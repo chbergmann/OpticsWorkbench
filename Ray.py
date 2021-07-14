@@ -205,15 +205,13 @@ class RayWorker:
                 
 
     def getNormal(self, nearest_obj, nearest_part, origin, neworigin):
+        dRay = neworigin - origin
         if hasattr(nearest_part, 'Curve'):                   
             param = nearest_part.Curve.parameter(neworigin)
-            if nearest_part.curvatureAt(param) < EPSILON:
-                tangent = nearest_part.tangentAt(param)
-                r = FreeCAD.Rotation(nearest_obj.Placement.Rotation)
-                r.Angle = r.Angle + math.radians(90)
-                normal = r.multVec(tangent)
-            else:   
-                normal = nearest_part.normalAt(param)
+            tangent = nearest_part.tangentAt(param)
+            normal1 = dRay.cross(tangent)
+            normal = tangent.cross(normal1)
+            normal = normal / normal.Length
             
         elif hasattr(nearest_part, 'Surface'):               
             uv = nearest_part.Surface.parameter(neworigin)         
@@ -221,7 +219,6 @@ class RayWorker:
         else:
             return Vector(0, 0, 0)
                
-        dRay = neworigin - origin
         cosangle = dRay * normal / (dRay.Length * normal.Length)
         if cosangle < 0:
             normal = -normal
