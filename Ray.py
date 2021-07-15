@@ -111,62 +111,60 @@ class RayWorker:
         nearest_part = None
         nearest_obj = None
         line = linearray[len(linearray) - 1]
+        dir = PointVec(line.Vertexes[1]) - PointVec(line.Vertexes[0])
         for optobj in FreeCAD.ActiveDocument.Objects:
             if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and hasattr(optobj, 'Base'):
-                for obj in optobj.Base:                   
-                    if len(obj.Shape.Shells) == 0 and len(obj.Shape.Solids) == 0:
-                        for edge in obj.Shape.Edges:
-                            normal = self.check2D([line, edge])
-                            isec = None
-                            if normal.Length == 1:
-                                plane = Part.Plane(obj.Placement.Base, normal)
-                                isec = line.Curve.intersect2d(edge.Curve, plane)
-                            else:
-                                try:
-                                    isec = line.Curve.intersect(edge.Curve)
-                                except Exception as ex:
-                                    print(ex)
-                                    
-                            if isec:
-                                for p in isec:
-                                    if normal == Vector(0, 0, 1):
-                                        vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0))
-                                        dist = vec - origin
-                                        p = Part.Point(vec)
-                                    elif normal == Vector(0, 1, 0):
-                                        vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1]))
-                                        dist = vec - origin
-                                        p = Part.Point(vec)
-                                    elif normal == Vector(1, 0, 0):
-                                        vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1]))
-                                        dist = vec - origin
-                                        p = Part.Point(vec)
-                                    else:
-                                        dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
+                for obj in optobj.Base:
+                    if obj.Shape.BoundBox.intersect(origin, dir):                   
+                        if len(obj.Shape.Faces) == 0:
+                            for edge in obj.Shape.Edges:
+                                normal = self.check2D([line, edge])
+                                isec = None
+                                if normal.Length == 1:
+                                    plane = Part.Plane(obj.Placement.Base, normal)
+                                    isec = line.Curve.intersect2d(edge.Curve, plane)
+                                else:
+                                    try:
+                                        isec = line.Curve.intersect(edge.Curve)
+                                    except Exception as ex:
+                                        print(ex)
                                         
-                                    vert=Part.Vertex(p)                            
-                                    if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
-                                        nearest = dist
-                                        nearest_point = p
-                                        nearest_part = edge
-                                        nearest_obj = optobj
-                      
-                    for face in obj.Shape.Faces:
-                        isec = None
-                        try:
-                            isec = line.Curve.intersect(face.Surface) 
-                        except Exception as ex:
-                            print(ex)
-                            
-                        if isec:
-                            for p in isec[0]: 
-                                dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
-                                vert=Part.Vertex(p)            
-                                if vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
-                                    nearest = dist
-                                    nearest_point = p
-                                    nearest_part = face
-                                    nearest_obj = optobj
+                                if isec:
+                                    for p in isec:
+                                        if normal == Vector(0, 0, 1):
+                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0))
+                                            dist = vec - origin
+                                            p = Part.Point(vec)
+                                        elif normal == Vector(0, 1, 0):
+                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1]))
+                                            dist = vec - origin
+                                            p = Part.Point(vec)
+                                        elif normal == Vector(1, 0, 0):
+                                            vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1]))
+                                            dist = vec - origin
+                                            p = Part.Point(vec)
+                                        else:
+                                            dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
+                                            
+                                        vert=Part.Vertex(p)                            
+                                        if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                                            nearest = dist
+                                            nearest_point = p
+                                            nearest_part = edge
+                                            nearest_obj = optobj
+                          
+                        for face in obj.Shape.Faces:
+                            if face.BoundBox.intersect(origin, dir):
+                                isec = line.Curve.intersect(face.Surface)                             
+                                if isec:
+                                    for p in isec[0]: 
+                                        dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
+                                        vert=Part.Vertex(p)            
+                                        if vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                                            nearest = dist
+                                            nearest_point = p
+                                            nearest_part = face
+                                            nearest_obj = optobj
                   
         if nearest_part:
             neworigin = PointVec(nearest_point)
