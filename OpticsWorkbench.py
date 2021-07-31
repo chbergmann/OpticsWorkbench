@@ -39,13 +39,13 @@ def makeRay(position = Vector(0, 0, 0),
     
 def restartAll():
     for obj in FreeCAD.ActiveDocument.Objects:
-        if hasattr(obj, 'MaxNumberRays'):
+        if hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns'):
             obj.Power = False
             obj.Power = True
             
 def allOff():
     for obj in FreeCAD.ActiveDocument.Objects:
-        if hasattr(obj, 'MaxNumberRays'):
+        if hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns'):
             obj.Power = False
 
 def makeMirror(base = []):
