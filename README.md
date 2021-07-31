@@ -32,11 +32,11 @@ Select a material in the Lens properties or provide a refraction index.
 A single ray for raytracing  
 Parameters:
 - Power: On or Off  
-- Direction: Direction vector of the ray. Set this value to (0, 0, 0) to get a radial or sperical beam.
+- Spherical: False=Beam in one direction, True=Radial or spherical rays
 - BeamNrColumns: Number of rays in a beam per row
 - BeamNrRows: Number of rays in a beam per column
 - BeamDistance: Distance between two beams
-- MaxNumberRays: Maximum number of reflections per ray (prevents infinite loops)
+- HideFirstPart: Hide the first part of every ray that comes from the source and goes to the first point of reflection/refraction/nirvana
 
 ### ![2D Beam](./icons/rayarray.svg) 2D Beam
 A row of multiple rays for raytracing  
@@ -44,11 +44,11 @@ Parameters: see Ray. BeamNrColumns must be > 1 to get a beam
 
 ### ![Radial Beam](./icons/sun.svg) 2D Radial Beam
 Rays coming from one point going to all directions in a 2D plane  
-Parameters: see Ray. BeamNrColumns must be > 1 and Direction = (0, 0, 0) to get a radial beam
+Parameters: see Ray. BeamNrColumns must be > 1 and BeamNrRows=1 and Spherical=True to get a radial beam
 
 ### ![Spherical Beam](./icons/sun3D.svg) Spherical Beam
 Rays coming from one point going to all directions  
-Parameters: see Ray. BeamNrColumns and BeamNrRows must be > 1 and Direction = (0, 0, 0) to get a spherical beam
+Parameters: see Ray. BeamNrColumns and BeamNrRows must be > 1 Spherical=True to get a spherical beam
 
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The FreeCAD objects in parameter Base will act as mirrors  
