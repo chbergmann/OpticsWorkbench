@@ -20,21 +20,20 @@ EPSILON = 1/INFINITY
 class RayWorker:
     def __init__(self, 
                  fp,    # an instance of Part::FeaturePython
-                 direction = Vector(1, 0, 0),
                  power = True,
+                 spherical = False,
                  beamNrColumns = 1,
                  beamNrRows = 1,
                  beamDistance = 0.1,                 
-                 maxIterations = 1000):
-        fp.addProperty("App::PropertyVector", "Direction", "Ray",  "Direction of the ray").Direction = direction
+                 hideFirst=False):
+        fp.addProperty("App::PropertyBool", "Spherical", "Ray",  "False=Beam in one direction, True=Radial or spherical rays").Spherical = spherical
         fp.addProperty("App::PropertyBool", "Power", "Ray",  "On or Off").Power = power
         fp.addProperty("App::PropertyQuantity", "BeamNrColumns", "Ray",  "number of rays in a beam").BeamNrColumns = beamNrColumns
         fp.addProperty("App::PropertyQuantity", "BeamNrRows", "Ray",  "number of rays in a beam").BeamNrRows = beamNrRows
         fp.addProperty("App::PropertyFloat", "BeamDistance", "Ray",  "distance between two beams").BeamDistance = beamDistance
-        fp.addProperty("App::PropertyQuantity", "MaxNumberRays", "Ray",  "maximum number of reflections").MaxNumberRays = maxIterations
+        fp.addProperty("App::PropertyBool", "HideFirstPart", "Ray",  "Hide the first part of every ray").HideFirstPart = hideFirst
         
         fp.Proxy = self
-        self.iter = 0
         self.lastRefIdx = 1
     
     def execute(self, fp):
@@ -43,7 +42,7 @@ class RayWorker:
         
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        proplist = ["Direction", "Power", "MaxNumberRays", "BeamNrColumns", "BeamNrRows", "BeamDistance"]
+        proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance"]
         if prop in proplist:
             self.redrawRay(fp)
             
@@ -53,10 +52,10 @@ class RayWorker:
         linearray = []
         for row in range(0, int(fp.BeamNrRows)): 
             for n in range(0, int(fp.BeamNrColumns)): 
-                if fp.Direction.Length > EPSILON:
+                if fp.Spherical == False:
                     newpos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
                     pos = pl.Base + pl.Rotation.multVec(newpos)
-                    dir = pl.Rotation.multVec(fp.Direction)
+                    dir = pl.Rotation.multVec(Vector(1, 0, 0))
                 else:
                     r = Rotation()
                     r.Axis = Vector(0, 0, 1)
@@ -73,7 +72,6 @@ class RayWorker:
                     dir = r.multVec(dir1)
                        
                 if fp.Power == True:
-                    self.iter = 0
                     ray = Part.makeLine(pos, pos + dir * INFINITY)
                     linearray.append(ray)
                     self.lastRefIdx = 1
@@ -82,7 +80,7 @@ class RayWorker:
                         self.lastRefIdx = insiders[0].RefractionIndex
                     
                     try:
-                        self.traceRay(fp, pos, linearray)                        
+                        self.traceRay(fp, pos, linearray, True)                        
                     except Exception as ex:
                         print(ex)
                 else:
@@ -104,19 +102,22 @@ class RayWorker:
         fp.ViewObject.Transparency = 50
         
         
-    def traceRay(self, fp, origin, linearray):
+    def traceRay(self, fp, origin, linearray, first=False):
         if len(linearray) == 0: return
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_point = None
         nearest_part = None
         nearest_obj = None
-        line = linearray[len(linearray) - 1]
+        line = linearray[len(linearray) - 1] 
+        if fp.HideFirstPart and first:
+            linearray.remove(line)
+                       
         dir = PointVec(line.Vertexes[1]) - PointVec(line.Vertexes[0])
         for optobj in FreeCAD.ActiveDocument.Objects:
             if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and hasattr(optobj, 'Base'):
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):                   
-                        if len(obj.Shape.Faces) == 0:
+                        if len(obj.Shape.Solids) == 0 and len(obj.Shape.Shells) == 0:
                             for edge in obj.Shape.Edges:
                                 normal = self.check2D([line, edge])
                                 isec = None
@@ -169,7 +170,10 @@ class RayWorker:
         if nearest_part:
             neworigin = PointVec(nearest_point)
             shortline = Part.makeLine(origin, neworigin)
-            linearray[len(linearray) - 1] = shortline
+            
+            if fp.HideFirstPart == False or first == False:
+                linearray[len(linearray) - 1] = shortline                      
+                
             newline = None
             dRay = neworigin - origin
             
@@ -197,8 +201,6 @@ class RayWorker:
             newline = Part.makeLine(neworigin, neworigin - dNewRay * INFINITY)
             linearray.append(newline)  
             if newline:
-                self.iter = self.iter + 1
-                if self.iter > fp.MaxNumberRays: return
                 self.traceRay(fp, neworigin, linearray)
                 
 
@@ -274,7 +276,7 @@ class RayViewProvider:
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         if self.Object.BeamNrColumns * self.Object.BeamNrRows <= 1:
             return os.path.join(_icondir_, 'ray.svg')
-        elif self.Object.Direction.Length < EPSILON:
+        elif self.Object.Spherical:
             return os.path.join(_icondir_, 'sun.svg')
         else:
             return os.path.join(_icondir_, 'rayarray.svg')
@@ -369,7 +371,7 @@ class RadialBeam2D():
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
         FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=64, direction=FreeCAD.Vector(0, 0, 0))")
+        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True")
                   
 
     def IsActive(self):
@@ -395,7 +397,7 @@ class SphericalBeam():
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
         FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, direction=FreeCAD.Vector(0, 0, 0))")
+        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True")
                   
 
     def IsActive(self):
