@@ -14,7 +14,7 @@ Performs simple raytracing through your FreeCAD objects.
 ### Manual Installation
 
 ```bash
-cd ~/FreeCAD/Mod/ 
+cd ~/.FreeCAD/Mod/ 
 git clone https://github.com/chbergmann/OpticsWorkbench.git
 ```
 When you restart FreeCAD, "Optics Workbench" workbench should now show up in the [workbench dropdown list](https://freecadweb.org/wiki/Std_Workbench).

@@ -11,6 +11,7 @@ import FreeCAD
 from FreeCAD import Vector, Rotation
 import Part
 import math
+import traceback
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
     
@@ -83,6 +84,7 @@ class RayWorker:
                         self.traceRay(fp, pos, linearray, True)                        
                     except Exception as ex:
                         print(ex)
+                        traceback.print_exc()
                 else:
                     linearray.append(Part.makeLine(pos, pos + dir))                
                          
@@ -129,6 +131,7 @@ class RayWorker:
                                         isec = line.Curve.intersect(edge.Curve)
                                     except Exception as ex:
                                         print(ex)
+                                        traceback.print_exc()
                                         
                                 if isec:
                                     for p in isec:
@@ -148,7 +151,7 @@ class RayWorker:
                                             dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
                                             
                                         vert=Part.Vertex(p)                            
-                                        if vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                                        if dist.Length > EPSILON and dist.Length < nearest.Length and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:                     
                                             nearest = dist
                                             nearest_point = p
                                             nearest_part = edge
@@ -161,7 +164,7 @@ class RayWorker:
                                     for p in isec[0]: 
                                         dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
                                         vert=Part.Vertex(p)            
-                                        if vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON and dist.Length > EPSILON and dist.Length < nearest.Length:                     
+                                        if dist.Length > EPSILON and dist.Length < nearest.Length and vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:                     
                                             nearest = dist
                                             nearest_point = p
                                             nearest_part = face
