@@ -374,7 +374,7 @@ class RadialBeam2D():
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
         FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True")
+        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)")
                   
 
     def IsActive(self):
@@ -400,7 +400,7 @@ class SphericalBeam():
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
         FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True")
+        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)")
                   
 
     def IsActive(self):
