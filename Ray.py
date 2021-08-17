@@ -441,8 +441,8 @@ class RedrawAll():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Lit.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': "(Re)start simulation",
-                'ToolTip' : __doc__ }
+                'MenuText': '(Re)start simulation',
+                'ToolTip' : '(Re)start simulation' }
                 
 class AllOff():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -466,8 +466,8 @@ class AllOff():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Off.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': "Switch off lights",
-                'ToolTip' : __doc__ }
+                'MenuText': 'Switch off lights',
+                'ToolTip' : 'Switch off all rays and beams' }
 
 FreeCADGui.addCommand('Ray', Ray())
 FreeCADGui.addCommand('Beam', Beam2D())
