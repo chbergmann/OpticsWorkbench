@@ -26,16 +26,21 @@ class RayWorker:
                  beamNrColumns = 1,
                  beamNrRows = 1,
                  beamDistance = 0.1,                 
-                 hideFirst=False):
+                 hideFirst=False,
+                 maxRayLength = 1000000,
+                 maxNrReflections = 200):
         fp.addProperty("App::PropertyBool", "Spherical", "Ray",  "False=Beam in one direction, True=Radial or spherical rays").Spherical = spherical
         fp.addProperty("App::PropertyBool", "Power", "Ray",  "On or Off").Power = power
         fp.addProperty("App::PropertyQuantity", "BeamNrColumns", "Ray",  "number of rays in a beam").BeamNrColumns = beamNrColumns
         fp.addProperty("App::PropertyQuantity", "BeamNrRows", "Ray",  "number of rays in a beam").BeamNrRows = beamNrRows
         fp.addProperty("App::PropertyFloat", "BeamDistance", "Ray",  "distance between two beams").BeamDistance = beamDistance
-        fp.addProperty("App::PropertyBool", "HideFirstPart", "Ray",  "Hide the first part of every ray").HideFirstPart = hideFirst
+        fp.addProperty("App::PropertyBool", "HideFirstPart", "Ray",  "hide the first part of every ray").HideFirstPart = hideFirst
+        fp.addProperty("App::PropertyFloat", "MaxRayLength", "Ray",  "maximum length of a ray").MaxRayLength = maxRayLength
+        fp.addProperty("App::PropertyFloat", "MaxNrReflections", "Ray",  "maximum number of reflections").MaxNrReflections = maxNrReflections
         
         fp.Proxy = self
         self.lastRefIdx = 1
+        self.iter = 0
     
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
@@ -43,7 +48,7 @@ class RayWorker:
         
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance"]
+        proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance", "MaxRayLength", "MaxNrReflections"]
         if prop in proplist:
             self.redrawRay(fp)
             
@@ -73,7 +78,8 @@ class RayWorker:
                     dir = r.multVec(dir1)
                        
                 if fp.Power == True:
-                    ray = Part.makeLine(pos, pos + dir * INFINITY)
+                    self.iter = fp.MaxNrReflections
+                    ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
                     linearray.append(ray)
                     self.lastRefIdx = 1
                     insiders = self.isInsideLens(ray.Vertexes[0])
@@ -177,6 +183,9 @@ class RayWorker:
             if fp.HideFirstPart == False or first == False:
                 linearray[len(linearray) - 1] = shortline                      
                 
+            self.iter -= 1
+            if self.iter == 0: return
+        
             newline = None
             dRay = neworigin - origin
             
@@ -201,7 +210,7 @@ class RayWorker:
 
             else: return
             
-            newline = Part.makeLine(neworigin, neworigin - dNewRay * INFINITY)
+            newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
             linearray.append(newline)  
             if newline:
                 self.traceRay(fp, neworigin, linearray)

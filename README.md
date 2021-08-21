@@ -37,6 +37,8 @@ Parameters:
 - BeamNrRows: Number of rays in a beam per column
 - BeamDistance: Distance between two beams
 - HideFirstPart: Hide the first part of every ray that comes from the source and goes to the first point of reflection/refraction/nirvana
+- MaxRayLength: Maximum length of a ray
+- MaxNrReflections: Maximum number of reflections. This prevents endless loops if the ray is inside a mirror box.
 
 ### ![2D Beam](./icons/rayarray.svg) 2D Beam
 A row of multiple rays for raytracing  
@@ -74,6 +76,9 @@ generates the screenshot above
 
 ### ![Example](./icons/pyrate_logo_icon.svg) Example 3D
 ![screenshot](./examples/screenshot3D.png)
+
+## Issues and Troubleshooting
+see [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)
 
 ## Discussion
 Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=59860).
