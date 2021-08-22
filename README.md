@@ -1,4 +1,4 @@
-# ![WorkbenchIcon](./icons/pyrate_logo_icon.svg) Optics Workbench
+# ![WorkbenchIcon](./optics_workbench_icon.svg) Optics Workbench
     
 Geometrical optics for FreeCAD.  
 Performs simple raytracing through your FreeCAD objects.
@@ -71,10 +71,10 @@ Switches off all Rays and Beams
 ### ![On](./icons/Anonymous_Lightbulb_Lit.svg) (Re)start simulation
 Switches on and recalculates all Rays and Beams
 
-### ![Example](./icons/pyrate_logo_icon.svg) Example 2D
+### ![Example](./optics_workbench_icon.svg) Example 2D
 generates the screenshot above
 
-### ![Example](./icons/pyrate_logo_icon.svg) Example 3D
+### ![Example](./optics_workbench_icon.svg) Example 3D
 ![screenshot](./examples/screenshot3D.png)
 
 ## Issues and Troubleshooting

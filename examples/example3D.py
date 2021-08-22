@@ -5,7 +5,7 @@ from FreeCAD import Vector, Placement, Rotation
 import FreeCAD as app
 import OpticsWorkbench
 
-_icondir_ = os.path.join(os.path.dirname(__file__), '..', 'icons')
+_icondir_ = os.path.join(os.path.dirname(__file__), '..')
 
 def make_Test3D():
     doc = app.activeDocument()
@@ -73,7 +73,7 @@ class Example3D():
         
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'pyrate_logo_icon.svg'),
+        return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': 'Example 3D',
                 'ToolTip' : '' }

@@ -6,7 +6,7 @@ import FreeCADGui as Gui
 import OpticsWorkbench
 import os
 
-_icondir_ = os.path.join(os.path.dirname(__file__), '..', 'icons')
+_icondir_ = os.path.join(os.path.dirname(__file__), '..')
 
 def createSketch_Sketch_Mirror1(doc):
     Sketch_Mirror1 = doc.addObject('Sketcher::SketchObject', 'Sketch_Mirror1')
@@ -114,7 +114,7 @@ class Example1():
         
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'pyrate_logo_icon.svg'),
+        return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': 'Example 2D',
                 'ToolTip' : '' }
