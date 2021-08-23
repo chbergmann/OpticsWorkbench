@@ -142,24 +142,25 @@ class RayWorker:
                                 if isec:
                                     for p in isec:
                                         if normal == Vector(0, 0, 1):
-                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0))
+                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0)) + obj.Placement.Base
                                             dist = vec - origin
-                                            p = Part.Point(vec)
+                                            p2 = Part.Point(vec)
                                         elif normal == Vector(0, 1, 0):
-                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1]))
+                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1])) + obj.Placement.Base
                                             dist = vec - origin
-                                            p = Part.Point(vec)
+                                            p2 = Part.Point(vec)
                                         elif normal == Vector(1, 0, 0):
-                                            vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1]))
+                                            vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1])) + obj.Placement.Base
                                             dist = vec - origin
-                                            p = Part.Point(vec)
+                                            p2 = Part.Point(vec)
                                         else:
-                                            dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)                                
+                                            p2 = Part.Point(PointVec(p) + obj.Placement.Base)
+                                            dist = PointVec(p) + obj.Placement.Base - origin                               
                                             
-                                        vert=Part.Vertex(p)                            
+                                        vert=Part.Vertex(p2)                            
                                         if dist.Length > EPSILON and dist.Length < nearest.Length and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:                     
                                             nearest = dist
-                                            nearest_point = p
+                                            nearest_point = p2
                                             nearest_part = edge
                                             nearest_obj = optobj
                           
@@ -267,7 +268,7 @@ class RayWorker:
         for optobj in FreeCAD.ActiveDocument.Objects:
             if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and optobj.OpticalType == "lens":
                 for obj in optobj.Base:
-                    if obj.Shape.distToShape(vertex)[0] < EPSILON:
+                    if obj.Shape.distToShape(Part.Vertex(vertex))[0] < EPSILON:
                         ret.append(optobj)            
              
         return ret
