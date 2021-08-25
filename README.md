@@ -84,4 +84,4 @@ see [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)
 Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=59860).
 
 ## License
-GNU Lesser General Public License v3.0
+GNU Lesser General Public License v3.0 ([LICENSE](LICENSE))
