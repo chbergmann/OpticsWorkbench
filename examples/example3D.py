@@ -44,24 +44,24 @@ def make_Test3D():
     HalfSphere.Tool = Cube002
     HalfSphere.ViewObject.DiffuseColor = [(0.80, 0.80, 0.80, 0.00), (0.80, 0.80, 0.80, 0.00)]
     HalfSphere.ViewObject.Transparency = 75
-    
+
     doc.recompute()
 
     OpticsWorkbench.makeMirror([Cube, Sphere, Cone])
     OpticsWorkbench.makeAbsorber([Cylinder])
     OpticsWorkbench.makeLens([HalfSphere])
-    
+
     doc.recompute()
     OpticsWorkbench.makeRay(beamNrColumns=20, beamNrRows=10, beamDistance=0.05)
-    
+
     doc.recompute()
 
 
 class Example3D():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
-        make_Test3D()           
+        make_Test3D()
 
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions
@@ -70,12 +70,12 @@ class Example3D():
             return(True)
         else:
             return(False)
-        
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': 'Example 3D',
                 'ToolTip' : '' }
-                
+
 Gui.addCommand('Example3D', Example3D())

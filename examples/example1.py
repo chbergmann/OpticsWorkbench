@@ -77,7 +77,7 @@ def createSketch_Sketch_Prism(doc):
     Sketch_Prism.addConstraint(Sketcher.Constraint('Coincident', 2, 2, 0, 1))
     Sketch_Prism.addConstraint(Sketcher.Constraint('Equal', 1, 2))
     return Sketch_Prism
-    
+
 def make_optics():
     doc = App.activeDocument()
 
@@ -86,23 +86,23 @@ def make_optics():
     Sketch_Mirror2 = createSketch_Sketch_Mirror2(doc)
     Sketch_Lens = createSketch_Sketch_Lens(doc)
     Sketch_Prism = createSketch_Sketch_Prism(doc)
-    
+
     OpticsWorkbench.makeMirror([Sketch_Mirror1, Sketch_Mirror2])
     OpticsWorkbench.makeAbsorber([Sketch_Box])
     OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='Flint glass')
-    
+
     doc.recompute()
     OpticsWorkbench.makeRay(Vector(75.00, 0.00, 0.00), Vector(-1,0,0))
     OpticsWorkbench.makeRay(beamNrColumns=50)
-    
+
     doc.recompute()
 
 class Example1():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
         make_optics()
-        Gui.activeDocument().activeView().viewTop()            
+        Gui.activeDocument().activeView().viewTop()
 
     def IsActive(self):
         """Here you can define if the command must be active or not (greyed) if certain conditions
@@ -111,12 +111,12 @@ class Example1():
             return(True)
         else:
             return(False)
-        
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
                 'MenuText': 'Example 2D',
                 'ToolTip' : '' }
-                
+
 Gui.addCommand('Example2D', Example1())

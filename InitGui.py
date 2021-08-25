@@ -21,10 +21,10 @@ class OpticsWorkbench (Workbench):
         import Ray
         import OpticalObject
         from examples import example1, example3D
-        
+
         self.list = ["Ray", "Beam", "2D Radial Beam", "Spherical Beam", "Mirror", "Absorber", 'Lens', "Off", "Start"] # A list of command names created in the line above
         self.menu = self.list + ["Example2D", 'Example3D']
-        
+
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands
         self.appendMenu(self.__class__.MenuText, self.menu) # creates a new menu
 
@@ -41,9 +41,9 @@ class OpticsWorkbench (Workbench):
         # "recipient" will be either "view" or "tree"
         self.appendContextMenu(self.__class__.MenuText, self.list) # add commands to the context menu
 
-    def GetClassName(self): 
+    def GetClassName(self):
         # this function is mandatory if this is a full python workbench
         return "Gui::PythonWorkbench"
-    
-       
+
+
 Gui.addWorkbench(OpticsWorkbench())
