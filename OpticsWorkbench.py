@@ -26,7 +26,7 @@ def makeRay(position = Vector(0, 0, 0),
             maxNrReflections = 200):
     '''Python command to create a light ray.'''
     import Ray      
-    reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.
+    reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     name = 'Ray'
     if beamNrColumns * beamNrRows > 1:
         name = 'Beam'
@@ -53,7 +53,7 @@ def allOff():
 def makeMirror(base = []):
     '''All FreeCAD objects in base will be optical mirrors.'''
     import OpticalObject      
-    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
+    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Mirror")
     OpticalObject.OpticalObjectWorker(fp, base)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
@@ -63,7 +63,7 @@ def makeMirror(base = []):
 def makeAbsorber(base = []):
     '''All FreeCAD objects in base will be optical light absorbers.'''
     import OpticalObject      
-    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
+    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Absorber")
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
@@ -73,7 +73,7 @@ def makeAbsorber(base = []):
 def makeLens(base = [], RefractionIndex = 0, material = 'Flint glass'):
     '''All FreeCAD objects in base will be optical lenses.'''
     import OpticalObject      
-    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.      
+    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Lens")
     OpticalObject.LensWorker(fp, base, RefractionIndex, material)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
