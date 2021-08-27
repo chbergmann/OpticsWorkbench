@@ -39,41 +39,49 @@ class LensWorker:
                  material = ''):
         fp.addProperty("App::PropertyEnumeration", "OpticalType", "Lens", "").OpticalType = ['lens'] 
         fp.addProperty("App::PropertyLinkList",  "Base",   "Lens",   "FreeCAD objects to be lenses").Base = base
-        fp.addProperty("App::PropertyFloat",  "RefractionIndex",   "Lens",   "depends on material").RefractionIndex = RefractionIndex
+        fp.addProperty("App::PropertyFloat",  "RefractionIndex",   "Lens",   "Refractive Index at 580nm (depends on material)").RefractionIndex = RefractionIndex
+        fp.addProperty(
+            "App::PropertyFloatList",  
+            "Sellmeier",   
+            "Lens",   
+            "Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n Usually noted in (µm)² in literature,\n (µm)²=10⁶(nm)².")
+
         fp.OpticalType = 'lens'  
         
-        mat = []
-        for m in self.getMaterial():
-            mat.append(m[0])
+        material_names = list(self.getMaterials())
           
-        fp.addProperty("App::PropertyEnumeration", "Material", "Lens", "").Material = mat
+        fp.addProperty("App::PropertyEnumeration", "Material", "Lens", "").Material = material_names
         
         self.update = True 
         fp.Proxy = self
         
-        if material in mat:
+        if material in material_names:
             fp.Material = material
         else:
             fp.Material = '?'
             
         
-    def getMaterial(self):
-        return [('?', 0),
-            ('Vacuum',  1),
-            ('Air',     1.000293),
-            ('Water',   1.333),
-            ('Ethanol',     1.36),
-            ('Olive oil',   1.47),
-            ('Ice',     1.31),
-            ('Quartz',   1.46),
-            ('PMMA (plexiglas)',  1.49),
-            ('Window glass',    1.52),
-            ('Polycarbonate',   1.58),
-            ('Flint glass',    1.69),
-            ('Sapphire',    1.77),
-            ('Cubic zirconia',  2.15),
-            ('Diamond',     2.42)]
-            
+    def getMaterials(self):
+        # https://refractiveindex.info/
+        return {
+            '?':                 None,
+            'Vacuum':            (0, 0, 0, 0, 0, 0),
+            'Air':               (4.915889e-4, 5.368273e-5, -1.949567e-4, 4352.140, 17470.01, 4258444000),  #https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
+            # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
+            # 'Ethanol':           (0, 0, 0, 0, 0, 0),
+            # 'Olive oil':         (0, 0, 0, 0, 0, 0),
+            # 'Ice':               (0, 0, 0, 0, 0, 0),
+            'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
+            'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
+            'Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
+            'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
+            # 'Flint glass':       (0, 0, 0, 0, 0, 0),
+            # 'Sapphire':          (0, 0, 0, 0, 0, 0),
+            # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
+            # 'Diamond':           (0, 0, 0, 0, 0, 0),
+            'BK7':               (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653)  # window glass?
+        }  
+
     def execute(self, fp):
         pass
         
@@ -82,13 +90,16 @@ class LensWorker:
         self.update = False
         
         if prop == 'Material':
-            for m in self.getMaterial():
-                if fp.Material == m[0]:
-                    fp.RefractionIndex = m[1]
-                    break
+            sellmeier = self.getMaterials()[fp.Material]
+            fp.Sellmeier = sellmeier
+            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
+
+        if prop == 'Sellmeier':
+            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
                     
         if prop == 'RefractionIndex':
             fp.Material = '?'
+            fp.Sellmeier = []
             
         self.update = True
         

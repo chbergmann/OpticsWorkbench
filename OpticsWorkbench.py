@@ -5,6 +5,7 @@ import FreeCAD
 from FreeCAD import Vector, Rotation
 from importlib import reload
 
+
 def get_module_path():
     """ Returns the current module path.
     Determines where this file is running from, so works regardless of whether
@@ -23,7 +24,8 @@ def makeRay(position = Vector(0, 0, 0),
             spherical = False, 
             hideFirst = False,
             maxRayLength = 1000000,
-            maxNrReflections = 200):
+            maxNrReflections = 200,
+            wavelength = 580):
     '''Python command to create a light ray.'''
     import Ray      
     reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developping the feature.
@@ -34,7 +36,7 @@ def makeRay(position = Vector(0, 0, 0),
     fp = FreeCAD.ActiveDocument.addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     fp.Placement.Rotation = Rotation(Vector(1, 0, 0), direction)
-    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections)
+    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength)
     Ray.RayViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
