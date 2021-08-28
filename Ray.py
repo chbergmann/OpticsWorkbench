@@ -44,7 +44,7 @@ class RayWorker:
         fp.addProperty("App::PropertyBool", "HideFirstPart", "Ray",  "hide the first part of every ray").HideFirstPart = hideFirst
         fp.addProperty("App::PropertyFloat", "MaxRayLength", "Ray",  "maximum length of a ray").MaxRayLength = maxRayLength
         fp.addProperty("App::PropertyFloat", "MaxNrReflections", "Ray",  "maximum number of reflections").MaxNrReflections = maxNrReflections
-        fp.addProperty("App::PropertyLength", "Wavelength", "Ray",  "Wavelength of the ray").Wavelength = wavelength        
+        fp.addProperty("App::PropertyFloat", "Wavelength", "Ray",  "Wavelength of the ray in nm").Wavelength = wavelength        
 
         fp.Proxy = self
         self.lastRefIdx = 1
