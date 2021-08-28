@@ -13,7 +13,7 @@ import Part
 import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
-from OpticsWorkbench import refraction_index_from_sellmeier
+from OpticalObject import refraction_index_from_sellmeier
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
@@ -299,6 +299,7 @@ class RayWorker:
                         ret.append(optobj)
 
         return ret
+        
 
 
 def PointVec(point):
@@ -376,8 +377,33 @@ class Ray():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'ray.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': "Ray",
+                'MenuText': "Ray (monochrome)",
                 'ToolTip' : __doc__ }
+
+
+class RaySun():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
+    def Activated(self):
+        '''Will be called when the feature is executed.'''
+        # Generate commands in the FreeCAD python console to create Ray
+        FreeCADGui.doCommand("import OpticsWorkbench")
+        FreeCADGui.doCommand("OpticsWorkbench.makeSunRay()")
+
+    def IsActive(self):
+        """Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional."""
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(_icondir_, 'raysun.svg'),
+                'Accel' : "", # a default shortcut (optional)
+                'MenuText': "Ray (sun light)",
+                'ToolTip' : "A bunch of rays with different wavelengths of visible light" }
 
 class Beam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -506,7 +532,8 @@ class AllOff():
                 'MenuText': 'Switch off lights',
                 'ToolTip' : 'Switch off all rays and beams' }
 
-FreeCADGui.addCommand('Ray', Ray())
+FreeCADGui.addCommand('Ray (monochrome)', Ray())
+FreeCADGui.addCommand('Ray (sun light)', RaySun())
 FreeCADGui.addCommand('Beam', Beam2D())
 FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
 FreeCADGui.addCommand('Spherical Beam', SphericalBeam())

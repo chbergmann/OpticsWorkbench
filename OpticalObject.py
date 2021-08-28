@@ -8,8 +8,7 @@ __doc__ = "Declare your FreeCAD objects to be optical mirrors, lenses or absorbe
 import os
 import FreeCADGui
 import FreeCAD
-from OpticsWorkbench import refraction_index_from_sellmeier
-
+import math
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
     
@@ -81,7 +80,6 @@ class LensWorker:
             # 'Sapphire':          (0, 0, 0, 0, 0, 0),
             # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
             # 'Diamond':           (0, 0, 0, 0, 0, 0),
-            'BK7':               (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653)  # window glass?
         }  
 
     def execute(self, fp):
@@ -153,6 +151,14 @@ class OpticalObjectViewProvider:
         '''When restoring the serialized object from document we have the chance to set some internals here.\
                 Since no data were serialized nothing needs to be done here.'''
         return None
+
+
+def refraction_index_from_sellmeier(wavelength, sellmeier):
+    b1, b2, b3, c1, c2, c3 = sellmeier
+    l = wavelength
+    n = math.sqrt(1 + b1*l**2/(l**2 - c1) + b2*l**2/(l**2 - c2) + b3*l**2/(l**2 - c3))
+    return n
+    
                 
 class OpticalMirror():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  

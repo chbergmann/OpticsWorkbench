@@ -47,17 +47,7 @@ def make_optics():
     prism = create_prism(doc)
     doc.recompute()
     OpticsWorkbench.makeLens(prism, material='Window glass').Label = 'Refractor'
-    
-    doc.addObject('App::DocumentObjectGroup','Rays')
-    num_rays = 100
-    for l in linspace(400, 800, num_rays):
-        ray = OpticsWorkbench.makeRay(position = Vector(0, 0, 0), wavelength=l, maxRayLength=1.0)
-        ray.ViewObject.LineWidth = 1
-
-        group = doc.getObject('Rays')
-        ray.adjustRelativeLinks(group)
-        group.addObject(ray)
-
+    OpticsWorkbench.makeSunRay(maxRayLength=1.0)
     doc.recompute()
 
 class ExampleDispersion():

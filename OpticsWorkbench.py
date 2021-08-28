@@ -3,8 +3,10 @@
 import os
 import FreeCAD
 from FreeCAD import Vector, Rotation
-from importlib import reload
 import math
+import Ray
+import OpticalObject
+from numpy import linspace
 
 
 def get_module_path():
@@ -28,8 +30,6 @@ def makeRay(position = Vector(0, 0, 0),
             maxNrReflections = 200,
             wavelength = 580):
     '''Python command to create a light ray.'''
-    import Ray
-    reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     name = 'Ray'
     if beamNrColumns * beamNrRows > 1:
         name = 'Beam'
@@ -41,6 +41,35 @@ def makeRay(position = Vector(0, 0, 0),
     Ray.RayViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
+    
+    
+def makeSunRay(position = Vector(0, 0, 0),
+            direction = Vector(1, 0, 0),
+            power = True,
+            hideFirst = False,
+            maxRayLength = 1000000,
+            maxNrReflections = 200,
+            wavelength_from = 400,
+            wavelength_to = 800,
+            num_rays = 100):
+    
+    doc = FreeCAD.activeDocument()
+    rays = []
+    for l in linspace(wavelength_from, wavelength_to, num_rays):
+        ray = makeRay(position = position,
+            direction = direction,
+            power = power,
+            hideFirst = hideFirst,
+            maxRayLength = maxRayLength,
+            maxNrReflections = maxNrReflections,
+            wavelength = l)
+        ray.ViewObject.LineWidth = 1
+        rays.append(ray)
+
+    group = doc.addObject('App::DocumentObjectGroup','SunRay')
+    group.Group = rays
+    doc.recompute()
+    
 
 def restartAll():
     for obj in FreeCAD.ActiveDocument.Objects:
@@ -55,8 +84,6 @@ def allOff():
 
 def makeMirror(base = []):
     '''All FreeCAD objects in base will be optical mirrors.'''
-    import OpticalObject
-    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Mirror")
     OpticalObject.OpticalObjectWorker(fp, base)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
@@ -65,8 +92,6 @@ def makeMirror(base = []):
 
 def makeAbsorber(base = []):
     '''All FreeCAD objects in base will be optical light absorbers.'''
-    import OpticalObject
-    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Absorber")
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
@@ -75,16 +100,8 @@ def makeAbsorber(base = []):
 
 def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
     '''All FreeCAD objects in base will be optical lenses.'''
-    import OpticalObject
-    reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Lens")
     OpticalObject.LensWorker(fp, base, RefractionIndex, material)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
-
-def refraction_index_from_sellmeier(wavelength, sellmeier):
-    b1, b2, b3, c1, c2, c3 = sellmeier
-    l = wavelength
-    n = math.sqrt(1 + b1*l**2/(l**2 - c1) + b2*l**2/(l**2 - c2) + b3*l**2/(l**2 - c3))
-    return n
