@@ -38,6 +38,7 @@ class LensWorker:
                  base = [],
                  RefractionIndex = 1,
                  material = ''):
+        self.update = False 
         fp.addProperty("App::PropertyEnumeration", "OpticalType", "Lens", "").OpticalType = ['lens'] 
         fp.addProperty("App::PropertyLinkList",  "Base",   "Lens",   "FreeCAD objects to be lenses").Base = base
         fp.addProperty("App::PropertyFloat",  "RefractionIndex",   "Lens",   "Refractive Index at 580nm (depends on material)").RefractionIndex = RefractionIndex
@@ -88,6 +89,8 @@ class LensWorker:
     def onChanged(self, fp, prop):
         if not self.update: return
         self.update = False
+        
+        if not hasattr(fp, 'Sellmeier'): return
         
         if prop == 'Material':
             sellmeier = self.getMaterials()[fp.Material]

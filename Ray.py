@@ -56,6 +56,8 @@ class RayWorker:
 
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
+        if not hasattr(fp, 'iter'): return
+        
         proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance", "MaxRayLength", "MaxNrReflections", "Wavelength"]
         if prop in proplist:
             self.redrawRay(fp)

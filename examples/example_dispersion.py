@@ -59,12 +59,7 @@ class ExampleDispersion():
         Gui.SendMsgToActiveView("ViewFit")          
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if App.activeDocument():
-            return(True)
-        else:
-            return(False)
+        return(True)
         
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
