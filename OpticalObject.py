@@ -143,6 +143,16 @@ class OpticalObjectViewProvider:
         '''Here we can do something when a single property got changed'''
         pass            
     
+    def __getstate__(self):
+        '''When saving the document this object gets stored using Python's json module.\
+                Since we have some un-serializable parts here we must define this method\
+                to return a tuple of all serializable objects or None.'''
+        return None
+
+    def __setstate__(self, state):
+        '''When restoring the serialized object from document we have the chance to set some internals here.\
+                Since no data were serialized nothing needs to be done here.'''
+        return None
                 
 class OpticalMirror():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  

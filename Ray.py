@@ -132,6 +132,7 @@ class RayWorker:
         nearest_point = None
         nearest_part = None
         nearest_obj = None
+        nearest_shape = None
         line = linearray[len(linearray) - 1]
         if fp.HideFirstPart and first:
             linearray.remove(line)
@@ -179,6 +180,7 @@ class RayWorker:
                                             nearest_point = p2
                                             nearest_part = edge
                                             nearest_obj = optobj
+                                            nearest_shape = obj
 
                         for face in obj.Shape.Faces:
                             if face.BoundBox.intersect(origin, dir):
@@ -192,6 +194,7 @@ class RayWorker:
                                             nearest_point = p
                                             nearest_part = face
                                             nearest_obj = optobj
+                                            nearest_shape = obj
 
         if nearest_part:
             neworigin = PointVec(nearest_point)
@@ -220,7 +223,7 @@ class RayWorker:
                 else:
                     n = nearest_obj.RefractionIndex
 
-                if nearest_obj in self.isInsideLens(shortline.Vertexes[0]):
+                if self.isInsidePart(nearest_shape, shortline.Vertexes[0]):
                     oldRefIdx = n
                     newRefIdx = self.lastRefIdx
                 else:
@@ -284,12 +287,15 @@ class RayWorker:
         return nvec
 
 
+    def isInsidePart(self, part, vertex):
+        return part.Shape.distToShape(Part.Vertex(vertex))[0] < EPSILON
+        
     def isInsideLens(self, vertex):
         ret = []
         for optobj in FreeCAD.ActiveDocument.Objects:
             if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and optobj.OpticalType == "lens":
                 for obj in optobj.Base:
-                    if obj.Shape.distToShape(Part.Vertex(vertex))[0] < EPSILON:
+                    if self.isInsidePart(obj, vertex):
                         ret.append(optobj)
 
         return ret
