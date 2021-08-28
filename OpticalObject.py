@@ -8,6 +8,8 @@ __doc__ = "Declare your FreeCAD objects to be optical mirrors, lenses or absorbe
 import os
 import FreeCADGui
 import FreeCAD
+from OpticsWorkbench import refraction_index_from_sellmeier
+
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
     

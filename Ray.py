@@ -13,6 +13,7 @@ import Part
 import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
+from OpticsWorkbench import refraction_index_from_sellmeier
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
@@ -20,12 +21,7 @@ _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 INFINITY = 1677216  
 EPSILON = 1/INFINITY
     
-def refraction_index_from_sellmeier(wavelength, sellmeier):
-    b1, b2, b3, c1, c2, c3 = sellmeier
-    l = wavelength
-    n = math.sqrt(1 + b1*l**2/(l**2 - c1) + b2*l**2/(l**2 - c2) + b3*l**2/(l**2 - c3))
 
-    return n
 
 
 class RayWorker:
@@ -56,7 +52,6 @@ class RayWorker:
     
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
-        print('redraw')
         self.redrawRay(fp)
         
     def onChanged(self, fp, prop):
