@@ -1,0 +1,4 @@
+*.py filter=kw 
+*.c filter=kw
+*.sh filter=kw
+

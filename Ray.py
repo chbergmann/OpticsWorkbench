@@ -12,11 +12,17 @@ from FreeCAD import Vector, Rotation
 import Part
 import math
 import traceback
+from wavelength_to_rgb.gentable import wavelen2rgb
+from OpticsWorkbench import refraction_index_from_sellmeier
+
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 
 INFINITY = 1677216
 EPSILON = 1/INFINITY
+    
+
+
 
 class RayWorker:
     def __init__(self,
@@ -28,7 +34,8 @@ class RayWorker:
                  beamDistance = 0.1,
                  hideFirst=False,
                  maxRayLength = 1000000,
-                 maxNrReflections = 200):
+                 maxNrReflections = 200,
+                 wavelength = 580):
         fp.addProperty("App::PropertyBool", "Spherical", "Ray",  "False=Beam in one direction, True=Radial or spherical rays").Spherical = spherical
         fp.addProperty("App::PropertyBool", "Power", "Ray",  "On or Off").Power = power
         fp.addProperty("App::PropertyQuantity", "BeamNrColumns", "Ray",  "number of rays in a beam").BeamNrColumns = beamNrColumns
@@ -37,6 +44,7 @@ class RayWorker:
         fp.addProperty("App::PropertyBool", "HideFirstPart", "Ray",  "hide the first part of every ray").HideFirstPart = hideFirst
         fp.addProperty("App::PropertyFloat", "MaxRayLength", "Ray",  "maximum length of a ray").MaxRayLength = maxRayLength
         fp.addProperty("App::PropertyFloat", "MaxNrReflections", "Ray",  "maximum number of reflections").MaxNrReflections = maxNrReflections
+        fp.addProperty("App::PropertyFloat", "Wavelength", "Ray",  "Wavelength of the ray in nm").Wavelength = wavelength        
 
         fp.Proxy = self
         self.lastRefIdx = 1
@@ -48,7 +56,7 @@ class RayWorker:
 
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance", "MaxRayLength", "MaxNrReflections"]
+        proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance", "MaxRayLength", "MaxNrReflections", "Wavelength"]
         if prop in proplist:
             self.redrawRay(fp)
 
@@ -103,9 +111,17 @@ class RayWorker:
         fp.Shape = Part.makeCompound(linearray)
         fp.Placement = pl
         if fp.Power == False:
-            fp.ViewObject.LineColor = (0.5, 0.5, 0.00)
+            fp.ViewObject.LineColor = (0.5, 0.5, 0.0)
         else:
-            fp.ViewObject.LineColor = (1.00,1.00,0.00)
+            try:
+                rgb = wavelen2rgb(fp.Wavelength)
+            except ValueError:
+                # set color to white if outside of visible range
+                rgb = (255, 255, 255)  
+            r = rgb[0] / 255.0
+            g = rgb[1] / 255.0
+            b = rgb[2] / 255.0 
+            fp.ViewObject.LineColor = (float(r), float(g), float(b), (0.0))
 
         fp.ViewObject.Transparency = 50
 
@@ -194,18 +210,23 @@ class RayWorker:
             if normal.Length == 0:
                 print("Cannot determine the normal on " + nearest_obj.Label)
                 return
+                    
+            if nearest_obj.OpticalType == 'mirror':      
+                dNewRay = self.mirror(dRay, normal)   
+                                                
+            elif nearest_obj.OpticalType == 'lens':  
+                if len(nearest_obj.Sellmeier) == 6:
+                    n = refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)                           
+                else:
+                    n = nearest_obj.RefractionIndex
 
-            if nearest_obj.OpticalType == 'mirror':
-                dNewRay = self.mirror(dRay, normal)
-
-            elif nearest_obj.OpticalType == 'lens':
                 if nearest_obj in self.isInsideLens(shortline.Vertexes[0]):
-                    oldRefIdx = nearest_obj.RefractionIndex
+                    oldRefIdx = n
                     newRefIdx = self.lastRefIdx
                 else:
                     oldRefIdx = self.lastRefIdx
-                    newRefIdx = nearest_obj.RefractionIndex
-
+                    newRefIdx = n
+                      
                 ray1 = dRay / dRay.Length
                 dNewRay = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
 

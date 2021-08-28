@@ -79,6 +79,7 @@ def createSketch_Sketch_Prism(doc):
     return Sketch_Prism
 
 def make_optics():
+    App.newDocument("Example 2D")
     doc = App.activeDocument()
 
     Sketch_Mirror1 = createSketch_Sketch_Mirror1(doc)
@@ -89,8 +90,8 @@ def make_optics():
 
     OpticsWorkbench.makeMirror([Sketch_Mirror1, Sketch_Mirror2])
     OpticsWorkbench.makeAbsorber([Sketch_Box])
-    OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='Flint glass')
-
+    OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='Window glass')
+    
     doc.recompute()
     OpticsWorkbench.makeRay(Vector(75.00, 0.00, 0.00), Vector(-1,0,0))
     OpticsWorkbench.makeRay(beamNrColumns=50)
@@ -116,7 +117,7 @@ class Example1():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': 'Example 2D',
+                'MenuText': 'Example - 2D',
                 'ToolTip' : '' }
 
 Gui.addCommand('Example2D', Example1())

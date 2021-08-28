@@ -4,6 +4,8 @@ import os
 import FreeCAD
 from FreeCAD import Vector, Rotation
 from importlib import reload
+import math
+
 
 def get_module_path():
     """ Returns the current module path.
@@ -23,7 +25,8 @@ def makeRay(position = Vector(0, 0, 0),
             spherical = False,
             hideFirst = False,
             maxRayLength = 1000000,
-            maxNrReflections = 200):
+            maxNrReflections = 200,
+            wavelength = 580):
     '''Python command to create a light ray.'''
     import Ray
     reload(Ray)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
@@ -34,7 +37,7 @@ def makeRay(position = Vector(0, 0, 0),
     fp = FreeCAD.ActiveDocument.addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     fp.Placement.Rotation = Rotation(Vector(1, 0, 0), direction)
-    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections)
+    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength)
     Ray.RayViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
@@ -70,7 +73,7 @@ def makeAbsorber(base = []):
     FreeCAD.ActiveDocument.recompute()
     return fp
 
-def makeLens(base = [], RefractionIndex = 0, material = 'Flint glass'):
+def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
     '''All FreeCAD objects in base will be optical lenses.'''
     import OpticalObject
     reload(OpticalObject)     # causes FreeCAD to reload Ray.py every time a new Ray is created. Useful while developing the feature.
@@ -79,3 +82,9 @@ def makeLens(base = [], RefractionIndex = 0, material = 'Flint glass'):
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     FreeCAD.ActiveDocument.recompute()
     return fp
+
+def refraction_index_from_sellmeier(wavelength, sellmeier):
+    b1, b2, b3, c1, c2, c3 = sellmeier
+    l = wavelength
+    n = math.sqrt(1 + b1*l**2/(l**2 - c1) + b2*l**2/(l**2 - c2) + b3*l**2/(l**2 - c3))
+    return n

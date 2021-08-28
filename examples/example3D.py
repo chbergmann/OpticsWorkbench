@@ -8,6 +8,7 @@ import OpticsWorkbench
 _icondir_ = os.path.join(os.path.dirname(__file__), '..')
 
 def make_Test3D():
+    App.newDocument("Example 3D")
     doc = app.activeDocument()
 
     Cube = doc.addObject('Part::Box', 'Cube')
@@ -75,7 +76,7 @@ class Example3D():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': 'Example 3D',
+                'MenuText': 'Example - 3D',
                 'ToolTip' : '' }
 
 Gui.addCommand('Example3D', Example3D())
