@@ -41,9 +41,9 @@ class OpticsWorkbench (Workbench):
         # "recipient" will be either "view" or "tree"
         self.appendContextMenu(self.__class__.MenuText, self.list) # add commands to the context menu
 
-    def GetClassName(self): 
+    def GetClassName(self):
         # this function is mandatory if this is a full python workbench
         return "Gui::PythonWorkbench"
-    
-       
+
+
 Gui.addWorkbench(OpticsWorkbench())
