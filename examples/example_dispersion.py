@@ -5,7 +5,6 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import OpticsWorkbench
 import os
-from numpy import linspace
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), '..')

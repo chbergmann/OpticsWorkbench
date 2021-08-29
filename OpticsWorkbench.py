@@ -3,7 +3,6 @@
 import os
 import FreeCAD
 from FreeCAD import Vector, Rotation
-import math
 import Ray
 import OpticalObject
 from numpy import linspace
