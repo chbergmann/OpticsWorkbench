@@ -6,6 +6,7 @@ from FreeCAD import Vector, Rotation
 import Ray
 import OpticalObject
 from numpy import linspace
+from importlib import reload
 
 
 def get_module_path():
@@ -28,6 +29,7 @@ def makeRay(position = Vector(0, 0, 0),
             maxRayLength = 1000000,
             maxNrReflections = 200,
             wavelength = 580):
+    reload(Ray)
     '''Python command to create a light ray.'''
     name = 'Ray'
     if beamNrColumns * beamNrRows > 1:
@@ -51,7 +53,7 @@ def makeSunRay(position = Vector(0, 0, 0),
             wavelength_from = 400,
             wavelength_to = 800,
             num_rays = 100):
-    
+    reload(Ray)
     doc = FreeCAD.activeDocument()
     rays = []
     for l in linspace(wavelength_from, wavelength_to, num_rays):
@@ -75,13 +77,18 @@ def restartAll():
         if hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns'):
             obj.Power = False
             obj.Power = True
+    
+    FreeCAD.ActiveDocument.recompute()
 
 def allOff():
     for obj in FreeCAD.ActiveDocument.Objects:
         if hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns'):
             obj.Power = False
+            
+    FreeCAD.ActiveDocument.recompute()
 
 def makeMirror(base = []):
+    reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Mirror")
     OpticalObject.OpticalObjectWorker(fp, base)
@@ -90,6 +97,7 @@ def makeMirror(base = []):
     return fp
 
 def makeAbsorber(base = []):
+    reload(OpticalObject)
     '''All FreeCAD objects in base will be optical light absorbers.'''
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Absorber")
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
@@ -98,6 +106,7 @@ def makeAbsorber(base = []):
     return fp
 
 def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
+    reload(OpticalObject)
     '''All FreeCAD objects in base will be optical lenses.'''
     fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Lens")
     OpticalObject.LensWorker(fp, base, RefractionIndex, material)
