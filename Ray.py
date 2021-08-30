@@ -15,7 +15,7 @@ import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 from OpticalObject import refraction_index_from_sellmeier
-from OpticsWorkbench import isOpticalObject
+from OpticsWorkbench import isOpticalObject, getSceneBoundBox
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
@@ -140,6 +140,7 @@ class RayWorker:
         line = linearray[len(linearray) - 1]
         if fp.HideFirstPart and first:
             linearray.remove(line)
+        scene_size = getSceneBoundBox().DiagonalLength
 
         dir = PointVec(line.Vertexes[1]) - PointVec(line.Vertexes[0])
         for optobj in activeDocument().Objects:
@@ -239,7 +240,7 @@ class RayWorker:
 
             else: return
 
-            newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
+            newline = Part.makeLine(neworigin, neworigin - dNewRay * min(scene_size, fp.MaxRayLength) / dNewRay.Length)
             linearray.append(newline)
             if newline:
                 self.traceRay(fp, neworigin, linearray)

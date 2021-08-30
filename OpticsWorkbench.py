@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from FreeCAD import Vector, Rotation, activeDocument
+from FreeCAD import Vector, Rotation, activeDocument, BoundBox
 import Ray
 import OpticalObject
 from numpy import linspace
@@ -120,3 +120,17 @@ def isRay(obj):
 
 def isOpticalObject(obj):
     return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')
+
+def getSceneBoundBox():
+    '''Gets the Bounding Box of all objects and the startings position of the rays'''
+    from FreeCAD import BoundBox
+    doc = activeDocument()
+    bb = BoundBox(0)
+
+    for obj in doc.Objects:
+        if isRay(obj): 
+            p = obj.Placement.Base
+            bb.add(BoundBox(p, p))
+        elif hasattr(obj, 'Shape') and not isLens(obj): 
+            bb.add(obj.Shape.BoundBox)
+    return bb
