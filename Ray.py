@@ -7,15 +7,14 @@ __doc__ = 'A single ray for raytracing'
 
 import os
 import FreeCADGui
-from FreeCADGui import doCommand, addCommand
 import FreeCAD
 from FreeCAD import Vector, Rotation, activeDocument
 import Part
 import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
-from OpticalObject import refraction_index_from_sellmeier
-from OpticsWorkbench import isOpticalObject
+import OpticalObject
+from OpticsWorkbench import *
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
@@ -223,7 +222,7 @@ class RayWorker:
                                                 
             elif nearest_obj.OpticalType == 'lens':  
                 if len(nearest_obj.Sellmeier) == 6:
-                    n = refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)                           
+                    n = OpticalObject.refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)                           
                 else:
                     n = nearest_obj.RefractionIndex
 
@@ -536,10 +535,10 @@ class AllOff():
                 'MenuText': 'Switch off lights',
                 'ToolTip' : 'Switch off all rays and beams' }
 
-addCommand('Ray (monochrome)', Ray())
-addCommand('Ray (sun light)', RaySun())
-addCommand('Beam', Beam2D())
-addCommand('2D Radial Beam', RadialBeam2D())
-addCommand('Spherical Beam', SphericalBeam())
-addCommand('Start', RedrawAll())
-addCommand('Off', AllOff())
+FreeCADGui.addCommand('Ray (monochrome)', Ray())
+FreeCADGui.addCommand('Ray (sun light)', RaySun())
+FreeCADGui.addCommand('Beam', Beam2D())
+FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
+FreeCADGui.addCommand('Spherical Beam', SphericalBeam())
+FreeCADGui.addCommand('Start', RedrawAll())
+FreeCADGui.addCommand('Off', AllOff())
