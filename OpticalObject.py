@@ -91,7 +91,9 @@ class LensWorker:
         if not self.update: return
         self.update = False
         
-        if not hasattr(fp, 'Sellmeier'): return
+        if not hasattr(fp, 'Sellmeier'): 
+            FreeCAD.Console.PrintWarning("Please update Optics Workbench!")
+            return
         
         if prop == 'Material':
             sellmeier = self.getMaterials()[fp.Material]
