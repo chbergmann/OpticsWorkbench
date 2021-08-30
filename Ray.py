@@ -7,7 +7,7 @@ __doc__ = 'A single ray for raytracing'
 
 import os
 import FreeCADGui
-from FreeCADGui import doCommand, addCommand
+from FreeCADGui import addCommand
 import FreeCAD
 from FreeCAD import Vector, Rotation, activeDocument
 import Part
@@ -15,7 +15,11 @@ import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 from OpticalObject import refraction_index_from_sellmeier
+<<<<<<< Updated upstream
 from OpticsWorkbench import isOpticalObject
+=======
+from OpticsWorkbench import *
+>>>>>>> Stashed changes
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
@@ -63,6 +67,9 @@ class RayWorker:
         proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength']
         if prop in proplist:
             self.redrawRay(fp)
+
+        if fp.BeamNrColumns < 1:  fp.BeamNrColumns = 1
+        if fp.BeamNrRows < 1:  fp.BeamNrRows = 1
 
     def redrawRay(self, fp):
         pl = fp.Placement
@@ -333,6 +340,7 @@ class RayViewProvider:
 
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
+        print(fp, prop)
         pass
 
     def claimChildren(self):
@@ -345,6 +353,7 @@ class RayViewProvider:
 
     def onChanged(self, fp, prop):
         '''Here we can do something when a single property got changed'''
+        print(fp, prop)
         pass
 
     def __getstate__(self):
@@ -365,8 +374,7 @@ class Ray():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay()')
+        OpticsWorkbench.makeRay()
 
 
     def IsActive(self):
@@ -391,8 +399,7 @@ class RaySun():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeSunRay()')
+        makeSunRay()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -415,8 +422,7 @@ class Beam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1)')
+        makeRay(beamNrColumns=50, beamDistance=0.1)
 
 
     def IsActive(self):
@@ -440,8 +446,7 @@ class RadialBeam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)')
+        OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)
 
 
     def IsActive(self):
@@ -466,8 +471,7 @@ class SphericalBeam():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)')
+        OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)
 
 
     def IsActive(self):
@@ -492,8 +496,7 @@ class RedrawAll():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.restartAll()')
+        restartAll()
 
 
     def IsActive(self):
@@ -517,8 +520,7 @@ class AllOff():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.allOff()')
+        OpticsWorkbench.allOff()
 
 
     def IsActive(self):
