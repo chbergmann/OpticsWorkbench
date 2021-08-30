@@ -2,19 +2,22 @@
 
 import os
 import FreeCAD
-from FreeCAD import Vector, Rotation
+from FreeCAD import Vector, Rotation, activeDocument, BoundBox
 import Ray
 import OpticalObject
 from numpy import linspace
 from importlib import reload
+from OpticsWorkbench import isOpticalObject
 
+def recompute():
+    activeDocument().recompute()
 
 def get_module_path():
-    """ Returns the current module path.
+    ''' Returns the current module path.
     Determines where this file is running from, so works regardless of whether
     the module is installed in the app's module directory or the user's app data folder.
     (The second overrides the first.)
-    """
+    '''
     return os.path.dirname(__file__)
 
 
@@ -35,12 +38,12 @@ def makeRay(position = Vector(0, 0, 0),
     if beamNrColumns * beamNrRows > 1:
         name = 'Beam'
 
-    fp = FreeCAD.ActiveDocument.addObject('Part::FeaturePython', name)
+    fp = activeDocument().addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     fp.Placement.Rotation = Rotation(Vector(1, 0, 0), direction)
     Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength)
     Ray.RayViewProvider(fp.ViewObject)
-    FreeCAD.ActiveDocument.recompute()
+    recompute()
     return fp
     
     
@@ -54,7 +57,7 @@ def makeSunRay(position = Vector(0, 0, 0),
             wavelength_to = 800,
             num_rays = 100):
     reload(Ray)
-    doc = FreeCAD.activeDocument()
+    doc = activeDocument()
     rays = []
     for l in linspace(wavelength_from, wavelength_to, num_rays):
         ray = makeRay(position = position,
@@ -69,47 +72,53 @@ def makeSunRay(position = Vector(0, 0, 0),
 
     group = doc.addObject('App::DocumentObjectGroup','SunRay')
     group.Group = rays
-    doc.recompute()
+    recompute()
     
 
 def restartAll():
-    for obj in FreeCAD.ActiveDocument.Objects:
-        if hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns'):
-            obj.Power = False
+    for obj in activeDocument().Objects:
+        if isRay(obj):
             obj.Power = True
+            obj.touch()
     
-    FreeCAD.ActiveDocument.recompute()
+    recompute()
 
 def allOff():
-    for obj in FreeCAD.ActiveDocument.Objects:
-        if hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns'):
+    for obj in activeDocument().Objects:
+        if isRay(obj):
             obj.Power = False
             
-    FreeCAD.ActiveDocument.recompute()
+    recompute()
 
 def makeMirror(base = []):
     reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
-    fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Mirror")
+    fp = activeDocument().addObject('Part::FeaturePython', 'Mirror')
     OpticalObject.OpticalObjectWorker(fp, base)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
-    FreeCAD.ActiveDocument.recompute()
+    recompute()
     return fp
 
 def makeAbsorber(base = []):
     reload(OpticalObject)
     '''All FreeCAD objects in base will be optical light absorbers.'''
-    fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Absorber")
+    fp = activeDocument().addObject('Part::FeaturePython', 'Absorber')
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
-    FreeCAD.ActiveDocument.recompute()
+    recompute()
     return fp
 
 def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
     reload(OpticalObject)
     '''All FreeCAD objects in base will be optical lenses.'''
-    fp = FreeCAD.ActiveDocument.addObject("Part::FeaturePython", "Lens")
+    fp = activeDocument().addObject('Part::FeaturePython', 'Lens')
     OpticalObject.LensWorker(fp, base, RefractionIndex, material)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
-    FreeCAD.ActiveDocument.recompute()
+    recompute()
     return fp
+
+def isRay(obj):
+    return hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns')
+
+def isOpticalObject(obj):
+    return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')

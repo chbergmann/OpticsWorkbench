@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
-__title__ = "OpticalObject"
-__author__ = "Christian Bergmann"
-__license__ = "LGPL 3.0"
-__doc__ = "Declare your FreeCAD objects to be optical mirrors, lenses or absorbers"
+__title__ = 'OpticalObject'
+__author__ = 'Christian Bergmann'
+__license__ = 'LGPL 3.0'
+__doc__ = 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers'
 
 import os
 import FreeCADGui
+from FreeCADGui import doCommand, addCommand
 import FreeCAD
 import math
 
@@ -20,8 +21,8 @@ class OpticalObjectWorker:
                  fp,    # an instance of Part::FeaturePython
                  base = [],
                  type = 'mirror'):
-        fp.addProperty("App::PropertyEnumeration", "OpticalType", "OpticalObject", "").OpticalType = ['mirror', 'absorber'] 
-        fp.addProperty("App::PropertyLinkList",  "Base",   "OpticalObject",   "FreeCAD objects to be mirrors").Base = base
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
+        fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   'FreeCAD objects to be mirrors or absorbers').Base = base
         fp.OpticalType = type    
         fp.Proxy = self
     
@@ -39,20 +40,20 @@ class LensWorker:
                  RefractionIndex = 1,
                  material = ''):
         self.update = False 
-        fp.addProperty("App::PropertyEnumeration", "OpticalType", "Lens", "").OpticalType = ['lens'] 
-        fp.addProperty("App::PropertyLinkList",  "Base",   "Lens",   "FreeCAD objects to be lenses").Base = base
-        fp.addProperty("App::PropertyFloat",  "RefractionIndex",   "Lens",   "Refractive Index at 580nm (depends on material)").RefractionIndex = RefractionIndex
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Lens', '').OpticalType = ['lens'] 
+        fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   'FreeCAD objects to be lenses').Base = base
+        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Lens',   'Refractive Index at 580nm (depends on material)').RefractionIndex = RefractionIndex
         fp.addProperty(
-            "App::PropertyFloatList",  
-            "Sellmeier",   
-            "Lens",   
-            "Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n Usually noted in (µm)² in literature,\n (µm)²=10⁶(nm)².")
+            'App::PropertyFloatList',  
+            'Sellmeier',   
+            'Lens',   
+            'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n Usually noted in (µm)² in literature,\n (µm)²=10⁶(nm)².')
 
         fp.OpticalType = 'lens'  
         
         material_names = list(self.getMaterials())
           
-        fp.addProperty("App::PropertyEnumeration", "Material", "Lens", "").Material = material_names
+        fp.addProperty('App::PropertyEnumeration', 'Material', 'Lens', '').Material = material_names
         
         self.update = True 
         fp.Proxy = self
@@ -126,7 +127,7 @@ class OpticalObjectViewProvider:
     def attach(self, vobj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.Object = vobj.Object
-        self.onChanged(vobj, "")
+        self.onChanged(vobj, '')
  
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
@@ -168,16 +169,16 @@ class OpticalMirror():
       
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("objects = []")
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
         for sel in selection:
-            FreeCADGui.doCommand("objects.append(FreeCAD.ActiveDocument.getObject('%s'))"%(sel.ObjectName))
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
             
-        FreeCADGui.doCommand("OpticsWorkbench.makeMirror(objects)")              
+        doCommand('OpticsWorkbench.makeMirror(objects)')              
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
             return(True)
         else:
@@ -186,7 +187,7 @@ class OpticalMirror():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'mirror.svg'),
-                'Accel' : "", # a default shortcut (optional)
+                'Accel' : '', # a default shortcut (optional)
                 'MenuText': 'Optical Mirror',
                 'ToolTip' : 'Declare your FreeCAD objects to be optical mirrors' }
 
@@ -196,16 +197,16 @@ class OpticalAbsorber():
       
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("objects = []")
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
         for sel in selection:
-            FreeCADGui.doCommand("objects.append(FreeCAD.ActiveDocument.getObject('%s'))"%(sel.ObjectName))
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        FreeCADGui.doCommand("OpticsWorkbench.makeAbsorber(objects)")               
+        doCommand('OpticsWorkbench.makeAbsorber(objects)')               
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
             return(True)
         else:
@@ -214,7 +215,7 @@ class OpticalAbsorber():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'absorber.svg'),
-                'Accel' : "", # a default shortcut (optional)
+                'Accel' : '', # a default shortcut (optional)
                 'MenuText': 'Optical Absorber',
                 'ToolTip' : 'Declare your FreeCAD objects to be optical absorbers' }
                 
@@ -223,16 +224,16 @@ class OpticalLens():
       
     def Activated(self):
         selection = FreeCADGui.Selection.getSelectionEx()
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("objects = []")
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
         for sel in selection:
-            FreeCADGui.doCommand("objects.append(FreeCAD.ActiveDocument.getObject('%s'))"%(sel.ObjectName))
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        FreeCADGui.doCommand("OpticsWorkbench.makeLens(objects, material='Window glass')")               
+        doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
             return(True)
         else:
@@ -241,10 +242,10 @@ class OpticalLens():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'lens.svg'),
-                'Accel' : "", # a default shortcut (optional)
+                'Accel' : '', # a default shortcut (optional)
                 'MenuText': 'Optical Lens',
                 'ToolTip' : 'Declare your FreeCAD objects to be optical lenses' }                
                 
-FreeCADGui.addCommand('Mirror', OpticalMirror())
-FreeCADGui.addCommand('Absorber', OpticalAbsorber())
-FreeCADGui.addCommand('Lens', OpticalLens())
+addCommand('Mirror', OpticalMirror())
+addCommand('Absorber', OpticalAbsorber())
+addCommand('Lens', OpticalLens())
