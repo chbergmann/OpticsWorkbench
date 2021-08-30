@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-__title__ = "Ray"
-__author__ = "Christian Bergmann"
-__license__ = "LGPL 3.0"
-__doc__ = "A single ray for raytracing"
+__title__ = 'Ray'
+__author__ = 'Christian Bergmann'
+__license__ = 'LGPL 3.0'
+__doc__ = 'A single ray for raytracing'
 
 import os
 import FreeCADGui
+from FreeCADGui import doCommand, addCommand
 import FreeCAD
-from FreeCAD import Vector, Rotation
+from FreeCAD import Vector, Rotation, activeDocument
 import Part
 import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 from OpticalObject import refraction_index_from_sellmeier
+from OpticsWorkbench import isOpticalObject
 
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
@@ -36,15 +38,15 @@ class RayWorker:
                  maxRayLength = 1000000,
                  maxNrReflections = 200,
                  wavelength = 580):
-        fp.addProperty("App::PropertyBool", "Spherical", "Ray",  "False=Beam in one direction, True=Radial or spherical rays").Spherical = spherical
-        fp.addProperty("App::PropertyBool", "Power", "Ray",  "On or Off").Power = power
-        fp.addProperty("App::PropertyQuantity", "BeamNrColumns", "Ray",  "number of rays in a beam").BeamNrColumns = beamNrColumns
-        fp.addProperty("App::PropertyQuantity", "BeamNrRows", "Ray",  "number of rays in a beam").BeamNrRows = beamNrRows
-        fp.addProperty("App::PropertyFloat", "BeamDistance", "Ray",  "distance between two beams").BeamDistance = beamDistance
-        fp.addProperty("App::PropertyBool", "HideFirstPart", "Ray",  "hide the first part of every ray").HideFirstPart = hideFirst
-        fp.addProperty("App::PropertyFloat", "MaxRayLength", "Ray",  "maximum length of a ray").MaxRayLength = maxRayLength
-        fp.addProperty("App::PropertyFloat", "MaxNrReflections", "Ray",  "maximum number of reflections").MaxNrReflections = maxNrReflections
-        fp.addProperty("App::PropertyFloat", "Wavelength", "Ray",  "Wavelength of the ray in nm").Wavelength = wavelength        
+        fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
+        fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
+        fp.addProperty('App::PropertyQuantity', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
+        fp.addProperty('App::PropertyQuantity', 'BeamNrRows', 'Ray',  'number of rays in a beam').BeamNrRows = beamNrRows
+        fp.addProperty('App::PropertyFloat', 'BeamDistance', 'Ray',  'distance between two beams').BeamDistance = beamDistance
+        fp.addProperty('App::PropertyBool', 'HideFirstPart', 'Ray',  'hide the first part of every ray').HideFirstPart = hideFirst
+        fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',  'maximum length of a ray').MaxRayLength = maxRayLength
+        fp.addProperty('App::PropertyFloat', 'MaxNrReflections', 'Ray',  'maximum number of reflections').MaxNrReflections = maxNrReflections
+        fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength        
 
         fp.Proxy = self
         self.lastRefIdx = 1
@@ -58,7 +60,7 @@ class RayWorker:
         '''Do something when a property has changed'''
         if not hasattr(fp, 'iter'): return
         
-        proplist = ["Spherical", "Power", "HideFirstPart", "BeamNrColumns", "BeamNrRows", "BeamDistance", "MaxRayLength", "MaxNrReflections", "Wavelength"]
+        proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength']
         if prop in proplist:
             self.redrawRay(fp)
 
@@ -105,7 +107,7 @@ class RayWorker:
                     linearray.append(Part.makeLine(pos, pos + dir))
 
         for line in linearray:
-            r2 = FreeCAD.Rotation(pl.Rotation)
+            r2 = Rotation(pl.Rotation)
             r2.invert()
             line.Placement.Rotation = r2
             line.Placement.Base = r2.multVec(line.Placement.Base - pl.Base)
@@ -140,8 +142,8 @@ class RayWorker:
             linearray.remove(line)
 
         dir = PointVec(line.Vertexes[1]) - PointVec(line.Vertexes[0])
-        for optobj in FreeCAD.ActiveDocument.Objects:
-            if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and hasattr(optobj, 'Base'):
+        for optobj in activeDocument().Objects:
+            if isOpticalObject(optobj):
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):
                         if len(obj.Shape.Solids) == 0 and len(obj.Shape.Shells) == 0:
@@ -213,7 +215,7 @@ class RayWorker:
 
             normal = self.getNormal(nearest_obj, nearest_part, origin, neworigin)
             if normal.Length == 0:
-                print("Cannot determine the normal on " + nearest_obj.Label)
+                print('Cannot determine the normal on ' + nearest_obj.Label)
                 return
                     
             if nearest_obj.OpticalType == 'mirror':      
@@ -266,11 +268,11 @@ class RayWorker:
 
 
     def mirror(self, dRay, normal):
-        return -dRay + 2 * normal * (dRay * normal)
+        return 2 * normal * (dRay * normal) - dRay
 
 
     def snellsLaw(self, ray, n1, n2, normal):
-        #print("snell " + str(n1) + "/" + str(n2))
+        #print('snell ' + str(n1) + '/' + str(n2))
         root = 1 - n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
             return self.mirror(ray, normal)
@@ -294,8 +296,8 @@ class RayWorker:
         
     def isInsideLens(self, vertex):
         ret = []
-        for optobj in FreeCAD.ActiveDocument.Objects:
-            if optobj.TypeId == 'Part::FeaturePython' and hasattr(optobj, 'OpticalType') and optobj.OpticalType == "lens":
+        for optobj in activeDocument().Objects:
+            if isOpticalObject(optobj) and optobj.OpticalType == 'lens':
                 for obj in optobj.Base:
                     if self.isInsidePart(obj, vertex):
                         ret.append(optobj)
@@ -305,7 +307,7 @@ class RayWorker:
 
 
 def PointVec(point):
-    """Converts a Part::Point to a FreeCAD::Vector"""
+    '''Converts a Part::Point to a FreeCAD::Vector'''
     return Vector(point.X, point.Y, point.Z)
 
 
@@ -327,7 +329,7 @@ class RayViewProvider:
     def attach(self, vobj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.Object = vobj.Object
-        self.onChanged(vobj, "Power")
+        self.onChanged(vobj, 'Power')
 
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
@@ -363,14 +365,14 @@ class Ray():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay()")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.makeRay()')
 
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -378,8 +380,8 @@ class Ray():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'ray.svg'),
-                'Accel' : "", # a default shortcut (optional)
-                'MenuText': "Ray (monochrome)",
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': 'Ray (monochrome)',
                 'ToolTip' : __doc__ }
 
 
@@ -389,13 +391,13 @@ class RaySun():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeSunRay()")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.makeSunRay()')
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -403,9 +405,9 @@ class RaySun():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'raysun.svg'),
-                'Accel' : "", # a default shortcut (optional)
-                'MenuText': "Ray (sun light)",
-                'ToolTip' : "A bunch of rays with different wavelengths of visible light" }
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': 'Ray (sun light)',
+                'ToolTip' : 'A bunch of rays with different wavelengths of visible light' }
 
 class Beam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -413,14 +415,14 @@ class Beam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1)")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1)')
 
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -428,9 +430,9 @@ class Beam2D():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'rayarray.svg'),
-                'Accel' : "", # a default shortcut (optional)
-                'MenuText': "2D Beam",
-                'ToolTip' : "A row of multiple rays for raytracing" }
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': '2D Beam',
+                'ToolTip' : 'A row of multiple rays for raytracing' }
 
 class RadialBeam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -438,14 +440,14 @@ class RadialBeam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)')
 
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -453,9 +455,9 @@ class RadialBeam2D():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'sun.svg'),
-                'Accel' : "", # a default shortcut (optional)
-                'MenuText': "2D Radial Beam",
-                'ToolTip' : "Rays coming from one point going to all directions in a 2D plane" }
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': '2D Radial Beam',
+                'ToolTip' : 'Rays coming from one point going to all directions in a 2D plane' }
 
 
 class SphericalBeam():
@@ -464,14 +466,14 @@ class SphericalBeam():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)')
 
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -479,9 +481,9 @@ class SphericalBeam():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'sun3D.svg'),
-                'Accel' : "", # a default shortcut (optional)
-                'MenuText': "Spherical Beam",
-                'ToolTip' : "Rays coming from one point going to all directions" }
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': 'Spherical Beam',
+                'ToolTip' : 'Rays coming from one point going to all directions' }
 
 
 class RedrawAll():
@@ -490,14 +492,14 @@ class RedrawAll():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.restartAll()")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.restartAll()')
 
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -505,7 +507,7 @@ class RedrawAll():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Lit.svg'),
-                'Accel' : "", # a default shortcut (optional)
+                'Accel' : '', # a default shortcut (optional)
                 'MenuText': '(Re)start simulation',
                 'ToolTip' : '(Re)start simulation' }
 
@@ -515,14 +517,14 @@ class AllOff():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        FreeCADGui.doCommand("import OpticsWorkbench")
-        FreeCADGui.doCommand("OpticsWorkbench.allOff()")
+        doCommand('import OpticsWorkbench')
+        doCommand('OpticsWorkbench.allOff()')
 
 
     def IsActive(self):
-        """Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional."""
-        if FreeCAD.ActiveDocument:
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():
             return(True)
         else:
             return(False)
@@ -530,14 +532,14 @@ class AllOff():
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Off.svg'),
-                'Accel' : "", # a default shortcut (optional)
+                'Accel' : '', # a default shortcut (optional)
                 'MenuText': 'Switch off lights',
                 'ToolTip' : 'Switch off all rays and beams' }
 
-FreeCADGui.addCommand('Ray (monochrome)', Ray())
-FreeCADGui.addCommand('Ray (sun light)', RaySun())
-FreeCADGui.addCommand('Beam', Beam2D())
-FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
-FreeCADGui.addCommand('Spherical Beam', SphericalBeam())
-FreeCADGui.addCommand('Start', RedrawAll())
-FreeCADGui.addCommand('Off', AllOff())
+addCommand('Ray (monochrome)', Ray())
+addCommand('Ray (sun light)', RaySun())
+addCommand('Beam', Beam2D())
+addCommand('2D Radial Beam', RadialBeam2D())
+addCommand('Spherical Beam', SphericalBeam())
+addCommand('Start', RedrawAll())
+addCommand('Off', AllOff())
