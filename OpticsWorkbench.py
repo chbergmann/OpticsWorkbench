@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import os
-import FreeCAD
-from FreeCAD import Vector, Rotation, activeDocument, BoundBox
+from FreeCAD import Vector, Rotation, activeDocument
 import Ray
 import OpticalObject
 from numpy import linspace
 from importlib import reload
-from OpticsWorkbench import isOpticalObject
 
 def recompute():
     activeDocument().recompute()
