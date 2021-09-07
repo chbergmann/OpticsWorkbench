@@ -6,8 +6,8 @@ __license__ = 'LGPL 3.0'
 __doc__ = 'A single ray for raytracing'
 
 import os
-import FreeCADGui
-import FreeCAD
+import FreeCAD as App
+import FreeCADGui as Gui
 from FreeCAD import Vector, Rotation, activeDocument
 import Part
 import math
@@ -364,8 +364,8 @@ class Ray():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay()')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.makeRay()')
 
 
     def IsActive(self):
@@ -390,8 +390,8 @@ class RaySun():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeSunRay()')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.makeSunRay()')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -414,8 +414,8 @@ class Beam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1)')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1)')
 
 
     def IsActive(self):
@@ -439,8 +439,8 @@ class RadialBeam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)')
 
 
     def IsActive(self):
@@ -465,8 +465,8 @@ class SphericalBeam():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)')
 
 
     def IsActive(self):
@@ -491,8 +491,8 @@ class RedrawAll():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.restartAll()')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.restartAll()')
 
 
     def IsActive(self):
@@ -516,8 +516,8 @@ class AllOff():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
-        doCommand('import OpticsWorkbench')
-        doCommand('OpticsWorkbench.allOff()')
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.allOff()')
 
 
     def IsActive(self):
@@ -535,10 +535,10 @@ class AllOff():
                 'MenuText': 'Switch off lights',
                 'ToolTip' : 'Switch off all rays and beams' }
 
-FreeCADGui.addCommand('Ray (monochrome)', Ray())
-FreeCADGui.addCommand('Ray (sun light)', RaySun())
-FreeCADGui.addCommand('Beam', Beam2D())
-FreeCADGui.addCommand('2D Radial Beam', RadialBeam2D())
-FreeCADGui.addCommand('Spherical Beam', SphericalBeam())
-FreeCADGui.addCommand('Start', RedrawAll())
-FreeCADGui.addCommand('Off', AllOff())
+Gui.addCommand('Ray (monochrome)', Ray())
+Gui.addCommand('Ray (sun light)', RaySun())
+Gui.addCommand('Beam', Beam2D())
+Gui.addCommand('2D Radial Beam', RadialBeam2D())
+Gui.addCommand('Spherical Beam', SphericalBeam())
+Gui.addCommand('Start', RedrawAll())
+Gui.addCommand('Off', AllOff())
