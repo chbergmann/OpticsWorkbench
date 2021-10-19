@@ -6,7 +6,6 @@ __license__ = 'LGPL 3.0'
 __doc__ = 'A single ray for raytracing'
 
 import os
-import FreeCAD as App
 import FreeCADGui as Gui
 from FreeCAD import Vector, Rotation, activeDocument
 import Part
