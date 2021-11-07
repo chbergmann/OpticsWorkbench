@@ -64,6 +64,12 @@ class RayWorker:
 
     def redrawRay(self, fp):
         pl = fp.Placement
+         
+        hitname = 'HitsFrom' + fp.Label
+        for optobj in activeDocument().Objects:
+            if isOpticalObject(optobj):
+                if hasattr(optobj, hitname):
+                    setattr(optobj, hitname, 0)
 
         linearray = []
         for row in range(0, int(fp.BeamNrRows)):
@@ -201,6 +207,13 @@ class RayWorker:
         if nearest_part:
             neworigin = PointVec(nearest_point)
             shortline = Part.makeLine(origin, neworigin)
+            
+            hitname = 'HitsFrom' + fp.Label
+            if not hasattr(nearest_obj, hitname):
+                hits = nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
+                setattr(nearest_obj, hitname, 1)
+            else:
+                setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
 
             if fp.HideFirstPart == False or first == False:
                 linearray[len(linearray) - 1] = shortline

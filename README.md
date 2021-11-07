@@ -58,16 +58,19 @@ Parameters: see Ray. BeamNrColumns and BeamNrRows must be > 1 Spherical=True to 
 
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The FreeCAD objects in parameter Base will act as mirrors  
-Select some FreeCAD objects, then create Optical Mirror
+Select some FreeCAD objects, then create Optical Mirror  
+After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many reflections you have from each ray. Do not modify this value.
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The FreeCAD objects in parameter Base will swallow the rays of light  
-Select some FreeCAD objects, then create Optical Absorber
+Select some FreeCAD objects, then create Optical Absorber  
+After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many rays have hit this absorber. Do not modify this value.
 
 ### ![Optical Lens](./icons/lens.svg) Optical Lens
 The FreeCAD objects in parameter Base will act as lenses  
 Select some FreeCAD objects, then create Optical Lens  
-The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.
+The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.  
+After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many refractions you have from each ray. Do not modify this value.
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights
 Switches off all Rays and Beams
