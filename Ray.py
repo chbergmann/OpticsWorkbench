@@ -46,7 +46,8 @@ class RayWorker:
         fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength        
 
         fp.Proxy = self
-        self.lastRefIdx = 1
+        self.lastRefIdx = []
+        self.in_shapes = []
         self.iter = 0
 
     def execute(self, fp):
@@ -96,10 +97,10 @@ class RayWorker:
                     self.iter = fp.MaxNrReflections
                     ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
                     linearray.append(ray)
-                    self.lastRefIdx = 1
-                    insiders = self.isInsideLens(ray.Vertexes[0])
-                    if len(insiders) > 0:
-                        self.lastRefIdx = insiders[0].RefractionIndex
+                    self.lastRefIdx = []
+                    self.in_shapes = self.isInsideLens(ray.Vertexes[0])
+                    for shape in self.in_shapes:
+                        self.lastRefIdx.append(shape.RefractionIndex)
 
                     try:
                         self.traceRay(fp, pos, linearray, True)
@@ -216,15 +217,32 @@ class RayWorker:
                 else:
                     n = nearest_obj.RefractionIndex
 
-                if self.isInsidePart(nearest_shape, shortline.Vertexes[0]):
+                if nearest_shape in self.in_shapes:
+                    self.in_shapes.remove(nearest_shape)
                     oldRefIdx = n
-                    newRefIdx = self.lastRefIdx
+                    if len(self.lastRefIdx) > 0:
+                        self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
+                        
+                    if len(self.lastRefIdx) == 0:
+                        newRefIdx = 1
+                    else: 
+                        newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
+                        
                 else:
-                    oldRefIdx = self.lastRefIdx
+                    if len(self.lastRefIdx) == 0:
+                        oldRefIdx = 1
+                    else: 
+                        oldRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
+                        
                     newRefIdx = n
+                    self.lastRefIdx.append(n)
+                    self.in_shapes.append(nearest_shape)
                       
                 ray1 = dRay / dRay.Length
-                dNewRay = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+                (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+                if totatreflect:
+                    self.lastRefIdx.append(n)
+                    self.in_shapes.append(nearest_shape)          
 
             else: return
 
@@ -259,14 +277,13 @@ class RayWorker:
     def mirror(self, dRay, normal):
         return 2 * normal * (dRay * normal) - dRay
 
-
     def snellsLaw(self, ray, n1, n2, normal):
         #print('snell ' + str(n1) + '/' + str(n2))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
-            return self.mirror(ray, normal)
+            return (self.mirror(ray, normal), True)
 
-        return -n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root)
+        return (-n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root), False)
 
 
     def check2D(self, objlist):
