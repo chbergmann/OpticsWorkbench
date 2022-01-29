@@ -15,7 +15,6 @@ from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
 from OpticsWorkbench import *
 
-
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 
 INFINITY = 1677216
@@ -152,43 +151,22 @@ class RayWorker:
                     if obj.Shape.BoundBox.intersect(origin, dir):
                         if len(obj.Shape.Solids) == 0 and len(obj.Shape.Shells) == 0:
                             for edge in obj.Shape.Edges:
-                                normal = self.check2D([line, edge])
-                                isec = None
-                                if normal.Length == 1:
-                                    plane = Part.Plane(obj.Placement.Base, normal)
+                                edgedir = PointVec(edge.Vertexes[1]) - PointVec(edge.Vertexes[0])
+                                normal = dir.cross(edgedir)
+                                if normal.Length > EPSILON:
+                                    plane = Part.Plane(origin, normal)
                                     isec = line.Curve.intersect2d(edge.Curve, plane)
-                                else:
-                                    try:
-                                        isec = line.Curve.intersect(edge.Curve)
-                                    except Exception as ex:
-                                        print(ex)
-                                        traceback.print_exc()
-
-                                if isec:
-                                    for p in isec:
-                                        if normal == Vector(0, 0, 1):
-                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], p[1], 0)) + obj.Placement.Base
-                                            dist = vec - origin
-                                            p2 = Part.Point(vec)
-                                        elif normal == Vector(0, 1, 0):
-                                            vec = obj.Placement.Rotation.multVec(Vector(p[0], 0, p[1])) + obj.Placement.Base
-                                            dist = vec - origin
-                                            p2 = Part.Point(vec)
-                                        elif normal == Vector(1, 0, 0):
-                                            vec = obj.Placement.Rotation.multVec(Vector(0, p[0], p[1])) + obj.Placement.Base
-                                            dist = vec - origin
-                                            p2 = Part.Point(vec)
-                                        else:
-                                            p2 = Part.Point(PointVec(p) + obj.Placement.Base)
-                                            dist = PointVec(p) + obj.Placement.Base - origin
-
-                                        vert=Part.Vertex(p2)
-                                        if dist.Length > EPSILON and dist.Length < nearest.Length and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
-                                            nearest = dist
-                                            nearest_point = p2
-                                            nearest_part = edge
-                                            nearest_obj = optobj
-                                            nearest_shape = obj
+                                    if isec:
+                                        for p in isec:
+                                            p2 = plane.value(p[0], p[1])
+                                            dist = p2 - origin
+                                            vert=Part.Vertex(p2)
+                                            if dist.Length > EPSILON and dist.Length < nearest.Length and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
+                                                nearest = dist
+                                                nearest_point = p2
+                                                nearest_part = edge
+                                                nearest_obj = optobj
+                                                nearest_shape = obj
 
                         for face in obj.Shape.Faces:
                             if face.BoundBox.intersect(origin, dir):
@@ -199,13 +177,13 @@ class RayWorker:
                                         vert=Part.Vertex(p)
                                         if dist.Length > EPSILON and dist.Length < nearest.Length and vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
                                             nearest = dist
-                                            nearest_point = p
+                                            nearest_point = PointVec(p)
                                             nearest_part = face
                                             nearest_obj = optobj
                                             nearest_shape = obj
 
         if nearest_part:
-            neworigin = PointVec(nearest_point)
+            neworigin = nearest_point
             shortline = Part.makeLine(origin, neworigin)
             
             hitname = 'HitsFrom' + fp.Label
