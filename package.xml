@@ -2,7 +2,7 @@
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>Optics</name>
   <description>Geometrical optics for FreeCAD. Performs simple raytracing through your FreeCAD objects.</description>
-  <version>1.1</version>
+  <version>1.02</version>
   <date>2022-01-29</date>
   <maintainer email="christian.bergmann@mailbox.org">Christi</maintainer>
   <license file="LICENSE">LGPL-2.1</license>
