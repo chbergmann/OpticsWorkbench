@@ -185,13 +185,13 @@ class RayWorker:
                                                 
                                             nearest = dist
                                             
-        newline = self.makeNewRay(fp, linearray, origin, nearest_parts)     
+        newline = self.makeNewRay(fp, linearray, origin, nearest_parts, first)     
         if newline:        
             linearray.append(newline)
             self.traceRay(fp, linearray)
             
         
-    def makeNewRay(self, fp, linearray, origin, nearest_parts):                                     
+    def makeNewRay(self, fp, linearray, origin, nearest_parts, first):                                     
         newline = None
         if len(nearest_parts) == 0: return
         
@@ -208,7 +208,7 @@ class RayWorker:
             
             hitname = 'HitsFrom' + fp.Label
             if not hasattr(nearest_obj, hitname):
-                hits = nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
+                nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
                 setattr(nearest_obj, hitname, 1)
             else:
                 setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
