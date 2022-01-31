@@ -196,11 +196,14 @@ class RayWorker:
         if len(nearest_parts) == 0: return
         
         if len(self.lastRefIdx) == 0:
-            newRefIdx = 1
             oldRefIdx = 1
         else: 
-            newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
-            oldRefIdx = newRefIdx
+            oldRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
+            
+        if len(self.lastRefIdx) < 2:
+            newRefIdx = 1
+        else: 
+            newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
                         
         for np in nearest_parts:
             (neworigin, nearest_part, nearest_obj, nearest_shape) = np
@@ -238,19 +241,14 @@ class RayWorker:
                     n = nearest_obj.RefractionIndex
 
                 if nearest_shape in self.in_shapes:
-                    #print("leave " + nearest_shape.Label)
+                    print("leave " + nearest_shape.Label)
                     self.in_shapes.remove(nearest_shape)
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
-                        
-                    if len(self.lastRefIdx) == 0:
-                        newRefIdx = 1
-                    else: 
-                        newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
-                            
+                                                
                 else:       
-                    #print("enter " + nearest_shape.Label)                 
+                    print("enter " + nearest_shape.Label)                 
                     newRefIdx = n
                     self.lastRefIdx.append(n)
                     self.in_shapes.append(nearest_shape)                               
@@ -292,7 +290,7 @@ class RayWorker:
         return 2 * normal * (dRay * normal) - dRay
 
     def snellsLaw(self, ray, n1, n2, normal):
-        #print('snell ' + str(n1) + '/' + str(n2))
+        print('snell ' + str(n1) + '/' + str(n2))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
             return (self.mirror(ray, normal), True)

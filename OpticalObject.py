@@ -143,9 +143,7 @@ class OpticalObjectViewProvider:
     
     def onChanged(self, fp, prop):
         '''Here we can do something when a single property got changed'''
-        if prop == 'Visibility':
-            for vp in fp.ClaimedChildren:
-                vp.Visibility = fp.Visibility
+        pass
     
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\
