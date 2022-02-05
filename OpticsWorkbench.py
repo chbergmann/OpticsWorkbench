@@ -118,5 +118,4 @@ def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
 def isRay(obj):
     return hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns')
 
-def isOpticalObject(obj):
-    return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')
+
