@@ -6,8 +6,7 @@ __license__ = 'LGPL 3.0'
 __doc__ = 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers'
 
 import os
-import FreeCADGui
-from FreeCADGui import doCommand, addCommand
+import FreeCADGui as Gui
 import FreeCAD
 import math
 
@@ -168,13 +167,13 @@ class OpticalMirror():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
             
-        doCommand('OpticsWorkbench.makeMirror(objects)')              
+        Gui.doCommand('OpticsWorkbench.makeMirror(objects)')              
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -196,13 +195,13 @@ class OpticalAbsorber():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        doCommand('OpticsWorkbench.makeAbsorber(objects)')               
+        Gui.doCommand('OpticsWorkbench.makeAbsorber(objects)')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -223,13 +222,13 @@ class OpticalLens():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
+        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -246,6 +245,6 @@ class OpticalLens():
                 'MenuText': 'Optical Lens',
                 'ToolTip' : 'Declare your FreeCAD objects to be optical lenses' }                
                 
-addCommand('Mirror', OpticalMirror())
-addCommand('Absorber', OpticalAbsorber())
-addCommand('Lens', OpticalLens())
+Gui.addCommand('Mirror', OpticalMirror())
+Gui.addCommand('Absorber', OpticalAbsorber())
+Gui.addCommand('Lens', OpticalLens())

@@ -4,7 +4,6 @@ __title__ = 'FreeCAD Optics Workbench - Init file'
 __author__ = 'Christian Bergmann'
 __url__ = ['http://www.freecadweb.org']
 __doc__ = 'Optics Workbench workbench'
-__version__ = '0.0.1'
 
 
 class OpticsWorkbench (Workbench):
@@ -19,10 +18,11 @@ class OpticsWorkbench (Workbench):
         '''This function is executed when FreeCAD starts'''
         # import here all the needed files that create your FreeCAD commands
         import Ray
+        import SunRay
         import OpticalObject
         from examples import example1, example3D, example_dispersion
         
-        self.list = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam', 'Mirror', 'Absorber', 'Lens', 'Off', 'Start'] # A list of command names created in the line above
+        self.list = ['Ray (monochrome)', 'Sun Ray', 'Beam', '2D Radial Beam', 'Spherical Beam', 'Mirror', 'Absorber', 'Lens', 'Off', 'Start'] # A list of command names created in the line above
         self.menu = self.list + ['Example2D', 'Example3D', 'ExampleDispersion']
         
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands

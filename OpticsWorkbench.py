@@ -4,6 +4,7 @@ import os
 from FreeCAD import Vector, Rotation, activeDocument
 import Ray
 import OpticalObject
+import SunRay
 from numpy import linspace
 from importlib import reload
 
@@ -54,8 +55,7 @@ def makeSunRay(position = Vector(0, 0, 0),
             wavelength_from = 400,
             wavelength_to = 800,
             num_rays = 100):
-    reload(Ray)
-    doc = activeDocument()
+    reload(SunRay)
     rays = []
     for l in linspace(wavelength_from, wavelength_to, num_rays):
         ray = makeRay(position = position,
@@ -68,9 +68,11 @@ def makeSunRay(position = Vector(0, 0, 0),
         ray.ViewObject.LineWidth = 1
         rays.append(ray)
 
-    group = doc.addObject('App::DocumentObjectGroup','SunRay')
-    group.Group = rays
+    fp = activeDocument().addObject('Part::FeaturePython','SunRay')
+    SunRay.SunRayWorker(fp, rays)
+    SunRay.SunRayViewProvider(fp.ViewObject)
     recompute()
+    return fp
     
 
 def restartAll():
@@ -89,7 +91,6 @@ def allOff():
     recompute()
 
 def makeMirror(base = []):
-    reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Mirror')
     OpticalObject.OpticalObjectWorker(fp, base)
@@ -98,7 +99,6 @@ def makeMirror(base = []):
     return fp
 
 def makeAbsorber(base = []):
-    reload(OpticalObject)
     '''All FreeCAD objects in base will be optical light absorbers.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Absorber')
     OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
@@ -107,7 +107,6 @@ def makeAbsorber(base = []):
     return fp
 
 def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
-    reload(OpticalObject)
     '''All FreeCAD objects in base will be optical lenses.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Lens')
     OpticalObject.LensWorker(fp, base, RefractionIndex, material)

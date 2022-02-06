@@ -13,7 +13,6 @@ import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
-from OpticsWorkbench import *
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 
@@ -310,16 +309,16 @@ class RayWorker:
 
 
     def isInsidePart(self, part, vertex):
-        return part.Shape.distToShape(Part.Vertex(vertex))[0] < EPSILON
+        return 
         
     def isInsideLens(self, vertex):
         ret = []
         for optobj in activeDocument().Objects:
             if isOpticalObject(optobj) and optobj.OpticalType == 'lens':
                 for obj in optobj.Base:
-                    if self.isInsidePart(obj, vertex):
-                        ret.append(optobj)
-
+                    if len(obj.Shape.Solids) > 0:
+                        if obj.Shape.distToShape(Part.Vertex(vertex))[0] < EPSILON:
+                            ret.append(optobj)
         return ret
       
     def checkNearest(self, dist, nearest, vert, line, edge):
@@ -560,7 +559,6 @@ class AllOff():
                 'ToolTip' : 'Switch off all rays and beams' }
 
 Gui.addCommand('Ray (monochrome)', Ray())
-Gui.addCommand('Ray (sun light)', RaySun())
 Gui.addCommand('Beam', Beam2D())
 Gui.addCommand('2D Radial Beam', RadialBeam2D())
 Gui.addCommand('Spherical Beam', SphericalBeam())
