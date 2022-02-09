@@ -97,22 +97,7 @@ class RayWorker:
                     Ncount = Ncount+1
                     pos = pl.Base
 
-                    if fp.Power == True:
-                        self.iter = fp.MaxNrReflections
-                        ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
-                        linearray.append(ray)
-                        self.lastRefIdx = []
-                        self.in_shapes = self.isInsideLens(ray.Vertexes[0])
-                        for shape in self.in_shapes:
-                            self.lastRefIdx.append(shape.RefractionIndex)
-    
-                        try:
-                            self.traceRay(fp, linearray, True)
-                        except Exception as ex:
-                            print(ex)
-                            traceback.print_exc()
-                    else:
-                        linearray.append(Part.makeLine(pos, pos + dir))
+                    self.makeInitialRay(fp, linearray, pos, dir)
             print("Number of rays created = ",Ncount)
         
         else:
@@ -136,23 +121,8 @@ class RayWorker:
     
                         r. Angle = row * math.pi / fp.BeamNrRows
                         dir = r.multVec(dir1)
-    
-                    if fp.Power == True:
-                        self.iter = fp.MaxNrReflections
-                        ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
-                        linearray.append(ray)
-                        self.lastRefIdx = []
-                        self.in_shapes = self.isInsideLens(ray.Vertexes[0])
-                        for shape in self.in_shapes:
-                            self.lastRefIdx.append(shape.RefractionIndex)
-    
-                        try:
-                            self.traceRay(fp, linearray, True)
-                        except Exception as ex:
-                            print(ex)
-                            traceback.print_exc()
-                    else:
-                        linearray.append(Part.makeLine(pos, pos + dir))
+
+                    self.makeInitialRay(fp, linearray, pos, dir)
 
 
         for line in linearray:
@@ -177,7 +147,26 @@ class RayWorker:
             fp.ViewObject.LineColor = (float(r), float(g), float(b), (0.0))
 
         fp.ViewObject.Transparency = 50
+        
 
+    def makeInitialRay(self, fp, linearray, pos, dir):
+        if fp.Power == True:
+            self.iter = fp.MaxNrReflections
+            ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
+            linearray.append(ray)
+            self.lastRefIdx = []
+            self.in_shapes = self.isInsideLens(ray.Vertexes[0])
+            for shape in self.in_shapes:
+                self.lastRefIdx.append(shape.RefractionIndex)
+
+            try:
+                self.traceRay(fp, linearray, True)
+            except Exception as ex:
+                print(ex)
+                traceback.print_exc()
+        else:
+            linearray.append(Part.makeLine(pos, pos + dir))
+            
 
     def traceRay(self, fp, linearray, first=False):
         if len(linearray) == 0: return
