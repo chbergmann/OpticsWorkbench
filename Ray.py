@@ -69,45 +69,91 @@ class RayWorker:
             if isOpticalObject(optobj):
                 if hasattr(optobj, hitname):
                     setattr(optobj, hitname, 0)
-
         linearray = []
-        for row in range(0, int(fp.BeamNrRows)):
-            for n in range(0, int(fp.BeamNrColumns)):
-                if fp.Spherical == False:
-                    newpos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
-                    pos = pl.Base + pl.Rotation.multVec(newpos)
-                    dir = pl.Rotation.multVec(Vector(1, 0, 0))
-                else:
-                    r = Rotation()
-                    r.Axis = Vector(0, 0, 1)
-                    r. Angle = n * 2 * math.pi / fp.BeamNrColumns
+        if fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
+            # make spherical beam pattern that has equaly spaced rays.
+            # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung, 
+            # link https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
+            Ncount = 0 #create counter to check how many beams actually are generated
+            N = int(fp.BeamNrColumns) #N = number of rays 
+            r = 1 # use a unit circle with radius 1 to determine the direction vector of each ray
+            a = 4*math.pi*r**2 / N # required surface area for each ray for a unit circle, by deviding the surface area of the unit circle by the number of rays
+            d = math.sqrt(a) #dont know but it works :-p
+            M_angle1 = round(math.pi/d) # dont know but it works :-p
+            #Quote from paper: Regular equidistribution can be achieved by choosing circles of latitude at constant intervals d_angle1 and on these circles points with distance d_angle2, such that d_angle1 roughly equal to d_angle2 and that d_angle1*d_angle2 equals the average area per point. This then gives the following algorithm:
+            d_angle1 = math.pi/M_angle1 # calculate the distance between the circles of the latitude
+            d_angle2 = a/d_angle1 # calculate the distance between the points on the circumferance of the circle
+            for m in range(0, M_angle1):
+                r = Rotation()
+                r.Axis = Vector(0, 0, 1)
+                angle1 = math.pi*(m+0.5)/M_angle1
+                M_angle2 = round(2*math.pi*math.sin(angle1)/d_angle2)                
+                if int(fp.BeamNrRows) == 1: # if the beam is 2d, create only two points on the each projecting circle
+                    M_angle2 = 2
+                for n in range(0,M_angle2):
+                    angle2 = 2*math.pi*n/M_angle2
+                    dir = pl.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
+
+                    Ncount = Ncount+1
                     pos = pl.Base
-                    dir1 = r.multVec(Vector(1,0,0))
 
-                    if row % 2 == 0:
-                        r.Axis = Vector(0, 1, 0)
+                    if fp.Power == True:
+                        self.iter = fp.MaxNrReflections
+                        ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
+                        linearray.append(ray)
+                        self.lastRefIdx = []
+                        self.in_shapes = self.isInsideLens(ray.Vertexes[0])
+                        for shape in self.in_shapes:
+                            self.lastRefIdx.append(shape.RefractionIndex)
+    
+                        try:
+                            self.traceRay(fp, linearray, True)
+                        except Exception as ex:
+                            print(ex)
+                            traceback.print_exc()
                     else:
-                        r.Axis = Vector(1, 0, 0)
+                        linearray.append(Part.makeLine(pos, pos + dir))
+            print("Number of rays created = ",Ncount)
+        
+        else:
+            for row in range(0, int(fp.BeamNrRows)):
+                for n in range(0, int(fp.BeamNrColumns)):
+                    if fp.Spherical == False:
+                        newpos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
+                        pos = pl.Base + pl.Rotation.multVec(newpos)
+                        dir = pl.Rotation.multVec(Vector(1, 0, 0))
+                    else:
+                        r = Rotation()
+                        r.Axis = Vector(0, 0, 1)
+                        r. Angle = n * 2 * math.pi / fp.BeamNrColumns
+                        pos = pl.Base
+                        dir1 = r.multVec(Vector(1,0,0))
+    
+                        if row % 2 == 0:
+                            r.Axis = Vector(0, 1, 0)
+                        else:
+                            r.Axis = Vector(1, 0, 0)
+    
+                        r. Angle = row * math.pi / fp.BeamNrRows
+                        dir = r.multVec(dir1)
+    
+                    if fp.Power == True:
+                        self.iter = fp.MaxNrReflections
+                        ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
+                        linearray.append(ray)
+                        self.lastRefIdx = []
+                        self.in_shapes = self.isInsideLens(ray.Vertexes[0])
+                        for shape in self.in_shapes:
+                            self.lastRefIdx.append(shape.RefractionIndex)
+    
+                        try:
+                            self.traceRay(fp, linearray, True)
+                        except Exception as ex:
+                            print(ex)
+                            traceback.print_exc()
+                    else:
+                        linearray.append(Part.makeLine(pos, pos + dir))
 
-                    r. Angle = row * math.pi / fp.BeamNrRows
-                    dir = r.multVec(dir1)
-
-                if fp.Power == True:
-                    self.iter = fp.MaxNrReflections
-                    ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
-                    linearray.append(ray)
-                    self.lastRefIdx = []
-                    self.in_shapes = self.isInsideLens(ray.Vertexes[0])
-                    for shape in self.in_shapes:
-                        self.lastRefIdx.append(shape.RefractionIndex)
-
-                    try:
-                        self.traceRay(fp, linearray, True)
-                    except Exception as ex:
-                        print(ex)
-                        traceback.print_exc()
-                else:
-                    linearray.append(Part.makeLine(pos, pos + dir))
 
         for line in linearray:
             r2 = Rotation(pl.Rotation)
