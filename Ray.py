@@ -92,7 +92,7 @@ class RayWorker:
                     M_angle2 = 2
                 for n in range(0,M_angle2):
                     angle2 = 2*math.pi*n/M_angle2
-                    dir = pl.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
+                    dir = Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1))
 
                     Ncount = Ncount+1
                     pos = pl.Base
