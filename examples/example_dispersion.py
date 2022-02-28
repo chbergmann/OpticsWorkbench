@@ -46,7 +46,7 @@ def make_optics():
     prism = create_prism(doc)
     doc.recompute()
     OpticsWorkbench.makeLens(prism, material='PMMA (plexiglass)').Label = 'Refractor'
-    OpticsWorkbench.makeSunRay(maxRayLength=1.0)
+    OpticsWorkbench.makeSunRay(maxRayLength=2.0)
     doc.recompute()
 
 class ExampleDispersion():

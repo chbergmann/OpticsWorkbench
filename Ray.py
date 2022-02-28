@@ -46,7 +46,6 @@ class RayWorker:
 
         fp.Proxy = self
         self.lastRefIdx = []
-        self.in_shapes = []
         self.iter = 0
 
     def execute(self, fp):
@@ -155,9 +154,6 @@ class RayWorker:
             ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
             linearray.append(ray)
             self.lastRefIdx = []
-            self.in_shapes = self.isInsideLens(ray.Vertexes[0])
-            for shape in self.in_shapes:
-                self.lastRefIdx.append(shape.RefractionIndex)
 
             try:
                 self.traceRay(fp, linearray, True)
@@ -167,19 +163,16 @@ class RayWorker:
         else:
             linearray.append(Part.makeLine(pos, pos + dir))
             
-
-    def traceRay(self, fp, linearray, first=False):
-        if len(linearray) == 0: return
-        nearest = Vector(INFINITY, INFINITY, INFINITY)
-        nearest_parts = []
-        line = linearray[len(linearray) - 1]
+        
+    def getIntersections(self, line):
+        '''returns [(OpticalObject, [(edge/face, intersection point)] )]'''
+        isec_struct = []
         origin = PointVec(line.Vertexes[0])
-        if fp.HideFirstPart and first:
-            linearray.remove(line)
 
         dir = PointVec(line.Vertexes[1]) - origin
         for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj):
+            if isOpticalObject(optobj):            
+                isec_parts = []
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):
                         if len(obj.Shape.Solids) == 0 and len(obj.Shape.Shells) == 0:
@@ -193,15 +186,9 @@ class RayWorker:
                                         for p in isec:
                                             p2 = plane.value(p[0], p[1])
                                             dist = p2 - origin
-                                            vert=Part.Vertex(p2)
-                                            if self.checkNearest(dist, nearest, vert, line, edge):
-                                                np = (p2, edge, optobj, obj)
-                                                if abs(dist.Length - nearest.Length) < EPSILON:
-                                                    nearest_parts.append(np)
-                                                else:
-                                                    nearest_parts = [np]
-                                                    
-                                                nearest = dist
+                                            vert=Part.Vertex(p2)                              
+                                            if dist.Length > EPSILON and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
+                                                isec_parts.append((edge, p2))                         
 
                         for face in obj.Shape.Faces:
                             if face.BoundBox.intersect(origin, dir):
@@ -209,24 +196,40 @@ class RayWorker:
                                 if isec:
                                     for p in isec[0]:
                                         dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
-                                        vert=Part.Vertex(p)
-                                        if self.checkNearest(dist, nearest, vert, line, face):
-                                            np = (PointVec(p), face, optobj, obj)
-                                            if abs(dist.Length - nearest.Length) < EPSILON:
-                                                nearest_parts.append(np)
-                                            else:
-                                                nearest_parts = [np]
-                                                
-                                            nearest = dist
+                                        vert=Part.Vertex(p)                
+                                        if dist.Length > EPSILON and vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
+                                            isec_parts.append((face, PointVec(p)))
                                             
-        newline = self.makeNewRay(fp, linearray, origin, nearest_parts, first)     
-        if newline:        
-            linearray.append(newline)
-            self.traceRay(fp, linearray)
-            
+                    if len(isec_parts) > 0:
+                        isec_struct.append((optobj, isec_parts))
         
-    def makeNewRay(self, fp, linearray, origin, nearest_parts, first):                                     
-        newline = None
+        return isec_struct
+        
+        
+    def traceRay(self, fp, linearray, first=False):
+        nearest = Vector(INFINITY, INFINITY, INFINITY)
+        nearest_parts = []
+        
+        if len(linearray) == 0: return   
+        line = linearray[len(linearray) - 1]
+        if fp.HideFirstPart and first:
+            linearray.remove(line)
+                  
+        isec_struct = self.getIntersections(line)
+        origin = PointVec(line.Vertexes[0])
+                                           
+        for isec in isec_struct:
+            for ipoints in isec[1]:
+                dist = ipoints[1] - origin
+                if dist.Length <= nearest.Length + EPSILON:
+                    np = (ipoints[1], ipoints[0], isec[0])
+                    if abs(dist.Length - nearest.Length) < EPSILON:
+                        nearest_parts.append(np)
+                    else:
+                        nearest_parts = [np]
+                        
+                    nearest = dist
+                         
         if len(nearest_parts) == 0: return
         
         if len(self.lastRefIdx) == 0:
@@ -240,7 +243,7 @@ class RayWorker:
             newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
                         
         for np in nearest_parts:
-            (neworigin, nearest_part, nearest_obj, nearest_shape) = np
+            (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
             
             hitname = 'HitsFrom' + fp.Label
@@ -264,9 +267,9 @@ class RayWorker:
                 print('Cannot determine the normal on ' + nearest_obj.Label)
                 return
                     
-            if nearest_obj.OpticalType == 'mirror':      
+            if nearest_obj.OpticalType == 'mirror':
                 dNewRay = self.mirror(dRay, normal)
-                return Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length) 
+                break
                                                 
             elif nearest_obj.OpticalType == 'lens':  
                 if len(nearest_obj.Sellmeier) == 6:
@@ -274,27 +277,25 @@ class RayWorker:
                 else:
                     n = nearest_obj.RefractionIndex
 
-                if nearest_shape in self.in_shapes:
-                    #print("leave " + nearest_shape.Label)
-                    self.in_shapes.remove(nearest_shape)
+                if self.isInsideLens(isec_struct, origin, nearest_obj):
+                    #print("leave " + nearest_obj.Label)
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                                                 
                 else:       
-                    #print("enter " + nearest_shape.Label)                 
-                    newRefIdx = n
-                    self.lastRefIdx.append(n)
-                    self.in_shapes.append(nearest_shape)                               
-
-            else: return       
+                    #print("enter " + nearest_obj.Label)                 
+                    newRefIdx = n                          
             
-        (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-        if totatreflect:
-            self.lastRefIdx.append(n)
-            self.in_shapes.append(nearest_shape) 
+                (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+                if totatreflect:
+                    self.lastRefIdx.append(n) 
  
-        newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)       
+            else: return
+            
+        newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)         
+        linearray.append(newline)
+        self.traceRay(fp, linearray)     
         return newline
             
 
@@ -305,6 +306,8 @@ class RayWorker:
             tangent = nearest_part.tangentAt(param)
             normal1 = dRay.cross(tangent)
             normal = tangent.cross(normal1)
+            if normal.Length < EPSILON:
+                return Vector(0, 0, 0)
             normal = normal / normal.Length
 
         elif hasattr(nearest_part, 'Surface'):
@@ -322,6 +325,7 @@ class RayWorker:
 
     def mirror(self, dRay, normal):
         return 2 * normal * (dRay * normal) - dRay
+
 
     def snellsLaw(self, ray, n1, n2, normal):
         #print('snell ' + str(n1) + '/' + str(n2))
@@ -342,23 +346,14 @@ class RayWorker:
 
         return nvec
 
-
-    def isInsidePart(self, part, vertex):
-        return 
         
-    def isInsideLens(self, vertex):
-        ret = []
-        for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj) and optobj.OpticalType == 'lens':
-                for obj in optobj.Base:
-                    if len(obj.Shape.Solids) > 0:
-                        if obj.Shape.distToShape(Part.Vertex(vertex))[0] < EPSILON:
-                            ret.append(optobj)
-        return ret
+    def isInsideLens(self, isec_struct, origin, lens):      
+        for isec in isec_struct:
+            if lens == isec[0]:
+                return len(isec[1]) % 2 == 1
+                
+        return False
       
-    def checkNearest(self, dist, nearest, vert, line, edge):
-        return dist.Length > EPSILON and dist.Length <= nearest.Length + EPSILON \
-            and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON
 
 def PointVec(point):
     '''Converts a Part::Point to a FreeCAD::Vector'''
