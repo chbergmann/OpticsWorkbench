@@ -6,7 +6,7 @@
   <date>2022-02-28</date>
   <maintainer email="christian.bergmann@mailbox.org">Christi</maintainer>
   <license file="LICENSE">LGPL-2.1</license>
-  <url type="repository" branch="master">https://github.com/chbergmann/OpticsWorkbench</url>
+  <url type="repository" branch="main">https://github.com/chbergmann/OpticsWorkbench</url>
   <url type="documentation">https://github.com/chbergmann/OpticsWorkbench/README.md</url>
   <icon>optics_workbench_icon.svg</icon>
 
