@@ -8,7 +8,6 @@ __doc__ = 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbe
 import os
 import FreeCADGui as Gui
 import FreeCAD
-import math
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
     

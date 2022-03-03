@@ -171,7 +171,7 @@ class RayWorker:
 
         dir = PointVec(line.Vertexes[1]) - origin
         for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj):            
+            if isOpticalObject(optobj):
                 isec_parts = []
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):
@@ -188,7 +188,7 @@ class RayWorker:
                                             dist = p2 - origin
                                             vert=Part.Vertex(p2)                              
                                             if dist.Length > EPSILON and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
-                                                isec_parts.append((edge, p2))                         
+                                                isec_parts.append((edge, p2))      
 
                         for face in obj.Shape.Faces:
                             if face.BoundBox.intersect(origin, dir):
@@ -200,8 +200,8 @@ class RayWorker:
                                         if dist.Length > EPSILON and vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
                                             isec_parts.append((face, PointVec(p)))
                                             
-                    if len(isec_parts) > 0:
-                        isec_struct.append((optobj, isec_parts))
+                if len(isec_parts) > 0:
+                    isec_struct.append((optobj, isec_parts))
         
         return isec_struct
         
@@ -209,6 +209,7 @@ class RayWorker:
     def traceRay(self, fp, linearray, first=False):
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_parts = []
+        doLens = False
         
         if len(linearray) == 0: return   
         line = linearray[len(linearray) - 1]
@@ -217,7 +218,7 @@ class RayWorker:
                   
         isec_struct = self.getIntersections(line)
         origin = PointVec(line.Vertexes[0])
-                                           
+                                      
         for isec in isec_struct:
             for ipoints in isec[1]:
                 dist = ipoints[1] - origin
@@ -271,28 +272,31 @@ class RayWorker:
                 dNewRay = self.mirror(dRay, normal)
                 break
                                                 
-            elif nearest_obj.OpticalType == 'lens':  
+            elif nearest_obj.OpticalType == 'lens':
+                doLens = True 
                 if len(nearest_obj.Sellmeier) == 6:
                     n = OpticalObject.refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)                           
                 else:
                     n = nearest_obj.RefractionIndex
 
                 if self.isInsideLens(isec_struct, origin, nearest_obj):
-                    #print("leave " + nearest_obj.Label)
+                    print("leave " + nearest_obj.Label)
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                                                 
                 else:       
-                    #print("enter " + nearest_obj.Label)                 
-                    newRefIdx = n                          
-            
-                (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-                if totatreflect:
-                    self.lastRefIdx.append(n) 
+                    print("enter " + nearest_obj.Label)                 
+                    newRefIdx = n
+                    self.lastRefIdx.append(n)                                   
  
             else: return
             
+        if doLens:
+            (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+            if totatreflect:
+                self.lastRefIdx.append(n) 
+                    
         newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)         
         linearray.append(newline)
         self.traceRay(fp, linearray)     
@@ -328,7 +332,7 @@ class RayWorker:
 
 
     def snellsLaw(self, ray, n1, n2, normal):
-        #print('snell ' + str(n1) + '/' + str(n2))
+        print('snell ' + str(n1) + '/' + str(n2))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
             return (self.mirror(ray, normal), True)
