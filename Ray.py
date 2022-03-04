@@ -280,13 +280,13 @@ class RayWorker:
                     n = nearest_obj.RefractionIndex
 
                 if self.isInsideLens(isec_struct, origin, nearest_obj):
-                    print("leave " + nearest_obj.Label)
+                    #print("leave " + nearest_obj.Label)
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                                                 
                 else:       
-                    print("enter " + nearest_obj.Label)                 
+                    #print("enter " + nearest_obj.Label)                 
                     newRefIdx = n
                     self.lastRefIdx.append(n)                                   
  
@@ -332,7 +332,7 @@ class RayWorker:
 
 
     def snellsLaw(self, ray, n1, n2, normal):
-        print('snell ' + str(n1) + '/' + str(n2))
+        #print('snell ' + str(n1) + '/' + str(n2))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
             return (self.mirror(ray, normal), True)
