@@ -33,7 +33,8 @@ class RayWorker:
                  hideFirst=False,
                  maxRayLength = 1000000,
                  maxNrReflections = 200,
-                 wavelength = 580):
+                 wavelength = 580,
+                 coneAngle = 360):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
         fp.addProperty('App::PropertyQuantity', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
@@ -43,6 +44,7 @@ class RayWorker:
         fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',  'maximum length of a ray').MaxRayLength = maxRayLength
         fp.addProperty('App::PropertyFloat', 'MaxNrReflections', 'Ray',  'maximum number of reflections').MaxNrReflections = maxNrReflections
         fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength        
+        fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle        
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -62,12 +64,20 @@ class RayWorker:
 
     def redrawRay(self, fp):
         pl = fp.Placement
-         
         hitname = 'HitsFrom' + fp.Label
         for optobj in activeDocument().Objects:
             if isOpticalObject(optobj):
                 if hasattr(optobj, hitname):
                     setattr(optobj, hitname, 0)
+                    
+        
+        try: #check if the beam has the parameter coneAngle, this is a legacy check.
+            coneAngle = float(fp.ConeAngle)
+            if coneAngle > 360:
+                coneAngle = 360 #cone angles larger than 360 are not possible, this is a sphere
+        except: 
+            coneAngle = 360
+            
         linearray = []
         if fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
             # make spherical beam pattern that has equaly spaced rays.
@@ -76,29 +86,36 @@ class RayWorker:
             Ncount = 0 #create counter to check how many beams actually are generated
             N = int(fp.BeamNrColumns) #N = number of rays 
             r = 1 # use a unit circle with radius 1 to determine the direction vector of each ray
-            a = 4*math.pi*r**2 / N # required surface area for each ray for a unit circle, by deviding the surface area of the unit circle by the number of rays
+            a = 2*math.radians(coneAngle)/N # required surface area for each ray for a unit circle, by deviding the surface area of the unit circle by the number of rays
             d = math.sqrt(a) #dont know but it works :-p
-            M_angle1 = round(math.pi/d) # dont know but it works :-p
+            M_angle1 = round(math.radians(coneAngle/2)/d) # Angle step between the circles on which the points are projected
             #Quote from paper: Regular equidistribution can be achieved by choosing circles of latitude at constant intervals d_angle1 and on these circles points with distance d_angle2, such that d_angle1 roughly equal to d_angle2 and that d_angle1*d_angle2 equals the average area per point. This then gives the following algorithm:
-            d_angle1 = math.pi/M_angle1 # calculate the distance between the circles of the latitude
+
+            d_angle1 = math.radians(coneAngle/2)/M_angle1 # calculate the distance between the circles of the latitude
             d_angle2 = a/d_angle1 # calculate the distance between the points on the circumferance of the circle
-            for m in range(0, M_angle1):
+            for m in range(0, M_angle1+1):
                 r = Rotation()
-                r.Axis = Vector(0, 0, 1)
-                angle1 = math.pi*(m+0.5)/M_angle1
+                r.Axis = Vector(0, 0, 1)                
+                angle1 = math.radians(coneAngle/2)*(m)/M_angle1
                 M_angle2 = round(2*math.pi*math.sin(angle1)/d_angle2)                
                 if int(fp.BeamNrRows) == 1: # if the beam is 2d, create only two points on the each projecting circle
                     M_angle2 = 2
+                if M_angle2 == 0: #if angle is 0 then set one ray in the vertical position
+                    angle2=0
+                    dir = pl.Rotation.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
+                    Ncount = Ncount+1
+                    pos = pl.Base
+                    self.makeInitialRay(fp, linearray, pos, dir)
+                    
                 for n in range(0,M_angle2):
                     angle2 = 2*math.pi*n/M_angle2
-                    dir = Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1))
-
+                    dir = pl.Rotation.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
                     Ncount = Ncount+1
                     pos = pl.Base
 
                     self.makeInitialRay(fp, linearray, pos, dir)
             print("Number of rays created = ",Ncount)
-        
+
         else:
             for row in range(0, int(fp.BeamNrRows)):
                 for n in range(0, int(fp.BeamNrColumns)):
