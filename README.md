@@ -10,14 +10,24 @@ Performs simple raytracing through your FreeCAD objects.
   
 ## Installation
 
+### Auto Installation
+
+Optics workbench is available through the FreeCAD [Addon Manager](https://wiki.freecad.org/AddonManager)
 
 ### Manual Installation
+
+<details>
+<summary>Expand to view manual installation instructions</summary>
 
 ```bash
 cd ~/.FreeCAD/Mod/ 
 git clone https://github.com/chbergmann/OpticsWorkbench.git
 ```
-When you restart FreeCAD, "Optics Workbench" workbench should now show up in the [workbench dropdown list](https://freecadweb.org/wiki/Std_Workbench).
+
+</details>
+
+#### Important Note
+Once Optics workbench is installed, FreeCAD will need to be restarted. When you restart FreeCAD, "Optics Workbench" workbench should now show up in the [workbench dropdown list](https://freecad.org/wiki/Std_Workbench).
   
 ## Getting started
 - Create some FreeCAD design objects. For 2D simulation Sketches will do the job.
@@ -91,7 +101,7 @@ generates the screenshot above
 see [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)
 
 ## Discussion
-Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecadweb.org/viewtopic.php?f=8&t=59860).
+Please offer feedback or connect with the developer via the [dedicated FreeCAD forum thread](https://forum.freecad.org/viewtopic.php?f=8&t=59860).
 
 ## License
 GNU Lesser General Public License v3.0 ([LICENSE](LICENSE))
