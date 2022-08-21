@@ -18,7 +18,7 @@ _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 
 INFINITY = 1677216
 EPSILON = 1/INFINITY
-    
+
 
 
 
@@ -43,8 +43,8 @@ class RayWorker:
         fp.addProperty('App::PropertyBool', 'HideFirstPart', 'Ray',  'hide the first part of every ray').HideFirstPart = hideFirst
         fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',  'maximum length of a ray').MaxRayLength = maxRayLength
         fp.addProperty('App::PropertyFloat', 'MaxNrReflections', 'Ray',  'maximum number of reflections').MaxNrReflections = maxNrReflections
-        fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength        
-        fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle        
+        fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength
+        fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -57,7 +57,7 @@ class RayWorker:
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
         if not hasattr(fp, 'iter'): return
-        
+
         proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength']
         if prop in proplist:
             self.redrawRay(fp)
@@ -69,35 +69,35 @@ class RayWorker:
             if isOpticalObject(optobj):
                 if hasattr(optobj, hitname):
                     setattr(optobj, hitname, 0)
-                    
-        
+
+
         try: #check if the beam has the parameter coneAngle, this is a legacy check.
             coneAngle = float(fp.ConeAngle)
             if coneAngle > 360:
                 coneAngle = 360 #cone angles larger than 360 are not possible, this is a sphere
-        except: 
+        except:
             coneAngle = 360
-            
+
         linearray = []
         if fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
-            # make spherical beam pattern that has equaly spaced rays.
-            # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung, 
+            # make spherical beam pattern that has equally spaced rays.
+            # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung,
             # link https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
             Ncount = 0 #create counter to check how many beams actually are generated
-            N = int(fp.BeamNrColumns) #N = number of rays 
+            N = int(fp.BeamNrColumns) #N = number of rays
             r = 1 # use a unit circle with radius 1 to determine the direction vector of each ray
-            a = 2*math.radians(coneAngle)/N # required surface area for each ray for a unit circle, by deviding the surface area of the unit circle by the number of rays
+            a = 2*math.radians(coneAngle)/N # required surface area for each ray for a unit circle, by dividing the surface area of the unit circle by the number of rays
             d = math.sqrt(a) #dont know but it works :-p
             M_angle1 = round(math.radians(coneAngle/2)/d) # Angle step between the circles on which the points are projected
             #Quote from paper: Regular equidistribution can be achieved by choosing circles of latitude at constant intervals d_angle1 and on these circles points with distance d_angle2, such that d_angle1 roughly equal to d_angle2 and that d_angle1*d_angle2 equals the average area per point. This then gives the following algorithm:
 
             d_angle1 = math.radians(coneAngle/2)/M_angle1 # calculate the distance between the circles of the latitude
-            d_angle2 = a/d_angle1 # calculate the distance between the points on the circumferance of the circle
+            d_angle2 = a/d_angle1 # calculate the distance between the points on the circumference of the circle
             for m in range(0, M_angle1+1):
                 r = Rotation()
-                r.Axis = Vector(0, 0, 1)                
+                r.Axis = Vector(0, 0, 1)
                 angle1 = math.radians(coneAngle/2)*(m)/M_angle1
-                M_angle2 = round(2*math.pi*math.sin(angle1)/d_angle2)                
+                M_angle2 = round(2*math.pi*math.sin(angle1)/d_angle2)
                 if int(fp.BeamNrRows) == 1: # if the beam is 2d, create only two points on the each projecting circle
                     M_angle2 = 2
                 if M_angle2 == 0: #if angle is 0 then set one ray in the vertical position
@@ -106,7 +106,7 @@ class RayWorker:
                     Ncount = Ncount+1
                     pos = pl.Base
                     self.makeInitialRay(fp, linearray, pos, dir)
-                    
+
                 for n in range(0,M_angle2):
                     angle2 = 2*math.pi*n/M_angle2
                     dir = pl.Rotation.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
@@ -129,12 +129,12 @@ class RayWorker:
                         r. Angle = n * 2 * math.pi / fp.BeamNrColumns
                         pos = pl.Base
                         dir1 = r.multVec(Vector(1,0,0))
-    
+
                         if row % 2 == 0:
                             r.Axis = Vector(0, 1, 0)
                         else:
                             r.Axis = Vector(1, 0, 0)
-    
+
                         r. Angle = row * math.pi / fp.BeamNrRows
                         dir = r.multVec(dir1)
 
@@ -156,14 +156,14 @@ class RayWorker:
                 rgb = wavelen2rgb(fp.Wavelength)
             except ValueError:
                 # set color to white if outside of visible range
-                rgb = (255, 255, 255)  
+                rgb = (255, 255, 255)
             r = rgb[0] / 255.0
             g = rgb[1] / 255.0
-            b = rgb[2] / 255.0 
+            b = rgb[2] / 255.0
             fp.ViewObject.LineColor = (float(r), float(g), float(b), (0.0))
 
         fp.ViewObject.Transparency = 50
-        
+
 
     def makeInitialRay(self, fp, linearray, pos, dir):
         if fp.Power == True:
@@ -179,8 +179,8 @@ class RayWorker:
                 traceback.print_exc()
         else:
             linearray.append(Part.makeLine(pos, pos + dir))
-            
-        
+
+
     def getIntersections(self, line):
         '''returns [(OpticalObject, [(edge/face, intersection point)] )]'''
         isec_struct = []
@@ -203,9 +203,9 @@ class RayWorker:
                                         for p in isec:
                                             p2 = plane.value(p[0], p[1])
                                             dist = p2 - origin
-                                            vert=Part.Vertex(p2)                              
+                                            vert=Part.Vertex(p2)
                                             if dist.Length > EPSILON and vert.distToShape(edge)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
-                                                isec_parts.append((edge, p2))      
+                                                isec_parts.append((edge, p2))
 
                         for face in obj.Shape.Faces:
                             if face.BoundBox.intersect(origin, dir):
@@ -213,29 +213,29 @@ class RayWorker:
                                 if isec:
                                     for p in isec[0]:
                                         dist = Vector(p.X - origin.x, p.Y - origin.y, p.Z - origin.z)
-                                        vert=Part.Vertex(p)                
+                                        vert=Part.Vertex(p)
                                         if dist.Length > EPSILON and vert.distToShape(face)[0] < EPSILON and vert.distToShape(line)[0] < EPSILON:
                                             isec_parts.append((face, PointVec(p)))
-                                            
+
                 if len(isec_parts) > 0:
                     isec_struct.append((optobj, isec_parts))
-        
+
         return isec_struct
-        
-        
+
+
     def traceRay(self, fp, linearray, first=False):
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_parts = []
         doLens = False
-        
-        if len(linearray) == 0: return   
+
+        if len(linearray) == 0: return
         line = linearray[len(linearray) - 1]
         if fp.HideFirstPart and first:
             linearray.remove(line)
-                  
+
         isec_struct = self.getIntersections(line)
         origin = PointVec(line.Vertexes[0])
-                                      
+
         for isec in isec_struct:
             for ipoints in isec[1]:
                 dist = ipoints[1] - origin
@@ -245,25 +245,25 @@ class RayWorker:
                         nearest_parts.append(np)
                     else:
                         nearest_parts = [np]
-                        
+
                     nearest = dist
-                         
+
         if len(nearest_parts) == 0: return
-        
+
         if len(self.lastRefIdx) == 0:
             oldRefIdx = 1
-        else: 
+        else:
             oldRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
-            
+
         if len(self.lastRefIdx) < 2:
             newRefIdx = 1
-        else: 
+        else:
             newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
-                        
+
         for np in nearest_parts:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
-            
+
             hitname = 'HitsFrom' + fp.Label
             if not hasattr(nearest_obj, hitname):
                 nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
@@ -284,15 +284,15 @@ class RayWorker:
             if normal.Length == 0:
                 print('Cannot determine the normal on ' + nearest_obj.Label)
                 return
-                    
+
             if nearest_obj.OpticalType == 'mirror':
                 dNewRay = self.mirror(dRay, normal)
                 break
-                                                
+
             elif nearest_obj.OpticalType == 'lens':
-                doLens = True 
+                doLens = True
                 if len(nearest_obj.Sellmeier) == 6:
-                    n = OpticalObject.refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)                           
+                    n = OpticalObject.refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)
                 else:
                     n = nearest_obj.RefractionIndex
 
@@ -301,24 +301,24 @@ class RayWorker:
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
-                                                
-                else:       
-                    #print("enter " + nearest_obj.Label)                 
+
+                else:
+                    #print("enter " + nearest_obj.Label)
                     newRefIdx = n
-                    self.lastRefIdx.append(n)                                   
- 
+                    self.lastRefIdx.append(n)
+
             else: return
-            
+
         if doLens:
             (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
             if totatreflect:
-                self.lastRefIdx.append(n) 
-                    
-        newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)         
+                self.lastRefIdx.append(n)
+
+        newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
         linearray.append(newline)
-        self.traceRay(fp, linearray)     
+        self.traceRay(fp, linearray)
         return newline
-            
+
 
     def getNormal(self, nearest_obj, nearest_part, origin, neworigin):
         dRay = neworigin - origin
@@ -367,14 +367,14 @@ class RayWorker:
 
         return nvec
 
-        
-    def isInsideLens(self, isec_struct, origin, lens):      
+
+    def isInsideLens(self, isec_struct, origin, lens):
         for isec in isec_struct:
             if lens == isec[0]:
                 return len(isec[1]) % 2 == 1
-                
+
         return False
-      
+
 
 def PointVec(point):
     '''Converts a Part::Point to a FreeCAD::Vector'''
@@ -382,7 +382,7 @@ def PointVec(point):
 
 def isOpticalObject(obj):
     return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')
-    
+
 
 class RayViewProvider:
     def __init__(self, vobj):
