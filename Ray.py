@@ -65,10 +65,13 @@ class RayWorker:
     def redrawRay(self, fp):
         pl = fp.Placement
         hitname = 'HitsFrom' + fp.Label
+        hitcoordsname = 'HitCoordsFrom' + fp.Label
         for optobj in activeDocument().Objects:
             if isOpticalObject(optobj):
                 if hasattr(optobj, hitname):
                     setattr(optobj, hitname, 0)
+                if hasattr(optobj, hitcoordsname):
+                    setattr(optobj, hitcoordsname, [])
 
 
         try: #check if the beam has the parameter coneAngle, this is a legacy check.
@@ -270,6 +273,14 @@ class RayWorker:
                 setattr(nearest_obj, hitname, 1)
             else:
                 setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
+
+            if nearest_obj.OpticalType == "absorber":
+                # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
+                hitcoordsname = 'HitCoordsFrom' + fp.Label
+                if not hasattr(nearest_obj, hitcoordsname):
+                    nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject',   'Hit coordinates from ' + fp.Label + ' (read only)')
+                    setattr(nearest_obj, hitcoordsname, [])
+                setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
 
             if fp.HideFirstPart == False or first == False:
                 linearray[len(linearray) - 1] = shortline
