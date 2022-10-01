@@ -77,7 +77,12 @@ Select some FreeCAD objects, then create Optical Absorber
 After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many rays have hit this absorber. Do not modify this value.  
 'Hit coordinates from ... (read only)' records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram.  
   
-![screenshot](./examples/ccd_xyplot.png)
+![screenshot](./examples/ccd_xyplot.png)  
+  
+To show an XY plot, open a python console and type:  
+
+	import OpticsWorkbench
+	OpticsWorkbench.plot_xy(App.ActiveDocument.Absorber)
 
 ### ![Optical Lens](./icons/lens.svg) Optical Lens
 The FreeCAD objects in parameter Base will act as lenses  
