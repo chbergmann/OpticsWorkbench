@@ -117,4 +117,17 @@ def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
 def isRay(obj):
     return hasattr(obj, 'Power') and hasattr(obj, 'BeamNrColumns')
 
-
+def plot_xy(absorber):
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    coords = []
+    attr_names = [attr for attr in dir(absorber) if attr.startswith('HitCoordsFrom')]
+    coords_per_beam = [getattr(absorber, attr) for attr in attr_names]
+    all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
+    x = -all_coords[:,1]
+    y = all_coords[:,2]       
+    
+    if len(all_coords) > 0:
+        plt.scatter(x, y)
+        plt.show()

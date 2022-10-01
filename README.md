@@ -74,7 +74,10 @@ After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will app
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The FreeCAD objects in parameter Base will swallow the rays of light  
 Select some FreeCAD objects, then create Optical Absorber  
-After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many rays have hit this absorber. Do not modify this value.
+After a ray or beam has been added, a parameter 'Hits From Ray/Beam...' will appear. This is a counter of how many rays have hit this absorber. Do not modify this value.  
+'Hit coordinates from ... (read only)' records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram.  
+  
+![screenshot](./examples/ccd_xyplot.png)
 
 ### ![Optical Lens](./icons/lens.svg) Optical Lens
 The FreeCAD objects in parameter Base will act as lenses  
