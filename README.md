@@ -11,17 +11,17 @@ enjoy!
 Thanks to the creator of the fantastic OpticsWorkbench!
 
 ![screenshot](./examples/simple_reflection_grating_set_of_planes.PNG)
-this illustrates a simple reflection grating with 500 lpm hit by sunray. Planes with normal 010 indicate the set of intersecting planes used to define the grating lines direction
+this illustrates a simple reflection grating with 500 lpm hit by sunray. Planes with normal 010 indicate the set of intersecting planes used to define the grating lines direction.
 
 ![screenshot](./examples/simple_transmission_grating.PNG)
 this shows the same body, defined as transmission grating. Note that the diffraction happens at the 2nd surface as specified by the grating type. Differences in refractive indices are taken into accound.
 
 ![screenshot](./examples/Concave_mirror_grating_thorlabs_1.PNG)
 ![screenshot](./examples/Concave_mirror_grating_thorlabs_2.PNG)
-screenshots show that also non-planar bodies can be used, in the example of a concave reflection grating. A stepfile for a thorlabs concave mirror is used and set as a grating with 500 lpm. Sunray of 1st and 2nd order are shown
+screenshots show that also non-planar bodies can be used, in the example of a concave reflection grating. A stepfile for a thorlabs concave mirror is used and set as a grating with 500 lpm. Sunray of 1st and 2nd order are shown.
 
 ![screenshot](./examples/echelle_example.PNG)
-an example of a simple echelle spectrometer using a R2 52.91 lpm grating and a set of sunrays from order -47 to -82 (each order comprises ~5-10 nm, sampled by 15 rays around a center wavelength from blue to red) and a flint glas prism. Collimation and camera optics are thorlabs step files and a transparent absorber shows the resulting echelle spectrum. Entrance into the spectrometer design is by a 50 mu slit. This is a example with very long calculation time due to the high number of rays.
+an example of a simple echelle spectrometer using a R2 52.91 lpm grating and a set of sunrays from order -47 to -82 (each order comprises ~5-10 nm, sampled by 15 rays around a center wavelength from blue to red) and a flint glas prism. Collimation and camera optics are thorlabs step files and a transparent absorber shows the resulting echelle spectrum. Entrance into the spectrometer design is by a 50 mu slit. This is a example with very long calculation time due to the high number of rays. Note that the sign of the order is not intuitive. If an error occurs, stating that complex numbers are not supported, while diffraction with this order is considered valid by the user, try to change the sign of the order. 
 
 
 
