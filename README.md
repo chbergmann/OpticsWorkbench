@@ -1,3 +1,4 @@
+#### tentatively also tested with FreeCAD 0.20.2 on windows 10, normally used with Version 0.19
 #### please find that not all of the below information is valid for this branch.
 #### this branch was done to add simple 1D grating simulation to the very superb OpticsWorkbench.
 #### raytracing of simple 1D gratings is done following Ludwig et al. 1973 https://doi.org/10.1364/JOSA.63.001105
