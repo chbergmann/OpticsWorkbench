@@ -6,7 +6,8 @@ __license__ = 'LGPL 3.0'
 __doc__ = 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers'
 
 import os
-import FreeCADGui as Gui
+import FreeCADGui
+from FreeCADGui import doCommand, addCommand
 import FreeCAD
 import math
 
@@ -105,7 +106,90 @@ class LensWorker:
             fp.Sellmeier = []
             
         self.update = True
+
+class GratingWorker: ### 
+    def __init__(self, 
+                 fp,    # an instance of Part::FeaturePython
+                 base = [],
+                 RefractionIndex = 1,
+                 material = '',
+                 lpm = 500,
+                 GratingType = "reflection",
+                 GratingLinesPlane = FreeCAD.Vector(0,1,0),
+                 order = 1, 
+                 ray_order_override = False):
+        self.update = False 
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Grating', '').OpticalType = ['grating'] 
+        fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',   'FreeCAD objects to be diffraction gratings').Base = base
+        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Grating',   'Refractive Index at 580nm (depends on material)').RefractionIndex = RefractionIndex
+        fp.addProperty(
+            'App::PropertyFloatList',  
+            'Sellmeier',   
+            'Grating',   
+            'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n Usually noted in (µm)² in literature,\n (µm)²=10⁶(nm)².')
+        fp.addProperty('App::PropertyFloat', 'lpm', 'Grating', 'lines per millimeter').lpm = lpm
+        fp.addProperty('App::PropertyEnumeration', 'GratingType', 'Grating', 'reflection or transmission').GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
+        fp.addProperty('App::PropertyVector', 'GratingLinesPlane', 'Grating', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines').GratingLinesPlane = GratingLinesPlane
+        fp.addProperty('App::PropertyFloat', 'order', 'Grating', 'order of diffraction, set by grating').order = order
+        fp.addProperty('App::PropertyBool', 'ray_order_override', 'Grating', 'if true, order of grating overrides order of ray, if false, ray order is used').ray_order_override = ray_order_override
+        fp.OpticalType = 'grating'
+        fp.GratingType = GratingType  
         
+        material_names = list(self.getMaterials())
+          
+        fp.addProperty('App::PropertyEnumeration', 'Material', 'Grating', '').Material = material_names
+        
+        self.update = True 
+        fp.Proxy = self
+        
+        if material in material_names:
+            fp.Material = material
+        else:
+            fp.Material = '?'
+            
+        
+    def getMaterials(self):
+        # https://refractiveindex.info/
+        return {
+            '?':                 None,
+            'Vacuum':            (0, 0, 0, 0, 0, 0),
+            'Air':               (4.915889e-4, 5.368273e-5, -1.949567e-4, 4352.140, 17470.01, 4258444000),  #https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
+            # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
+            # 'Ethanol':           (0, 0, 0, 0, 0, 0),
+            # 'Olive oil':         (0, 0, 0, 0, 0, 0),
+            # 'Ice':               (0, 0, 0, 0, 0, 0),
+            'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
+            'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
+            'Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
+            'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
+            # 'Flint glass':       (0, 0, 0, 0, 0, 0),
+            # 'Sapphire':          (0, 0, 0, 0, 0, 0),
+            # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
+            # 'Diamond':           (0, 0, 0, 0, 0, 0),
+        }  
+
+    def execute(self, fp):
+        pass
+        
+    def onChanged(self, fp, prop):
+        if not self.update: return
+        self.update = False
+        
+        if not hasattr(fp, 'Sellmeier'): return
+        
+        if prop == 'Material':
+            sellmeier = self.getMaterials()[fp.Material]
+            fp.Sellmeier = sellmeier
+            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
+
+        if prop == 'Sellmeier':
+            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
+                    
+        if prop == 'RefractionIndex':
+            fp.Material = '?'
+            fp.Sellmeier = []
+            
+        self.update = True    
     
 class OpticalObjectViewProvider:
     def __init__(self, vobj):
@@ -120,6 +204,9 @@ class OpticalObjectViewProvider:
             
         if self.Object.OpticalType == 'absorber':
             return os.path.join(_icondir_, 'absorber.svg')
+
+        if self.Object.OpticalType == 'grating': ### this paragraph was provided by OpenAI chatgpt at feb.01.2023 
+            return os.path.join(_icondir_, 'grating.svg')
             
         return os.path.join(_icondir_, 'lens.svg')
 
@@ -142,7 +229,9 @@ class OpticalObjectViewProvider:
     
     def onChanged(self, fp, prop):
         '''Here we can do something when a single property got changed'''
-        pass
+        if prop == 'Visibility':
+            for vp in fp.ClaimedChildren:
+                vp.Visibility = fp.Visibility
     
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\
@@ -156,6 +245,7 @@ class OpticalObjectViewProvider:
         return None
 
 
+
 def refraction_index_from_sellmeier(wavelength, sellmeier):
     b1, b2, b3, c1, c2, c3 = sellmeier
     l = wavelength
@@ -167,13 +257,13 @@ class OpticalMirror():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = Gui.Selection.getSelectionEx()
-        Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('objects = []')
+        selection = FreeCADGui.Selection.getSelectionEx()
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
             
-        Gui.doCommand('OpticsWorkbench.makeMirror(objects)')              
+        doCommand('OpticsWorkbench.makeMirror(objects)')              
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -195,13 +285,13 @@ class OpticalAbsorber():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = Gui.Selection.getSelectionEx()
-        Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('objects = []')
+        selection = FreeCADGui.Selection.getSelectionEx()
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        Gui.doCommand('OpticsWorkbench.makeAbsorber(objects)')               
+        doCommand('OpticsWorkbench.makeAbsorber(objects)')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -222,13 +312,13 @@ class OpticalLens():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = Gui.Selection.getSelectionEx()
-        Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('objects = []')
+        selection = FreeCADGui.Selection.getSelectionEx()
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
+        doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -243,8 +333,36 @@ class OpticalLens():
         return {'Pixmap'  : os.path.join(_icondir_, 'lens.svg'),
                 'Accel' : '', # a default shortcut (optional)
                 'MenuText': 'Optical Lens',
-                'ToolTip' : 'Declare your FreeCAD objects to be optical lenses' }                
+                'ToolTip' : 'Declare your FreeCAD objects to be optical lenses' } 
+
+class OpticalGrating():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
+      
+    def Activated(self):
+        selection = FreeCADGui.Selection.getSelectionEx()
+        doCommand('import OpticsWorkbench')
+        doCommand('objects = []')
+        for sel in selection:
+            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            
+        doCommand('OpticsWorkbench.makeGrating(objects)')              
+
+    def IsActive(self):
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+        
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(_icondir_, 'mirror.svg'),
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': 'Diffraction grating',
+                'ToolTip' : 'Declare your FreeCAD objects to be diffraction gratings' }               
                 
-Gui.addCommand('Mirror', OpticalMirror())
-Gui.addCommand('Absorber', OpticalAbsorber())
-Gui.addCommand('Lens', OpticalLens())
+addCommand('Mirror', OpticalMirror())
+addCommand('Absorber', OpticalAbsorber())
+addCommand('Lens', OpticalLens())
+addCommand('Grating', OpticalGrating())
