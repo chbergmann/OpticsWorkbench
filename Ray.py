@@ -340,9 +340,9 @@ class RayWorker:
 
 
     def mirror(self, dRay, normal):
-        print("Mirror normal = ", normal)
-        print("dRay = ", dRay)
-        print("mirror returns: ", 2 * normal * (dRay * normal) - dRay)
+        #print("Mirror normal = ", normal)
+        #print("dRay = ", dRay)
+        #print("mirror returns: ", 2 * normal * (dRay * normal) - dRay)
         return 2 * normal * (dRay * normal) - dRay
 
 
