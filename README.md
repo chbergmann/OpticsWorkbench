@@ -5,6 +5,26 @@
 #### using this it is possible to simulate multiple orders of diffraction at one grating by generating rays with the same wavelength but different order
 #### gratings are defined by their type (reflection, transmission with diffraction at 1st surfache, transmission with diffraction at 2nd surface), by their line spacing, their line direction as specified by a hypothetical set of planes intersecting the body and generating the lines as intersecion cuts, and also have the attribute "order". Additionally, for transmission gratings a refractive index should be provided.
 #### diffraction at a grating object can be specified to be calculated using the order defined by the ray, or by the hit grating, allowing for multiple diffractions of different orders at multiple gratings beeing hit in the path of a single ray.
+#### note that due to the specific type of this approach to simulate diffraction gratings, one ends up very fast with very many rays or even sunrays, which heavily increases calculation time.
+#### also note that errors in the code might of course be present, however in my testing diffraction (at least for reflection and transmission grationgs without taking into account different indices of refactions) is simulated accurate.
+enjoy!
+Thanks to the creator of the fantastic OpticsWorkbench!
+
+![screenshot](./examples/simple_reflection_grating_set_of_planes.PNG)
+this illustrates a simple reflection grating with 500 lpm hit by sunray. Planes with normal 010 indicate the set of intersecting planes used to define the grating lines direction
+
+![screenshot](./examples/simple_transmission_grating.PNG)
+this shows the same body, defined as transmission grating. Note that the diffraction happens at the 2nd surface as specified by the grating type. Differences in refractive indices are taken into accound.
+
+![screenshot](./examples/Concave_mirror_grating_thorlabs_1.PNG)
+![screenshot](./examples/Concave_mirror_grating_thorlabs_2.PNG)
+screenshots show that also non-planar bodies can be used, in the example of a concave reflection grating. A stepfile for a thorlabs concave mirror is used and set as a grating with 500 lpm. Sunray of 1st and 2nd order are shown
+
+![screenshot](./examples/echelle_example.PNG)
+an example of a simple echelle spectrometer using a R2 52.91 lpm grating and a set of sunrays from order -47 to -82 (each order comprises ~5-10 nm, sampled by 15 rays around a center wavelength from blue to red) and a flint glas prism. Collimation and camera optics are thorlabs step files and a transparent absorber shows the resulting echelle spectrum. Entrance into the spectrometer design is by a 50 mu slit. This is a example with very long calculation time due to the high number of rays.
+
+
+
 
 
 
