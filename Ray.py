@@ -354,7 +354,7 @@ class RayWorker:
 
         return -n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root)
 
-    def grating_calculation(self, grating_type, order, wavelength, lpm, ray, normal, g_g_p_vector, n1, n2): #from Ludwig 1970
+    def grating_calculation(self, grating_type, order, wavelength, lpm, ray, normal, g_g_p_vector, n1, n2): #from Ludwig 1973
         ### get parameters
         wavelength = wavelength/1000
         ray = ray / ray.Length
