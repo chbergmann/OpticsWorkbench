@@ -19,8 +19,8 @@ def get_module_path():
     return os.path.dirname(__file__)
 
 
-def makeRay(position = Vector(0, 0, 0),
-            direction = Vector(1, 0, 0),
+def makeRay(position = Vector(0, 0, 0), #maxNrReflections should not exceed ~900 due to maximum recursion depth of Python which 
+            direction = Vector(1, 0, 0),#in combination with total reflection inside an object can cause to crash FreeCAD
             power = True,
             beamNrColumns = 1,
             beamNrRows = 1,
@@ -55,7 +55,7 @@ def makeSunRay(position = Vector(0, 0, 0),
             spherical = False,
             hideFirst = False,
             maxRayLength = 1000000,
-            maxNrReflections = 2000,
+            maxNrReflections = 900,
             wavelength_from = 450,
             wavelength_to = 750,
             num_rays = 70,
