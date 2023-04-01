@@ -443,6 +443,8 @@ def PointVec(point):
     '''Converts a Part::Point to a FreeCAD::Vector'''
     return Vector(point.X, point.Y, point.Z)
 
+def isOpticalObject(obj):
+    return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')
 
 class RayViewProvider:
     def __init__(self, vobj):
