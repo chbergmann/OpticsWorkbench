@@ -378,8 +378,8 @@ class RayWorker:
         if doLens:
             print("do Lens!")
             (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-            #if totatreflect:
-                #self.lastRefIdx.append(n)
+            #if totatreflect:                   ## these two lines seem to be unecessary and indeed cause a wrongly stored n when 
+                #self.lastRefIdx.append(n)      ## total reflection happens at lens-lens surface
 
         newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
         linearray.append(newline)
