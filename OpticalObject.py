@@ -6,8 +6,7 @@ __license__ = 'LGPL 3.0'
 __doc__ = 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers'
 
 import os
-import FreeCADGui
-from FreeCADGui import doCommand, addCommand
+import FreeCADGui as Gui
 import FreeCAD
 import math
 
@@ -51,8 +50,8 @@ class LensWorker:
 
         fp.OpticalType = 'lens'  
         
-        material_names = list(self.getMaterials())
-          
+        material_names = list(getMaterials())  
+
         fp.addProperty('App::PropertyEnumeration', 'Material', 'Lens', '').Material = material_names
         
         self.update = True 
@@ -63,36 +62,6 @@ class LensWorker:
         else:
             fp.Material = '?'
             
-        
-    def getMaterials(self):
-        # https://refractiveindex.info/, from glass-spec-sheets directly or fitted with lambda-n data
-        return {
-            '?':                 (0, 0, 0, 0, 0, 0),
-            'Vacuum':            (0, 0, 0, 0, 0, 0),
-            'Air':               (4.334446e-4, 3.470339e-5, 1.118728e-4, 1.118728e4, 0, 0),  #https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
-            # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
-            # 'Ethanol':           (0, 0, 0, 0, 0, 0),
-            # 'Olive oil':         (0, 0, 0, 0, 0, 0),
-            # 'Ice':               (0, 0, 0, 0, 0, 0),
-            'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
-            'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
-            'NBK7/Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
-            'NSF2':      (1.47343127, 0.163681849, 1.36920899, 10901.9098, 58568.3687,  127404933),
-            'NBKA4':      (1.28834642, 0.132817724, 0.945395373, 7799.80626, 31563.1177,  105965875),
-            'SF5':      (1.46141885, 0.247713019, 0.949995832, 11182.6126, 50859.4669,  112041888),
-            'DLAK6':      (1.79674556, 0.00384614025, 1.6647332, 10953.7412, 78018.5022,  131153263),
-            'B270':      (1.05963142, 0.229442956, 1.10647397, 3520.36549, 32098.963,  95281358),
-            'NBAF10':      (1.5851495, 0.143559385, 1.08521269, 9266.81282, 42448.9805,  105613573),
-            'NSF10':      (1.62153902, 0.256287842, 1.64447552, 12224.1457, 59573.6775,  147468793),
-            'NSF11':      (1.73759695, 0.313747346, 1.89878101, 13188.707, 62306.8142,  155236290),
-            'silica glass':      (1.0007668, 0.102419414, 3.0344236, 8391.82477, 8277.39389,  312601508),
-            'NSF6HT':      (1.77931763, 0.338149866, 2.08734474, 13371.4182, 61753.3621,  174017590),
-            'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
-            # 'Flint glass':       (0, 0, 0, 0, 0, 0),
-            # 'Sapphire':          (0, 0, 0, 0, 0, 0),
-            # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
-            # 'Diamond':           (0, 0, 0, 0, 0, 0),
-        }  
 
     def execute(self, fp):
         pass
@@ -104,7 +73,8 @@ class LensWorker:
         if not hasattr(fp, 'Sellmeier'): return
         
         if prop == 'Material':
-            sellmeier = self.getMaterials()[fp.Material]
+            #sellmeier = self.getMaterials()[fp.Material]
+            sellmeier = getMaterials()[fp.Material]
             fp.Sellmeier = sellmeier
             fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
 
@@ -145,7 +115,7 @@ class GratingWorker: ###
         fp.OpticalType = 'grating'
         fp.GratingType = GratingType  
         
-        material_names = list(self.getMaterials())
+        material_names = list(getMaterials())
           
         fp.addProperty('App::PropertyEnumeration', 'Material', 'Grating', '').Material = material_names
         
@@ -156,37 +126,7 @@ class GratingWorker: ###
             fp.Material = material
         else:
             fp.Material = '?'
-            
-        
-    def getMaterials(self):
-        # https://refractiveindex.info/, from glass-spec-sheets directly or fitted with lambda-n data
-        return {
-            '?':                 (0, 0, 0, 0, 0, 0),
-            'Vacuum':            (0, 0, 0, 0, 0, 0),
-            'Air':               (4.334446e-4, 3.470339e-5, 1.118728e-4, 1.118728e4, 0, 0),  #https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
-            # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
-            # 'Ethanol':           (0, 0, 0, 0, 0, 0),
-            # 'Olive oil':         (0, 0, 0, 0, 0, 0),
-            # 'Ice':               (0, 0, 0, 0, 0, 0),
-            'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
-            'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
-            'NBK7/Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
-            'NSF2':      (1.47343127, 0.163681849, 1.36920899, 10901.9098, 58568.3687,  127404933),
-            'NBKA4':      (1.28834642, 0.132817724, 0.945395373, 7799.80626, 31563.1177,  105965875),
-            'SF5':      (1.46141885, 0.247713019, 0.949995832, 11182.6126, 50859.4669,  112041888),
-            'DLAK6':      (1.79674556, 0.00384614025, 1.6647332, 10953.7412, 78018.5022,  131153263),
-            'B270':      (1.05963142, 0.229442956, 1.10647397, 3520.36549, 32098.963,  95281358),
-            'NBAF10':      (1.5851495, 0.143559385, 1.08521269, 9266.81282, 42448.9805,  105613573),
-            'NSF10':      (1.62153902, 0.256287842, 1.64447552, 12224.1457, 59573.6775,  147468793),
-            'NSF11':      (1.73759695, 0.313747346, 1.89878101, 13188.707, 62306.8142,  155236290),
-            'silica glass':      (1.0007668, 0.102419414, 3.0344236, 8391.82477, 8277.39389,  312601508),
-            'NSF6HT':      (1.77931763, 0.338149866, 2.08734474, 13371.4182, 61753.3621,  174017590),
-            'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
-            # 'Flint glass':       (0, 0, 0, 0, 0, 0),
-            # 'Sapphire':          (0, 0, 0, 0, 0, 0),
-            # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
-            # 'Diamond':           (0, 0, 0, 0, 0, 0),
-        }  
+             
 
     def execute(self, fp):
         pass
@@ -198,7 +138,7 @@ class GratingWorker: ###
         if not hasattr(fp, 'Sellmeier'): return
         
         if prop == 'Material':
-            sellmeier = self.getMaterials()[fp.Material]
+            sellmeier = getMaterials()[fp.Material]
             fp.Sellmeier = sellmeier
             fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
 
@@ -250,9 +190,6 @@ class OpticalObjectViewProvider:
     def onChanged(self, fp, prop):
         '''Here we can do something when a single property got changed'''
         pass
-        #if prop == 'Visibility':
-        #    for vp in fp.ClaimedChildren:
-        #        vp.Visibility = fp.Visibility
     
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\
@@ -266,6 +203,35 @@ class OpticalObjectViewProvider:
         return None
 
 
+def getMaterials():
+        # https://refractiveindex.info/, from glass-spec-sheets directly or fitted with lambda-n data
+        return {
+            '?':                 (0, 0, 0, 0, 0, 0),
+            'Vacuum':            (0, 0, 0, 0, 0, 0),
+            'Air':               (4.334446e-4, 3.470339e-5, 1.118728e-4, 1.118728e4, 0, 0),  #https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
+            # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
+            # 'Ethanol':           (0, 0, 0, 0, 0, 0),
+            # 'Olive oil':         (0, 0, 0, 0, 0, 0),
+            # 'Ice':               (0, 0, 0, 0, 0, 0),
+            'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
+            'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
+            'NBK7/Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
+            'NSF2':      (1.47343127, 0.163681849, 1.36920899, 10901.9098, 58568.3687,  127404933),
+            'NBKA4':      (1.28834642, 0.132817724, 0.945395373, 7799.80626, 31563.1177,  105965875),
+            'SF5':      (1.46141885, 0.247713019, 0.949995832, 11182.6126, 50859.4669,  112041888),
+            'DLAK6':      (1.79674556, 0.00384614025, 1.6647332, 10953.7412, 78018.5022,  131153263),
+            'B270':      (1.05963142, 0.229442956, 1.10647397, 3520.36549, 32098.963,  95281358),
+            'NBAF10':      (1.5851495, 0.143559385, 1.08521269, 9266.81282, 42448.9805,  105613573),
+            'NSF10':      (1.62153902, 0.256287842, 1.64447552, 12224.1457, 59573.6775,  147468793),
+            'NSF11':      (1.73759695, 0.313747346, 1.89878101, 13188.707, 62306.8142,  155236290),
+            'silica glass':      (1.0007668, 0.102419414, 3.0344236, 8391.82477, 8277.39389,  312601508),
+            'NSF6HT':      (1.77931763, 0.338149866, 2.08734474, 13371.4182, 61753.3621,  174017590),
+            'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
+            # 'Flint glass':       (0, 0, 0, 0, 0, 0),
+            # 'Sapphire':          (0, 0, 0, 0, 0, 0),
+            # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
+            # 'Diamond':           (0, 0, 0, 0, 0, 0),
+        }
 
 def refraction_index_from_sellmeier(wavelength, sellmeier):
     b1, b2, b3, c1, c2, c3 = sellmeier
@@ -278,13 +244,13 @@ class OpticalMirror():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
             
-        doCommand('OpticsWorkbench.makeMirror(objects)')              
+        Gui.doCommand('OpticsWorkbench.makeMirror(objects)')              
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -306,13 +272,13 @@ class OpticalAbsorber():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        doCommand('OpticsWorkbench.makeAbsorber(objects)')               
+        Gui.doCommand('OpticsWorkbench.makeAbsorber(objects)')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -333,13 +299,13 @@ class OpticalLens():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
+        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -360,13 +326,13 @@ class OpticalGrating():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
-        selection = FreeCADGui.Selection.getSelectionEx()
-        doCommand('import OpticsWorkbench')
-        doCommand('objects = []')
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
         for sel in selection:
-            doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
             
-        doCommand('OpticsWorkbench.makeGrating(objects)')              
+        Gui.doCommand('OpticsWorkbench.makeGrating(objects)')              
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -383,7 +349,7 @@ class OpticalGrating():
                 'MenuText': 'Diffraction grating',
                 'ToolTip' : 'Declare your FreeCAD objects to be diffraction gratings' }               
                 
-addCommand('Mirror', OpticalMirror())
-addCommand('Absorber', OpticalAbsorber())
-addCommand('Lens', OpticalLens())
-addCommand('Grating', OpticalGrating())
+Gui.addCommand('Mirror', OpticalMirror())
+Gui.addCommand('Absorber', OpticalAbsorber())
+Gui.addCommand('Lens', OpticalLens())
+Gui.addCommand('Grating', OpticalGrating())
