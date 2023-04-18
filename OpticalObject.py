@@ -344,7 +344,7 @@ class OpticalGrating():
         
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'mirror.svg'),
+        return {'Pixmap'  : os.path.join(_icondir_, 'grating.svg'),
                 'Accel' : '', # a default shortcut (optional)
                 'MenuText': 'Diffraction grating',
                 'ToolTip' : 'Declare your FreeCAD objects to be diffraction gratings' }               

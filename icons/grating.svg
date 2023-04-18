@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
+    <g id="Ebene-1" serif:id="Ebene 1">
+        <path id="path833" d="M58.732,3.32L38.425,62.306" style="fill:none;fill-rule:nonzero;stroke:rgb(0,0,255);stroke-width:15.12px;"/>
+        <path d="M39.533,34.637L13.06,0" style="fill:none;stroke:rgb(0,255,254);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
+        <path d="M39.533,34.637L0,12.114L39.533,34.637Z" style="fill:none;stroke:rgb(255,0,0);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
+        <path d="M0.094,4.866L39.533,34.637" style="fill:none;stroke:rgb(255,255,0);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
+        <path d="M39.533,34.637C39.579,34.251 3.958,0 3.958,0" style="fill:none;stroke:rgb(0,255,0);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
+        <path d="M39.533,34.637L21.746,0" style="fill:none;stroke:rgb(1,0,255);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
+        <path d="M39.533,34.637L28.399,0" style="fill:none;stroke:rgb(253,0,255);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
+        <path id="path835" d="M0.094,37.417L39.533,34.681L39.533,34.637" style="fill:none;fill-rule:nonzero;stroke:rgb(255,204,0);stroke-width:3.65px;"/>
+    </g>
+</svg>
