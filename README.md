@@ -1,4 +1,4 @@
-### still to do: icon for grating, examples...tbc
+### still to do: examples...tbc
 #### should now have catched up to the same version as original OpticsWorkbench + grating functionality
 #### please find that not all of the below information is valid for this branch.
 #### this branch was done to add simple 1D grating simulation to the very superb OpticsWorkbench.
