@@ -15,7 +15,7 @@ class SunRayWorker:
     def __init__(self, 
                  fp,    # an instance of Part::FeaturePython
                  rays = []):
-        fp.addProperty('App::PropertyLinkList',  'Rays',   'SunRay',   'FreeCAD objects to be mirrors or absorbers').Rays = rays   
+        fp.addProperty('App::PropertyLinkList',  'Rays',   'SunRay',   'Create rays of different wavelength').Rays = rays   
         fp.Proxy = self
         self.update = True
     

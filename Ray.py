@@ -34,18 +34,20 @@ class RayWorker:
                  maxRayLength = 1000000,
                  maxNrReflections = 200,
                  wavelength = 580,
+                 order = 0,
                  coneAngle = 360):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
-        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = (beamNrColumns, 0, INFINITY, 1)
-        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrRows', 'Ray',  'number of rays in a beam').BeamNrRows = (beamNrRows, 0, INFINITY, 1)
+        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
+        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrRows', 'Ray',  'number of rays in a beam').BeamNrRows = beamNrRows
         fp.addProperty('App::PropertyFloat', 'BeamDistance', 'Ray',  'distance between two beams').BeamDistance = beamDistance
         fp.addProperty('App::PropertyBool', 'HideFirstPart', 'Ray',  'hide the first part of every ray').HideFirstPart = hideFirst
         fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',  'maximum length of a ray').MaxRayLength = maxRayLength
-        fp.addProperty('App::PropertyIntegerConstraint', 'MaxNrReflections', 'Ray',  'maximum number of reflections').MaxNrReflections = (maxNrReflections, 0, INFINITY, 1)
+        fp.addProperty('App::PropertyIntegerConstraint', 'MaxNrReflections', 'Ray',  'maximum number of reflections').MaxNrReflections = maxNrReflections
         fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength
+        fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  'Order of the ray').Order = order        
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
-
+        
         fp.Proxy = self
         self.lastRefIdx = []
         self.iter = 0
@@ -57,8 +59,8 @@ class RayWorker:
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
         if not hasattr(fp, 'iter'): return
-
-        proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength']
+        
+        proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength', "ConeAngle", "Order"]
         if prop in proplist:
             self.redrawRay(fp)
 
@@ -312,18 +314,72 @@ class RayWorker:
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
-
+                    #print()
                 else:
                     #print("enter " + nearest_obj.Label)
                     newRefIdx = n
                     self.lastRefIdx.append(n)
 
+            elif nearest_obj.OpticalType == 'grating':  
+                if len(nearest_obj.Sellmeier) == 6:
+                    n = OpticalObject.refraction_index_from_sellmeier(fp.Wavelength, nearest_obj.Sellmeier)
+                else:
+                    n = nearest_obj.RefractionIndex
+                
+                lpm = nearest_obj.lpm
+                grating_lines_plane =nearest_obj.GratingLinesPlane
+
+                if nearest_obj.ray_order_override == True:
+                    order = nearest_obj.order
+                else:
+                    order = fp.Order
+
+                
+                if nearest_obj.GratingType == "reflection":
+                    grating_type = 0
+                elif nearest_obj.GratingType == "transmission - diffraction at 2nd surface":
+                    grating_type = 1
+                else:
+                    grating_type = 2
+
+                if grating_type == 0: #reflection grating
+                    dNewRay = self.grating_calculation(grating_type, order, fp.Wavelength, lpm, ray1, normal, grating_lines_plane, oldRefIdx, oldRefIdx)
+                
+                elif grating_type == 2: #transmission grating with diffraction at first surface
+                    if self.isInsideLens(isec_struct, origin, nearest_obj):
+                        doLens = True
+                        #print("leave t-grating 1s " + nearest_obj.Label)
+                        oldRefIdx = n
+                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        if len(self.lastRefIdx) > 0:
+                            self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
+                    else:
+                        newRefIdx = n
+                        self.lastRefIdx.append(n)
+                        #print("enter t-grating 1s " + nearest_obj.Label)
+                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        dNewRay = self.grating_calculation(grating_type, order, fp.Wavelength, lpm, ray1, normal, grating_lines_plane, oldRefIdx, newRefIdx)
+                
+                elif grating_type == 1: #transmission grating with diffraction at second surface
+                    if self.isInsideLens(isec_struct, origin, nearest_obj):
+                        #print("leave t-grating 2s " + nearest_obj.Label)
+                        oldRefIdx = n
+                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        dNewRay = self.grating_calculation(grating_type, order, fp.Wavelength, lpm, ray1, normal, grating_lines_plane, oldRefIdx, newRefIdx)
+                    else:
+                        doLens = True
+                        newRefIdx = n
+                        self.lastRefIdx.append(n)
+                        #print("enter t-grating 2s " + nearest_obj.Label)
+                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)                   
+               
             else: return
 
         if doLens:
+            print("do Lens!")
             (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-            if totatreflect:
-                self.lastRefIdx.append(n)
+            #if totatreflect:                   ## these two lines seem to be unecessary and indeed cause a wrongly stored n when 
+                #self.lastRefIdx.append(n)      ## total reflection happens at lens-lens surface
 
         newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
         linearray.append(newline)
@@ -356,16 +412,79 @@ class RayWorker:
 
 
     def mirror(self, dRay, normal):
+        #print("Mirror normal = ", normal)
+        #print("dRay = ", dRay)
+        #print("mirror returns: ", 2 * normal * (dRay * normal) - dRay)
         return 2 * normal * (dRay * normal) - dRay
 
 
     def snellsLaw(self, ray, n1, n2, normal):
         #print('snell ' + str(n1) + '/' + str(n2))
+        #print("angle: ", ray.getAngle(normal)*(180/math.pi))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
+            #print("root: ", root)
             return (self.mirror(ray, normal), True)
-
+        #d = normal*math.sqrt(1-(n1/n2)**2*(1-(normal.dot(ray))**2))+(n1/n2)*(ray-(normal.dot(ray))*normal)
+        #print("angle2: ",d.getAngle(normal)*(180/math.pi) )
         return (-n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root), False)
+
+    def grating_calculation(self, grating_type, order, wavelength, lpm, ray, normal, g_g_p_vector, n1, n2): #from Ludwig 1970
+        ### get parameters
+        wavelength = wavelength/1000
+        ray = ray / ray.Length
+        surf_norma = -normal # the normal seems to be in ray direction so change this
+        surf_norma = surf_norma/surf_norma.Length # normalize the surface normal
+        g_g_p_vector = g_g_p_vector/g_g_p_vector.Length # hypothetical first vector determining the orientation of the grating rules. This vector is normal to a plane that would cause the rules by intersection with the surface of the grating.
+        
+
+        # print("Grating normal = ", normal)
+        # print("ray = ", ray[0], ray[1], ray[2])
+        # print("Grating normal = ", surf_norma)
+        # print("wavelength= ", wavelength)
+        # print("g_g_p_vector = ", g_g_p_vector)
+
+
+
+        P = g_g_p_vector.cross(surf_norma)
+        P = P/P.Length
+        #print("P",P)
+        D = surf_norma.cross(P)
+        #print("D", D)
+        D = D/D.Length    
+        mu = n1/n2
+        #print("mu", mu)
+        d = 1000/lpm
+        #print("d",d)
+        T = (order*wavelength)/(n1*d)
+        #print("T", T)
+        #print("ray", ray[0], ray[1], ray[2])
+        V = (mu*(ray[0]*surf_norma[0]+ray[1]*surf_norma[1]+ray[2]*surf_norma[2]))/surf_norma.dot(surf_norma)
+        #print("V", V)
+        W = (mu**2-1+T**2-2*mu*T*(ray[0]*D[0]+ray[1]*D[1]+ray[2]*D[2]))/surf_norma.dot(surf_norma)
+        #print("W", W)
+        #print("calc_test ", (ray[0]*D[0]+ray[1]*D[1]+ray[2]*D[2]))
+        #print ("W>V**2? ", W>V**2)
+        Q = ((-2*V+((2*V)**2-4*W)**0.5)/2,(-2*V-((2*V)**2-4*W)**0.5)/2)
+        #print("Q",Q)
+
+        if grating_type == 0: # reflection grating
+            #S_ = mu*ray_trans-T*D+max(Q)*surf_norma_trans
+            S_0 = mu*ray[0]-T*D[0]+max(Q)*surf_norma[0]
+            S_1 = mu*ray[1]-T*D[1]+max(Q)*surf_norma[1]
+            S_2 = mu*ray[2]-T*D[2]+max(Q)*surf_norma[2]
+            S_=Vector(S_0,S_1,S_2)
+        else: # transmission grating
+            #S_ = mu*ray-T*D+min(Q)*surf_norma
+            S_0 = mu*ray[0]-T*D[0]+min(Q)*surf_norma[0]
+            S_1 = mu*ray[1]-T*D[1]+min(Q)*surf_norma[1]
+            S_2 = mu*ray[2]-T*D[2]+min(Q)*surf_norma[2]
+            S_=Vector(S_0,S_1,S_2)
+            
+        
+        S_=-S_
+        #print("S_", S_)
+        return S_
 
 
     def check2D(self, objlist):
@@ -621,6 +740,7 @@ class AllOff():
                 'ToolTip' : 'Switch off all rays and beams' }
 
 Gui.addCommand('Ray (monochrome)', Ray())
+Gui.addCommand('Ray (sun light)', RaySun())
 Gui.addCommand('Beam', Beam2D())
 Gui.addCommand('2D Radial Beam', RadialBeam2D())
 Gui.addCommand('Spherical Beam', SphericalBeam())
