@@ -86,7 +86,7 @@ To show an XY plot, open a python console and type:
 
 ### ![Diffraction grating](./icons/grating.svg) Diffraction grating
 The FreeCAD objects in parameter Base will do simple 1D grating simulation to the very superb OpticsWorkbench.  
-raytracing of simple 1D gratings is done following Ludwig 1973 https://doi.org/10.1364/JOSA.63.001105  
+raytracing of simple 1D gratings is done following [Ludwig 1973](https://doi.org/10.1364/JOSA.63.001105)  
 for this approach, rays now have the additional attribute "order", which is taken into account when hitting an object specified as optical grating  
 using this it is possible to simulate multiple orders of diffraction at one grating by generating rays with the same wavelength but different order  
 gratings are defined by their type (reflection, transmission with diffraction at 1st surfache, transmission with diffraction at 2nd surface), by their line spacing, their line direction as specified by a hypothetical set of planes intersecting the body and generating the lines as intersecion cuts, and also have the attribute "order". Additionally, for transmission gratings a refractive index should be provided.  

@@ -1,14 +1,73 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;">
-    <g id="Ebene-1" serif:id="Ebene 1">
-        <path id="path833" d="M58.732,3.32L38.425,62.306" style="fill:none;fill-rule:nonzero;stroke:rgb(0,0,255);stroke-width:15.12px;"/>
-        <path d="M39.533,34.637L13.06,0" style="fill:none;stroke:rgb(0,255,254);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
-        <path d="M39.533,34.637L0,12.114L39.533,34.637Z" style="fill:none;stroke:rgb(255,0,0);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
-        <path d="M0.094,4.866L39.533,34.637" style="fill:none;stroke:rgb(255,255,0);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
-        <path d="M39.533,34.637C39.579,34.251 3.958,0 3.958,0" style="fill:none;stroke:rgb(0,255,0);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
-        <path d="M39.533,34.637L21.746,0" style="fill:none;stroke:rgb(1,0,255);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
-        <path d="M39.533,34.637L28.399,0" style="fill:none;stroke:rgb(253,0,255);stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5;"/>
-        <path id="path835" d="M0.094,37.417L39.533,34.681L39.533,34.637" style="fill:none;fill-rule:nonzero;stroke:rgb(255,204,0);stroke-width:3.65px;"/>
+<svg
+   width="68.377388"
+   height="67.382706"
+   viewBox="0 0 68.377388 67.382706"
+   version="1.1"
+   xml:space="preserve"
+   style="clip-rule:evenodd;fill-rule:evenodd"
+   id="svg17"
+   sodipodi:docname="grating.svg"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:serif="http://www.serif.com/"><defs
+   id="defs21" /><sodipodi:namedview
+   id="namedview19"
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1.0"
+   inkscape:showpageshadow="2"
+   inkscape:pageopacity="0.0"
+   inkscape:pagecheckerboard="0"
+   inkscape:deskcolor="#d1d1d1"
+   showgrid="false"
+   inkscape:zoom="13.328125"
+   inkscape:cx="34.475967"
+   inkscape:cy="34.66354"
+   inkscape:window-width="3840"
+   inkscape:window-height="2082"
+   inkscape:window-x="0"
+   inkscape:window-y="40"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="svg17" />
+    <g
+   id="Ebene-1"
+   serif:id="Ebene 1"
+   transform="translate(2.4971362,2.6157924)">
+        <path
+   id="path833"
+   d="M 58.732,3.32 38.425,62.306"
+   style="fill:none;fill-rule:nonzero;stroke:#0000ff;stroke-width:15.12px" />
+        <path
+   d="M 39.533,34.637 13.06,0"
+   style="fill:none;stroke:#00fffe;stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5"
+   id="path3" />
+        <path
+   d="M 39.533,34.637 0,12.114 Z"
+   style="fill:none;stroke:#ff0000;stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5"
+   id="path5" />
+        <path
+   d="M 0.094,4.866 39.533,34.637"
+   style="fill:none;stroke:#ffff00;stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5"
+   id="path7" />
+        <path
+   d="M 39.533,34.637 C 39.579,34.251 3.958,0 3.958,0"
+   style="fill:none;stroke:#00ff00;stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5"
+   id="path9" />
+        <path
+   d="M 39.533,34.637 21.746,0"
+   style="fill:none;stroke:#0100ff;stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5"
+   id="path11" />
+        <path
+   d="M 39.533,34.637 28.399,0"
+   style="fill:none;stroke:#fd00ff;stroke-width:3.7px;stroke-linecap:square;stroke-linejoin:round;stroke-miterlimit:1.5"
+   id="path13" />
+        <path
+   id="path835"
+   d="M 0.094,37.417 39.533,34.681 V 34.637"
+   style="fill:none;fill-rule:nonzero;stroke:#ffcc00;stroke-width:3.65px" />
     </g>
 </svg>
