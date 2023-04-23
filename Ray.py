@@ -376,10 +376,7 @@ class RayWorker:
             else: return
 
         if doLens:
-            print("do Lens!")
-            (dNewRay, totatreflect) = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-            #if totatreflect:                   ## these two lines seem to be unecessary and indeed cause a wrongly stored n when 
-                #self.lastRefIdx.append(n)      ## total reflection happens at lens-lens surface
+            dNewRay = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
 
         newline = Part.makeLine(neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
         linearray.append(newline)
@@ -412,22 +409,14 @@ class RayWorker:
 
 
     def mirror(self, dRay, normal):
-        #print("Mirror normal = ", normal)
-        #print("dRay = ", dRay)
-        #print("mirror returns: ", 2 * normal * (dRay * normal) - dRay)
         return 2 * normal * (dRay * normal) - dRay
 
 
     def snellsLaw(self, ray, n1, n2, normal):
-        #print('snell ' + str(n1) + '/' + str(n2))
-        #print("angle: ", ray.getAngle(normal)*(180/math.pi))
         root = 1 - n1/n2 * n1/n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0: # total reflection
-            #print("root: ", root)
-            return (self.mirror(ray, normal), True)
-        #d = normal*math.sqrt(1-(n1/n2)**2*(1-(normal.dot(ray))**2))+(n1/n2)*(ray-(normal.dot(ray))*normal)
-        #print("angle2: ",d.getAngle(normal)*(180/math.pi) )
-        return (-n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root), False)
+            return self.mirror(ray, normal)
+        return -n1/n2 * normal.cross( (-normal).cross(ray)) - normal * math.sqrt(root)
 
     def grating_calculation(self, grating_type, order, wavelength, lpm, ray, normal, g_g_p_vector, n1, n2): #from Ludwig 1970
         ### get parameters

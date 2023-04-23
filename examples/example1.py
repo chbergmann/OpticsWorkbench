@@ -90,7 +90,7 @@ def make_optics():
 
     OpticsWorkbench.makeMirror([Sketch_Mirror1, Sketch_Mirror2])
     OpticsWorkbench.makeAbsorber([Sketch_Box])
-    OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='Window glass')
+    OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='NBK7/Window glass')
     
     doc.recompute()
     OpticsWorkbench.makeRay(Vector(75.00, 0.00, 0.00), Vector(-1,0,0))
