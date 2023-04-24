@@ -3,9 +3,6 @@
 Geometrical optics for FreeCAD.  
 Performs simple raytracing through your FreeCAD objects.
 
-[![Total alerts](https://img.shields.io/lgtm/alerts/g/chbergmann/OpticsWorkbench.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chbergmann/OpticsWorkbench/alerts/)
-[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/chbergmann/OpticsWorkbench.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/chbergmann/OpticsWorkbench/context:python)
-
 ![screenshot](./examples/example2D.png)
   
 ## Installation
