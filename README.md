@@ -139,7 +139,7 @@ Switches off all Rays and Beams
 Switches on and recalculates all Rays and Beams
 
 ### ![Example](./optics_workbench_icon.svg) Example - 2D
-Generates the screenshot above
+![screenshot](./examples/example2D.png)
 
 ### ![Example](./optics_workbench_icon.svg) Example - 3D
 ![screenshot](./examples/screenshot3D.png)
