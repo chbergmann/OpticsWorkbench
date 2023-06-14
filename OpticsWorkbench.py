@@ -177,8 +177,21 @@ def plot_xy(absorber):
     print("coords_per_beam", coords_per_beam)
     print("all_coords", all_coords)
     
-    x = -all_coords[:,1]
-    y = all_coords[:,2]       
+    # Save points to a text file (spot_diagramme.txt)
+    file_path = 'spot_diagramme.txt'
+
+    with open(file_path, 'w') as file:
+        for point in all_coords:
+            file.write(f"{point[0]}\t{point[1]}\t{point[2]}\n") #remplace le ',' par des 'Tab'
+
+    if os.path.isfile(file_path):
+        absolute_path = os.path.abspath(file_path)
+        print(f"Le fichier a été créé avec succès : {absolute_path}")
+    else:
+        print("Une erreur s'est produite lors de la création du fichier.")
+
+    x = -all_coords[:,0]  #récupère les valeurs de colonne 1
+    y = all_coords[:,1]   #récupère les valeurs de colonne 2   
     
     if len(all_coords) > 0:
         plt.scatter(x, y)
