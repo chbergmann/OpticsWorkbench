@@ -199,7 +199,12 @@ class RayWorker:
                     if obj.Shape.BoundBox.intersect(origin, dir):
                         if len(obj.Shape.Solids) == 0 and len(obj.Shape.Shells) == 0:
                             for edge in obj.Shape.Edges:
-                                edgedir = PointVec(edge.Vertexes[1]) - PointVec(edge.Vertexes[0])
+                                # get a normal to the plane where the edge is lying in
+                                if(len(edge.Vertexes) == 2):
+                                    edgedir = PointVec(edge.Vertexes[1]) - PointVec(edge.Vertexes[0])
+                                else:
+                                    edgedir = edge.valueAt(0) - edge.valueAt(0.5)  # workaround for circles             
+                                    
                                 normal = dir.cross(edgedir)
                                 if normal.Length > EPSILON:
                                     plane = Part.Plane(origin, normal)
