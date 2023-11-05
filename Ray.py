@@ -71,7 +71,7 @@ class RayWorker:
         hitname = 'HitsFrom' + fp.Label
         hitcoordsname = 'HitCoordsFrom' + fp.Label
         for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj) and (optobj not in fp.IgnoredOpticalElements):
+            if isRelevantOptic(fp, optobj):
                 if hasattr(optobj, hitname):
                     setattr(optobj, hitname, 0)
                 if hasattr(optobj, hitcoordsname):
@@ -195,7 +195,7 @@ class RayWorker:
 
         dir = PointVec(line.Vertexes[1]) - origin
         for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj) and (optobj not in fp.IgnoredOpticalElements):
+            if isRelevantOptic(fp, optobj):
                 isec_parts = []
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):
@@ -509,6 +509,14 @@ def PointVec(point):
 def isOpticalObject(obj):
     return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')
 
+def isRelevantOptic(fp, obj): 
+    '''Determine if given object is a workbench optical component and if it should be considered in the ray calculation'''
+    if hasattr(fp, "IgnoredOpticalElements"):
+        return (isOpticalObject(obj) and (obj not in fp.IgnoredOpticalElements))
+    
+    # for older documents where rays do not have the IgnoredOpticalElements field we
+    # will just return the old function, which checks only if the object is of "OpticalType"
+    return isOpticalObject(obj)
 
 class RayViewProvider:
     def __init__(self, vobj):
