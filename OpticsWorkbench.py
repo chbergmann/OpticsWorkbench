@@ -31,7 +31,9 @@ def makeRay(position = Vector(0, 0, 0),
             maxRayLength = 1000000,
             maxNrReflections = 200,
             wavelength = 580,
-            order = 0):
+            order = 0,
+            coneAngle = 360,
+            ignoredElements=[]):
     reload(Ray)
     '''Python command to create a light ray.'''
     name = 'Ray'
@@ -41,7 +43,7 @@ def makeRay(position = Vector(0, 0, 0),
     fp = activeDocument().addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     fp.Placement.Rotation = Rotation(Vector(1, 0, 0), direction)
-    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength, order)
+    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength, order, coneAngle, ignoredElements)
     Ray.RayViewProvider(fp.ViewObject)
     recompute()
     return fp
@@ -60,7 +62,8 @@ def makeSunRay(position = Vector(0, 0, 0),
             wavelength_from = 450,
             wavelength_to = 750,
             num_rays = 70,
-            order = 1):
+            order = 1,
+            ignoredElements=[]):
     reload(SunRay)
     rays = []
     for l in linspace(wavelength_from, wavelength_to, num_rays):
@@ -75,7 +78,8 @@ def makeSunRay(position = Vector(0, 0, 0),
             maxRayLength = maxRayLength,
             maxNrReflections = maxNrReflections,
             wavelength = l,
-            order = order)
+            order = order,
+            ignoredElements = ignoredElements)
         ray.ViewObject.LineWidth = 1
         rays.append(ray)
 
