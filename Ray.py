@@ -35,7 +35,8 @@ class RayWorker:
                  maxNrReflections = 200,
                  wavelength = 580,
                  order = 0,
-                 coneAngle = 360):
+                 coneAngle = 360,
+                 ignoredElements=[]):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
         fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
@@ -47,6 +48,7 @@ class RayWorker:
         fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength
         fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  'Order of the ray').Order = order        
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
+        fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
         
         fp.Proxy = self
         self.lastRefIdx = []
@@ -69,7 +71,7 @@ class RayWorker:
         hitname = 'HitsFrom' + fp.Label
         hitcoordsname = 'HitCoordsFrom' + fp.Label
         for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj):
+            if isOpticalObject(optobj) and (optobj not in fp.IgnoredOpticalElements):
                 if hasattr(optobj, hitname):
                     setattr(optobj, hitname, 0)
                 if hasattr(optobj, hitcoordsname):
@@ -186,14 +188,14 @@ class RayWorker:
             linearray.append(Part.makeLine(pos, pos + dir))
 
 
-    def getIntersections(self, line):
+    def getIntersections(self, fp, line):
         '''returns [(OpticalObject, [(edge/face, intersection point)] )]'''
         isec_struct = []
         origin = PointVec(line.Vertexes[0])
 
         dir = PointVec(line.Vertexes[1]) - origin
         for optobj in activeDocument().Objects:
-            if isOpticalObject(optobj):
+            if isOpticalObject(optobj) and (optobj not in fp.IgnoredOpticalElements):
                 isec_parts = []
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):
@@ -243,7 +245,7 @@ class RayWorker:
         if fp.HideFirstPart and first:
             linearray.remove(line)
 
-        isec_struct = self.getIntersections(line)
+        isec_struct = self.getIntersections(fp, line)
         origin = PointVec(line.Vertexes[0])
 
         for isec in isec_struct:
