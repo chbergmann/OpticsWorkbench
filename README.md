@@ -46,6 +46,7 @@ Parameters:
 - `HideFirstPart`: Hide the first part of every ray that comes from the source and goes to the first point of reflection/refraction/nirvana
 - `MaxRayLength`: Maximum length of a ray
 - `MaxNrReflections`: Maximum number of reflections. This prevents endless loops if the ray is inside a mirror box.
+- `Ignored Optical Elements`: List of optical objects that will be ignored by the ray/beam.
 
 ### ![SunRayIcon](./icons/raysun.svg) Ray (sun light)
 A number of rays with different wavelengths of visible light.  
@@ -115,10 +116,6 @@ Diffraction at a grating object can be specified to be calculated using the orde
 
 ![screenshot](./examples/simple_transmission_grating.PNG)
 *Above: shows the same body, defined as transmission grating. Note that the diffraction happens at the 2nd surface as specified by the grating type. Differences in refractive indices are taken into account.*
-
-![screenshot](./examples/Concave_mirror_grating_thorlabs_1.PNG)
-![screenshot](./examples/Concave_mirror_grating_thorlabs_2.PNG)
-*Above 2 screenshots show that non-planar bodies can also be used in the example of a concave reflection grating. A STEP file for a thorlabs concave mirror is used and set as a grating with 500 lpm. Sunray of 1st and 2nd order are shown.*
 
 ![screenshot](./examples/echelle_example.PNG)
 *Above: an example of a simple echelle spectrometer using a R2 52.91 lpm grating and a set of sunrays from order -47 to -82 (each order comprises ~5-10 nm, sampled by 15 rays around a center wavelength from blue to red) and a flint glass prism. Collimation and camera optics are thorlabs STEP files and a transparent absorber shows the resulting echelle spectrum. Entrance into the spectrometer design is by a 50 mu slit. This is an example with very long calculation time due to the high number of rays. **Note** that the sign of the order is not intuitive. If an error occurs stating that complex numbers are not supported, while diffraction with this order is considered valid by the user, try to change the sign of the order.* 
