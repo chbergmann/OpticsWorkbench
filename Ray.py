@@ -91,16 +91,17 @@ class RayWorker:
             # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung,
             # link https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
             Ncount = 0 #create counter to check how many beams actually are generated
-            N = int(fp.BeamNrColumns) #N = number of rays
+            N = int(fp.BeamNrColumns * fp.BeamNrRows) #N = number of rays
+            if N == 0: return
             r = 1 # use a unit circle with radius 1 to determine the direction vector of each ray
-            a = 2*math.radians(coneAngle)/N # required surface area for each ray for a unit circle, by dividing the surface area of the unit circle by the number of rays
+            a = 2*math.pi*(1-math.cos(math.radians(coneAngle/2)))/N # required surface area for each ray for a unit circle, by dividing the surface area of the unit circle by the number of rays
             d = math.sqrt(a) #dont know but it works :-p
-            M_angle1 = round(math.radians(coneAngle/2)/d) # Angle step between the circles on which the points are projected
+            M_angle1 = math.radians(coneAngle/2)/d # Angle step between the circles on which the points are projected
             #Quote from paper: Regular equidistribution can be achieved by choosing circles of latitude at constant intervals d_angle1 and on these circles points with distance d_angle2, such that d_angle1 roughly equal to d_angle2 and that d_angle1*d_angle2 equals the average area per point. This then gives the following algorithm:
 
             d_angle1 = math.radians(coneAngle/2)/M_angle1 # calculate the distance between the circles of the latitude
             d_angle2 = a/d_angle1 # calculate the distance between the points on the circumference of the circle
-            for m in range(0, M_angle1+1):
+            for m in range(0, math.ceil(M_angle1)):
                 r = Rotation()
                 r.Axis = Vector(0, 0, 1)
                 angle1 = math.radians(coneAngle/2)*(m)/M_angle1
@@ -674,7 +675,7 @@ class SphericalBeam():
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
         Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('OpticsWorkbench.makeRay(beamNrColumns=32, beamNrRows=32, spherical=True)')
+        Gui.doCommand('OpticsWorkbench.makeRay(beamNrColumns=8, beamNrRows=8, spherical=True)')
 
 
     def IsActive(self):
