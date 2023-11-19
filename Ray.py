@@ -133,7 +133,7 @@ class RayWorker:
                     else:
                         r = Rotation()
                         r.Axis = Vector(0, 0, 1)
-                        r. Angle = n * 2 * math.pi / fp.BeamNrColumns
+                        r. Angle = n * 2 * math.pi / fp.BeamNrColumns * coneAngle / 360
                         pos = pl.Base
                         dir1 = r.multVec(Vector(1,0,0))
 
