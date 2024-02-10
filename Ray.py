@@ -101,6 +101,7 @@ class RayWorker:
 
             d_angle1 = math.radians(coneAngle/2)/M_angle1 # calculate the distance between the circles of the latitude
             d_angle2 = a/d_angle1 # calculate the distance between the points on the circumference of the circle
+            pos = Vector(0, 0, 0)
             for m in range(0, math.ceil(M_angle1)):
                 r = Rotation()
                 r.Axis = Vector(0, 0, 1)
@@ -110,16 +111,14 @@ class RayWorker:
                     M_angle2 = 2
                 if M_angle2 == 0: #if angle is 0 then set one ray in the vertical position
                     angle2=0
-                    dir = pl.Rotation.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
+                    dir = Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1))
                     Ncount = Ncount+1
-                    pos = pl.Base
                     self.makeInitialRay(fp, linearray, pos, dir)
 
                 for n in range(0,M_angle2):
                     angle2 = 2*math.pi*n/M_angle2
-                    dir = pl.Rotation.multVec(Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1)))
+                    dir = Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1))
                     Ncount = Ncount+1
-                    pos = pl.Base
 
                     self.makeInitialRay(fp, linearray, pos, dir)
             print("Number of rays created = ",Ncount)
@@ -128,14 +127,13 @@ class RayWorker:
             for row in range(0, int(fp.BeamNrRows)):
                 for n in range(0, int(fp.BeamNrColumns)):
                     if fp.Spherical == False:
-                        newpos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
-                        pos = pl.Base + pl.Rotation.multVec(newpos)
-                        dir = pl.Rotation.multVec(Vector(1, 0, 0))
+                        pos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
+                        dir = Vector(1, 0, 0)
                     else:
                         r = Rotation()
                         r.Axis = Vector(0, 0, 1)
                         r. Angle = n * 2 * math.pi / fp.BeamNrColumns * coneAngle / 360
-                        pos = pl.Base
+                        pos = Vector(0, 0, 0)
                         dir1 = r.multVec(Vector(1,0,0))
 
                         if row % 2 == 0:
@@ -174,9 +172,13 @@ class RayWorker:
 
 
     def makeInitialRay(self, fp, linearray, pos, dir):
+        pl = fp.Placement
+        ppos = pos + pl.Base
+        pdir = pl.Rotation.multVec(dir)
         if fp.Power == True:
             self.iter = fp.MaxNrReflections
-            ray = Part.makeLine(pos, pos + dir * fp.MaxRayLength / dir.Length)
+            ray = Part.makeLine(ppos, ppos + pdir * fp.MaxRayLength / pdir.Length)
+            
             linearray.append(ray)
             self.lastRefIdx = []
 
@@ -186,7 +188,7 @@ class RayWorker:
                 print(ex)
                 traceback.print_exc()
         else:
-            linearray.append(Part.makeLine(pos, pos + dir))
+            linearray.append(Part.makeLine(ppos, ppos + pdir))
 
 
     def getIntersections(self, fp, line):
