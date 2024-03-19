@@ -127,7 +127,7 @@ class RayWorker:
             for row in range(0, int(fp.BeamNrRows)):
                 for n in range(0, int(fp.BeamNrColumns)):
                     if fp.Spherical == False:
-                        pos = Vector(0, fp.BeamDistance * n, fp.BeamDistance * row)
+                        pos = pl.Rotation.multVec(Vector(0, fp.BeamDistance * n, fp.BeamDistance * row))
                         dir = Vector(1, 0, 0)
                     else:
                         r = Rotation()
