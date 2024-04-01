@@ -8,6 +8,7 @@ __doc__ = 'A single ray for raytracing'
 import os
 import FreeCADGui as Gui
 from FreeCAD import Vector, Rotation, activeDocument
+#import FreeCADGui
 import Part
 import math
 import traceback
@@ -735,16 +736,41 @@ class AllOff():
         '''Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional.'''
         if activeDocument():
+            return(True)  
+        else:
+            return(False)
+
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Off.svg'), 
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': 'Switch off lights',
+                'ToolTip' : 'Switch off all rays and beams' }
+
+class PlotRayHits():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
+    def Activated(self):
+        '''Will be called when the feature is executed.'''
+        # Generate commands in the FreeCAD python console to plot ray hits for selected absorber
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('OpticsWorkbench.plot3D()')
+
+
+    def IsActive(self):
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if activeDocument():    
             return(True)
         else:
             return(False)
 
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Off.svg'),
+        return {'Pixmap'  : os.path.join(_icondir_, 'scatter3D.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Switch off lights',
-                'ToolTip' : 'Switch off all rays and beams' }
+                'MenuText': '3D scatter Ray hits',
+                'ToolTip' : 'Show Ray Hits 3D scatter plot and save data' }
 
 Gui.addCommand('Ray (monochrome)', Ray())
 Gui.addCommand('Ray (sun light)', RaySun())
@@ -753,3 +779,4 @@ Gui.addCommand('2D Radial Beam', RadialBeam2D())
 Gui.addCommand('Spherical Beam', SphericalBeam())
 Gui.addCommand('Start', RedrawAll())
 Gui.addCommand('Off', AllOff())
+Gui.addCommand('RayHits', PlotRayHits())

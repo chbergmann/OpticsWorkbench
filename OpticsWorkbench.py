@@ -5,8 +5,12 @@ from FreeCAD import Vector, Rotation, activeDocument
 import Ray
 import OpticalObject
 import SunRay
+import FreeCADGui
 from numpy import linspace
 from importlib import reload
+import datetime
+import csv
+
 
 def recompute():
     activeDocument().recompute()
@@ -190,3 +194,67 @@ def plot_xy(absorber):
 
 # def isOpticalObject(obj):
 #     return obj.TypeId == 'Part::FeaturePython' and hasattr(obj, 'OpticalType') and hasattr(obj, 'Base')
+
+def plot3D():
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    
+    #Figure out the selected absorber; if multiple absorbers selected, or multiple objects then loop through them all
+    # and accumulate data from all of them
+
+    ## Create the list of selected absorbers; if none then skip
+    #selectedObjList = App.activeDocument().getSelection()
+    selectedObjList = FreeCADGui.Selection.getSelection()
+    # may try Gui.Selection.getSelection()
+    print("Selected Objects: ", len(selectedObjList))
+    if len(selectedObjList) >0:
+        coords = []
+        attr_names=[]
+        coords_per_beam = []
+        for eachObject in selectedObjList:
+            print("Looping through: ", eachObject.Label)
+            try:
+                if eachObject.OpticalType == "absorber":
+                    #coords = []
+                    attr_names[len(attr_names):] = [attr for attr in dir(eachObject) if attr.startswith('HitCoordsFrom')]
+                    coords_per_beam[len(coords_per_beam):] = [getattr(eachObject, attr) for attr in attr_names]
+                    #all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
+                else:
+                    print ("Ignoring: ",eachObject.Label)
+            except:
+                print ("Ignoring: ",eachObject.Label)
+        all_coords = np.array([coord for coords in coords_per_beam for coord in coords])    
+        if len(all_coords) > 0:
+            x = all_coords[:,0]
+            y = all_coords[:,1]
+            z = all_coords[:,2]       
+        
+            currentTime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+            docDirectory = os.path.dirname(FreeCADGui.ActiveDocument.Document.FileName)
+            #print(docDirectory)
+            docName = FreeCADGui.ActiveDocument.Document.Label+"_Hits_" + currentTime+".csv"
+            #print(docName)
+            myHitsFileName = os.path.join(docDirectory,docName)
+            print("Exporting hits to: "+ myHitsFileName)
+            
+            ### May need to do more for the cases where writing to folder requires special permissions; should at least catch the exception and put a message
+            with open(myHitsFileName,"w+", newline='', encoding='utf-8') as myHitsFile:
+                csvWriter = csv.writer(myHitsFile,delimiter=',')
+                csvWriter.writerow(["X-axis","Y-axis","Z-axis"])
+                csvWriter.writerows(all_coords)
+            myHitsFile.close
+
+       
+            fig = plt.figure()
+            ax = fig.add_subplot(projection='3d')
+            ax.scatter(x, y, z)
+            ax.set_xlabel('X-axis')
+            ax.set_ylabel('Y-axis')
+            ax.set_zlabel('Z-axis')
+
+            plt.show()
+        else:
+            print("No ray hits were found")
+
+
