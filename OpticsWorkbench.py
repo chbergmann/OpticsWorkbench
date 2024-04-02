@@ -241,46 +241,33 @@ def plot3D():
 
 
 def Hits2CSV():
-    import numpy as np
     
-    #Figure out the selected absorber; if multiple absorbers selected, or multiple objects then loop through them all
-    # and accumulate data from all of them
-
-    ## Create the list of selected absorbers; if none then skip
-    selectedObjList = FreeCADGui.Selection.getSelection()
-    print("Selected Objects: ", len(selectedObjList))
-    if len(selectedObjList) >0:
-        coords = []
-        attr_names=[]
-        coords_per_beam = []
-        for eachObject in selectedObjList:
-            print("Looping through: ", eachObject.Label)
-            try:
-                if eachObject.OpticalType == "absorber":
-                    #coords = []
-                    attr_names[len(attr_names):] = [attr for attr in dir(eachObject) if attr.startswith('HitCoordsFrom')]
-                    coords_per_beam[len(coords_per_beam):] = [getattr(eachObject, attr) for attr in attr_names]
-                    #all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
-                else:
-                    print ("Ignoring: ",eachObject.Label)
-            except:
-                print ("Ignoring: ",eachObject.Label)
-        all_coords = np.array([coord for coords in coords_per_beam for coord in coords])    
-        if len(all_coords) > 0:
-            currentTime = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-            docDirectory = os.path.dirname(FreeCADGui.ActiveDocument.Document.FileName)
-            #print(docDirectory)
-            docName = FreeCADGui.ActiveDocument.Document.Label+"_Hits_" + currentTime+".csv"
-            #print(docName)
-            myHitsFileName = os.path.join(docDirectory,docName)
-            print("Exporting hits to: "+ myHitsFileName)
+    sheet = activeDocument().addObject('Spreadsheet::Sheet', 'RayHits')
             
-            ### May need to do more for the cases where writing to folder requires special permissions; should at least catch the exception and put a message
-            with open(myHitsFileName,"w+", newline='', encoding='utf-8') as myHitsFile:
-                csvWriter = csv.writer(myHitsFile,delimiter=',')
-                csvWriter.writerow(["X-axis","Y-axis","Z-axis"])
-                csvWriter.writerows(all_coords)
-            myHitsFile.close
-        else:
-            print("No ray hits were found")
+    sheet.set('A1','Absorber')
+    sheet.set('B1','Ray')
+    sheet.set('C1','X-axis')
+    sheet.set('D1','Y-axis')
+    sheet.set('E1','Z-axis')
+    row = 1
+    
+    coords = []
+    attr_names=[]
+    coords_per_beam = []
+    for eachObject in activeDocument().Objects:
+        if hasattr(eachObject, 'OpticalType') and eachObject.OpticalType == "absorber":
+            #all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
+            for attr in dir(eachObject):
+                if attr.startswith('HitCoordsFrom'):
+                    coords_per_beam = getattr(eachObject, attr)
+                    for co in coords_per_beam:
+                        row += 1
+                        sheet.set('A' + str(row), eachObject.Label)
+                        sheet.set('B' + str(row), attr[13:])
+                        sheet.set('C' + str(row), str(co[0]))
+                        sheet.set('D' + str(row), str(co[1]))
+                        sheet.set('E' + str(row), str(co[2]))
+    
+    sheet.recompute()
+    sheet.ViewObject.doubleClicked()
  

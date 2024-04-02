@@ -141,9 +141,10 @@ Select one or more absorber objects and display the location rays hitting them o
 ![screenshot](./examples/plot3Dexample1.png) ![screenshot](./examples/plot3Dexample2.png)
 
 ### ![CSVexport](./icons/ExportCSV.svg) CSV Ray Hits Export
-Select one or more absorber objects and display the location rays hitting them on a 3D scatter graph. It will ignore objects other than absorbers. To only export hits from select beam sources, turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the exported CSV data.
+Creates a spreadsheet with the coordinates of all hits of all beams in all absorbers.  
+Go to the Spreadsheet workbench ofr doing further data processing or export the data to a file.
 
-The CSV file is created under same folder as the FreeCAD document file; file name is based on the FreeCAD document name and the timestamp of saving the data.
+![screenshot](./examples/RayHits.png) ![screenshot](./examples/RayHits.png)
 
 ### ![Example](./optics_workbench_icon.svg) Example - 2D
 ![screenshot](./examples/example2D.png)
