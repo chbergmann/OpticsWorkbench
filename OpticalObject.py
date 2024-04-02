@@ -37,7 +37,7 @@ class LensWorker:
                  fp,    # an instance of Part::FeaturePython
                  base = [],
                  RefractionIndex = 1,
-                 material = 'Quartz'):
+                 material = ''):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Lens', '').OpticalType = ['lens'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   'FreeCAD objects to be lenses').Base = base
@@ -305,7 +305,7 @@ class OpticalLens():
         for sel in selection:
             Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
                 
-        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Window glass")')               
+        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Quartz")')               
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions

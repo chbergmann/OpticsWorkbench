@@ -794,8 +794,8 @@ class RayHits2CSV():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'ExportCSV.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Ray Hits to Spreadsheed',
-                'ToolTip' : 'Export Ray Hits to Spreadsheed' }
+                'MenuText': 'Ray Hits to Spreadsheet',
+                'ToolTip' : 'Export Ray Hits to Spreadsheet' }
 
 
 
