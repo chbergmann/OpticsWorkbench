@@ -37,7 +37,7 @@ class LensWorker:
                  fp,    # an instance of Part::FeaturePython
                  base = [],
                  RefractionIndex = 1,
-                 material = ''):
+                 material = 'Quartz'):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Lens', '').OpticalType = ['lens'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   'FreeCAD objects to be lenses').Base = base

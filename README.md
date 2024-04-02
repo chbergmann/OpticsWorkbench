@@ -142,7 +142,7 @@ Select one or more absorber objects and display the location rays hitting them o
 
 ### ![CSVexport](./icons/ExportCSV.svg) CSV Ray Hits Export
 Creates a spreadsheet with the coordinates of all hits of all beams in all absorbers.  
-Go to the Spreadsheet workbench ofr doing further data processing or export the data to a file.
+Go to the Spreadsheet workbench for doing further data processing or export the data to a file.
 
 ![screenshot](./examples/RayHits.png)
 
