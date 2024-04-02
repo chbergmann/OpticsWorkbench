@@ -144,7 +144,7 @@ Select one or more absorber objects and display the location rays hitting them o
 Creates a spreadsheet with the coordinates of all hits of all beams in all absorbers.  
 Go to the Spreadsheet workbench ofr doing further data processing or export the data to a file.
 
-![screenshot](./examples/RayHits.png) ![screenshot](./examples/RayHits.png)
+![screenshot](./examples/RayHits.png)
 
 ### ![Example](./optics_workbench_icon.svg) Example - 2D
 ![screenshot](./examples/example2D.png)
