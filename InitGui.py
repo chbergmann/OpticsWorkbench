@@ -20,6 +20,7 @@ class OpticsWorkbench (Workbench):
         # import here all the needed files that create your FreeCAD commands
         import Ray
         import OpticalObject
+        import Plot
         from examples import example1, example3D, example_dispersion
         
         self.list = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam', 'Mirror', "Grating", 'Absorber', 'Lens', 'Off', 'Start', 'RayHits', 'Hits2CSV'] # A list of command names created in the line above

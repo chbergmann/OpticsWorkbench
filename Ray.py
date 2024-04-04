@@ -747,55 +747,7 @@ class AllOff():
                 'MenuText': 'Switch off lights',
                 'ToolTip' : 'Switch off all rays and beams' }
 
-class PlotRayHits():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
 
-    def Activated(self):
-        '''Will be called when the feature is executed.'''
-        # Generate commands in the FreeCAD python console to plot ray hits for selected absorber
-        Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('OpticsWorkbench.plot3D()')
-
-
-    def IsActive(self):
-        '''Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional.'''
-        if activeDocument():    
-            return(True)
-        else:
-            return(False)
-
-    def GetResources(self):
-        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'scatter3D.svg'),
-                'Accel' : '', # a default shortcut (optional)
-                'MenuText': '2D/3D Plot',
-                'ToolTip' : 'Show selected absorbers ray hits in scatter plot' }
-
-class RayHits2CSV():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
-
-    def Activated(self):
-        '''Will be called when the feature is executed.'''
-        # Generate commands in the FreeCAD python console to plot ray hits for selected absorber
-        Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('OpticsWorkbench.Hits2CSV()')
-
-
-    def IsActive(self):
-        '''Here you can define if the command must be active or not (greyed) if certain conditions
-        are met or not. This function is optional.'''
-        if activeDocument():    
-            return(True)
-        else:
-            return(False)
-
-    def GetResources(self):
-        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'ExportCSV.svg'),
-                'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Ray Hits to Spreadsheet',
-                'ToolTip' : 'Export Ray Hits to Spreadsheet' }
 
 
 
@@ -806,6 +758,4 @@ Gui.addCommand('2D Radial Beam', RadialBeam2D())
 Gui.addCommand('Spherical Beam', SphericalBeam())
 Gui.addCommand('Start', RedrawAll())
 Gui.addCommand('Off', AllOff())
-Gui.addCommand('RayHits', PlotRayHits())
-Gui.addCommand('Hits2CSV', RayHits2CSV())
 
