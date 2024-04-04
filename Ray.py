@@ -769,8 +769,8 @@ class PlotRayHits():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'scatter3D.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': '3D Plot',
-                'ToolTip' : 'Show Ray Hits 3D scatter plot' }
+                'MenuText': '2D/3D Plot',
+                'ToolTip' : 'Show selected absorbers ray hits in scatter plot' }
 
 class RayHits2CSV():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''

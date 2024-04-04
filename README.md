@@ -135,8 +135,9 @@ Switches off all Rays and Beams
 ### ![On](./icons/Anonymous_Lightbulb_Lit.svg) (Re)start simulation
 Switches on and recalculates all Rays and Beams
 
-### ![plot3D](./icons/scatter3D.svg) 3D Plot
-Select one or more absorber objects and display the location rays hitting them on a 3D scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.
+### ![plot3D](./icons/scatter3D.svg) 2D/3D Plot
+Select one or more absorber objects and display the location rays hitting them on a scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.  
+If coordinates in all 3 dimensions are present, a 3D plot will be shown, otherwise you will see a 2D plot only.
 
 ![screenshot](./examples/plot3Dexample1.png) ![screenshot](./examples/plot3Dexample2.png)
 

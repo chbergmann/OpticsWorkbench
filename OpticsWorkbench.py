@@ -8,9 +8,6 @@ import SunRay
 import FreeCADGui
 from numpy import linspace
 from importlib import reload
-import datetime
-import csv
-
 
 
 def recompute():
@@ -205,13 +202,13 @@ def plot3D():
 
     ## Create the list of selected absorbers; if none then skip
     selectedObjList = FreeCADGui.Selection.getSelection()
-    print("Selected Objects: ", len(selectedObjList))
+    #print("Selected Objects: ", len(selectedObjList))
     if len(selectedObjList) >0:
         coords = []
         attr_names=[]
         coords_per_beam = []
         for eachObject in selectedObjList:
-            print("Looping through: ", eachObject.Label)
+            #print("Looping through: ", eachObject.Label)
             try:
                 if eachObject.OpticalType == "absorber":
                     #coords = []
@@ -226,14 +223,41 @@ def plot3D():
         if len(all_coords) > 0:
             x = all_coords[:,0]
             y = all_coords[:,1]
-            z = all_coords[:,2]       
+            z = all_coords[:,2]
+            
+            startx = x[0]
+            starty = y[0]
+            startz = z[0]
+            xpresent = False
+            ypresent = False
+            zpresent = False
+            for co in all_coords:
+                if abs(startx - co[0]) > Ray.EPSILON: xpresent = True
+                if abs(starty - co[1]) > Ray.EPSILON: ypresent = True
+                if abs(startz - co[2]) > Ray.EPSILON: zpresent = True
         
             fig = plt.figure()
-            ax = fig.add_subplot(projection='3d')
-            ax.scatter(x, y, z)
-            ax.set_xlabel('X-axis')
-            ax.set_ylabel('Y-axis')
-            ax.set_zlabel('Z-axis')
+            
+            if xpresent and ypresent and zpresent:  
+                ax = fig.add_subplot(projection='3d')
+                ax.scatter(x, y, z)
+                ax.set_xlabel('X-axis')
+                ax.set_ylabel('Y-axis')
+                ax.set_zlabel('Z-axis')
+            else:
+                ax = fig.add_subplot()
+                if not zpresent:
+                    ax.scatter(x, y) 
+                    ax.set_xlabel('X-axis')
+                    ax.set_ylabel('Y-axis')
+                elif not ypresent:
+                    ax.scatter(x, z)
+                    ax.set_xlabel('X-axis')
+                    ax.set_ylabel('Z-axis')
+                else:
+                    ax.scatter(y, z)
+                    ax.set_xlabel('Y-axis')
+                    ax.set_ylabel('Z-axis')
 
             plt.show()
         else:
