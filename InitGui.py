@@ -23,8 +23,14 @@ class OpticsWorkbench (Workbench):
         import Plot
         from examples import example1, example3D, example_dispersion
         
-        self.list = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam', 'Mirror', "Grating", 'Absorber', 'Lens', 'Off', 'Start', 'RayHits', 'Hits2CSV'] # A list of command names created in the line above
-        self.menu = self.list + ['Example2D', 'Example3D', 'ExampleDispersion']
+        rays = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam']
+        optics = ['Mirror', "Grating", 'Absorber', 'Lens']
+        actions = ['Off', 'Start']
+        analysis= ['RayHits', 'Hits2CSV']
+        separator = ['Separator']
+        examples = ['Example2D', 'Example3D', 'ExampleDispersion']
+        self.list = rays + separator + optics + separator + actions + separator + analysis #A list of command names created in the line above
+        self.menu = self.list + separator + examples
         
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands
         self.appendMenu(self.__class__.MenuText, self.menu) # creates a new menu
