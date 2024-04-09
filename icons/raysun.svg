@@ -1,160 +1,211 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="64"
    height="64"
-   viewBox="0 0 16.933333 16.933333"
+   id="svg2869"
    version="1.1"
-   id="svg42"
-   sodipodi:docname="raysun.svg"
-   inkscape:version="1.0.2 (e86c870879, 2021-01-15)">
+   viewBox="0 0 64 64"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <defs
+     id="defs2871">
+    <linearGradient
+       id="linearGradient5">
+      <stop
+         style="stop-color:#ef2929;stop-opacity:1;"
+         offset="0"
+         id="stop19" />
+      <stop
+         style="stop-color:#ef2929;stop-opacity:0;"
+         offset="1"
+         id="stop20" />
+    </linearGradient>
+    <linearGradient
+       id="swatch18">
+      <stop
+         style="stop-color:#ef2929;stop-opacity:1;"
+         offset="0"
+         id="stop18" />
+    </linearGradient>
+    <linearGradient
+       id="swatch15">
+      <stop
+         style="stop-color:#3d0000;stop-opacity:1;"
+         offset="0"
+         id="stop15" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5-1">
+      <stop
+         style="stop-color:#ef2929;stop-opacity:1;"
+         offset="0"
+         id="stop5" />
+      <stop
+         style="stop-color:#ef2929;stop-opacity:0;"
+         offset="1"
+         id="stop6" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3836-9">
+      <stop
+         style="stop-color:#a40000;stop-opacity:1"
+         offset="0"
+         id="stop3838-8" />
+      <stop
+         style="stop-color:#ef2929;stop-opacity:1"
+         offset="1"
+         id="stop3840-1" />
+    </linearGradient>
+  </defs>
   <metadata
-     id="metadata48">
+     id="metadata2874">
     <rdf:RDF>
       <cc:Work
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>[maxwxyz]</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:relation>https://www.freecad.org/wiki/index.php?title=Artwork</dc:relation>
+        <dc:publisher>
+          <cc:Agent>
+            <dc:title>FreeCAD</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:identifier>FreeCAD/src/</dc:identifier>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>FreeCAD LGPL2+</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:date>2024</dc:date>
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <defs
-     id="defs46" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="3840"
-     inkscape:window-height="2093"
-     id="namedview44"
-     showgrid="false"
-     units="px"
-     inkscape:zoom="45.254834"
-     inkscape:cx="21.11697"
-     inkscape:cy="41.870954"
-     inkscape:window-x="0"
-     inkscape:window-y="36"
-     inkscape:window-maximized="1"
-     inkscape:current-layer="Ray" />
   <g
-     id="Ray"
-     transform="matrix(1,0,0,-1,0.06633183,-0.14780199)">
-    <path
-       id="Ray_nwe0000"
-       d="M -0.05902655,-11.813497 H 16.838811"
-       stroke="#8300b5"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.726793;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title3">b'Ray'</title>
-  </g>
-  <g
-     id="Ray001"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.01448179,10.887401)">
-    <path
-       id="Ray001_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#0025ff"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title7">b'Ray001'</title>
-  </g>
-  <g
-     id="Ray002"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.02343857,9.9829004)">
-    <path
-       id="Ray002_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#00faff"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title11">b'Ray002'</title>
-  </g>
-  <g
-     id="Ray003"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.02701791,9.0877919)">
-    <path
-       id="Ray003_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#6aff00"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title15">b'Ray003'</title>
-  </g>
-  <g
-     id="Ray004"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.04391242,8.1739577)">
-    <path
-       id="Ray004_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#f9ff00"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title19">b'Ray004'</title>
-  </g>
-  <g
-     id="Ray005"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.03421998,7.3180649)">
-    <path
-       id="Ray005_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#ff6e00"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title23">b'Ray005'</title>
-  </g>
-  <g
-     id="Ray006"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.02939971,6.4336193)">
-    <path
-       id="Ray006_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#ff0000"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title27">b'Ray006'</title>
-  </g>
-  <g
-     id="Ray007"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.02737427,5.5485776)">
-    <path
-       id="Ray007_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#eb0000"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title31">b'Ray007'</title>
-  </g>
-  <g
-     id="Ray008"
-     transform="matrix(1.6897837,0,0,-2.5518424,0.02050382,4.689092)">
-    <path
-       id="Ray008_nwe0000"
-       d="M 0,0 H 10"
-       stroke="#960000"
-       stroke-width="0.35 px"
-       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:0.35;stroke-miterlimit:4;stroke-dasharray:none" />
-    <title
-       id="title35">b'Ray008'</title>
+     id="layer3"
+     style="display:inline">
+    <g
+       id="g135"
+       transform="matrix(0.96296296,0,0,0.96271674,1.1851853,0.2303471)"
+       style="stroke-width:1.03859">
+      <path
+         id="path127"
+         d="M 5,58.677088 H 58.883269"
+         stroke="#8300b5"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path128"
+         d="M 5.0228842,52.257816 H 58.906152"
+         stroke="#0025ff"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path129"
+         d="M 5.0514453,45.838544 H 58.934714"
+         stroke="#00faff"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path130"
+         d="M 5.062859,39.419272 H 58.946127"
+         stroke="#6aff00"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path131"
+         d="M 5.1167317,33 H 59"
+         stroke="#f9ff00"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path132"
+         d="M 5.0858247,26.580729 H 58.969092"
+         stroke="#ff6e00"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path133"
+         d="M 5.070454,20.161457 H 58.953722"
+         stroke="#ff0000"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path134"
+         d="M 5.0639953,13.742185 H 58.947264"
+         stroke="#eb0000"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="path135"
+         d="M 5.042087,7.322913 H 58.925355"
+         stroke="#960000"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#231f0b;stroke-width:8.30875;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+      <path
+         id="Ray_nwe0000"
+         d="M 5,58.677088 H 58.883269"
+         stroke="#8300b5"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray001_nwe0000"
+         d="M 5.0228842,52.257816 H 58.906152"
+         stroke="#0025ff"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray002_nwe0000"
+         d="M 5.0514453,45.838544 H 58.934714"
+         stroke="#00faff"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray003_nwe0000"
+         d="M 5.062859,39.419272 H 58.946127"
+         stroke="#6aff00"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray004_nwe0000"
+         d="M 5.1167317,33 H 59"
+         stroke="#f9ff00"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray005_nwe0000"
+         d="M 5.0858247,26.580729 H 58.969092"
+         stroke="#ff6e00"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray006_nwe0000"
+         d="M 5.070454,20.161457 H 58.953722"
+         stroke="#ff0000"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray007_nwe0000"
+         d="M 5.0639953,13.742185 H 58.947264"
+         stroke="#eb0000"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         id="Ray008_nwe0000"
+         d="M 5.042087,7.322913 H 58.925355"
+         stroke="#960000"
+         stroke-width="0.35 px"
+         style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke-width:4.15438;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
   </g>
 </svg>
