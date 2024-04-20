@@ -24,7 +24,7 @@ class OpticsWorkbench (Workbench):
         from examples import example1, example3D, example_dispersion
         
         rays = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam']
-        optics = ['Mirror', "Grating", 'Absorber', 'Lens']
+        optics = ['Emitter', 'Mirror', 'Grating', 'Absorber', 'Lens']
         actions = ['Off', 'Start']
         analysis= ['RayHits', 'Hits2CSV']
         separator = ['Separator']
