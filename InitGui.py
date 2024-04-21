@@ -21,14 +21,14 @@ class OpticsWorkbench (Workbench):
         import Ray
         import OpticalObject
         import Plot
-        from examples import example1, example3D, example_dispersion
+        from examples import example1, example3D, example_dispersion, example_candle
         
         rays = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam']
         optics = ['Emitter', 'Mirror', 'Grating', 'Absorber', 'Lens']
         actions = ['Off', 'Start']
         analysis= ['RayHits', 'Hits2CSV']
         separator = ['Separator']
-        examples = ['Example2D', 'Example3D', 'ExampleDispersion']
+        examples = ['Example2D', 'Example3D', 'ExampleDispersion', 'ExampleCandle']
         self.list = rays + separator + optics + separator + actions + separator + analysis #A list of command names created in the line above
         self.menu = self.list + separator + examples
         

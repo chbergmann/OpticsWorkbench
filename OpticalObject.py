@@ -364,7 +364,7 @@ class OpticalEmitter():
             for sub in selection[0].SubElementNames:
                 faces.append(sub)
                                          
-            Gui.doCommand('OpticsWorkbench.makeRay(baseShapes=[obj, %s])'%faces)
+            Gui.doCommand('OpticsWorkbench.makeRay(baseShape=[obj, %s])'%faces)
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions

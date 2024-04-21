@@ -191,11 +191,17 @@ class RayWorker:
         for face in subShapes:
             for row in range(0, int(BeamNrRows)):
                 for col in range(0, int(BeamNrColumns)):
-                    param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / BeamNrRows
-                    param2 = face.ParameterRange[2] + (face.ParameterRange[3] - face.ParameterRange[2]) * (col + 0.5) / BeamNrColumns
-                    newdir = face.normalAt(param1, param2)
-                    newpos = face.valueAt(param1, param2)
-                    posdirarray.append((newpos, newdir))
+                    if len(face.ParameterRange) == 4:
+                        param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / BeamNrRows
+                        param2 = face.ParameterRange[2] + (face.ParameterRange[3] - face.ParameterRange[2]) * (col + 0.5) / BeamNrColumns
+                        newdir = face.normalAt(param1, param2)
+                        newpos = face.valueAt(param1, param2)
+                        posdirarray.append((newpos, newdir))
+                    elif len(face.ParameterRange) == 2:
+                        param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / BeamNrRows
+                        newdir = face.normalAt(param1)
+                        newpos = face.valueAt(param1)
+                        posdirarray.append((newpos, newdir))
                         
         return posdirarray             
         

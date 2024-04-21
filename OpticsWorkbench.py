@@ -36,19 +36,19 @@ def makeRay(position = Vector(0, 0, 0),
             order = 0,
             coneAngle = 360,
             ignoredElements=[],
-            baseShapes = []):
+            baseShape = None):
     reload(Ray)
     '''Python command to create a light ray.'''
     name = 'Ray'
     if beamNrColumns * beamNrRows > 1:
         name = 'Beam'
-    if len(baseShapes) > 0:
+    if baseShape:
         name = 'Emitter'
 
     fp = activeDocument().addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     fp.Placement.Rotation = Rotation(Vector(1, 0, 0), direction)
-    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength, order, coneAngle, ignoredElements, baseShapes)
+    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength, order, coneAngle, ignoredElements, baseShape)
     Ray.RayViewProvider(fp.ViewObject)
     recompute()
     return fp
