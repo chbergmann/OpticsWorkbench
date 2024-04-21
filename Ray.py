@@ -89,7 +89,11 @@ class RayWorker:
 
         pl = fp.Placement
         posdirarray = []
-        if fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
+        
+        if fp.Base and len(fp.Base) > 0:
+            posdirarray = self.getPosDirFromFaces(fp)
+            
+        elif fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
             # make spherical beam pattern that has equally spaced rays.
             # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung,
             # link https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
@@ -149,7 +153,6 @@ class RayWorker:
 
                     posdirarray.append((pos, dir))
 
-        posdirarray = self.getNormalsFromFaces(fp, posdirarray)
         linearray = self.makeInitialRay(fp, posdirarray)
 
         for line in linearray:            
@@ -176,20 +179,19 @@ class RayWorker:
         fp.ViewObject.Transparency = 50
         
         
-    def getNormalsFromFaces(self, fp, linearray):
-        newlinearray = []
-        if not fp.Base:
-            return linearray
-            
-        for (pos, dir) in linearray:
-            for obj in fp.Base:
-                for face in obj.Shape.Faces:
-                    newpos = pos + face.CenterOfGravity
-                    p = face.Surface.parameter(face.CenterOfGravity)
-                    newdir = face.normalAt(p[0], p[1])
-                    newlinearray.append((newpos, newdir))
-                    
-        return newlinearray
+    def getPosDirFromFaces(self, fp):
+        posdirarray = []            
+        for obj in fp.Base:
+            for face in obj.Shape.Faces:
+                for row in range(0, int(fp.BeamNrRows)):
+                    for col in range(0, int(fp.BeamNrColumns)):
+                        param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / fp.BeamNrRows
+                        param2 = face.ParameterRange[2] + (face.ParameterRange[3] - face.ParameterRange[2]) * (col + 0.5) / fp.BeamNrColumns
+                        newdir = face.normalAt(param1, param2)
+                        newpos = face.valueAt(param1, param2)
+                        posdirarray.append((newpos, newdir))
+                        
+        return posdirarray             
         
 
     def makeInitialRay(self, fp, posdirarray):
