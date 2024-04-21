@@ -40,13 +40,14 @@ A single ray for raytracing
 Parameters:
 - `Power`: On or Off  
 - `Spherical`: `False=Beam` in one direction, `True=Radial` or `spherical` rays
-- `BeamNrColumns`: Number of rays in a beam per row
-- `BeamNrRows`: Number of rays in a beam per column
+- `BeamNrColumns`: Number of rays in a beam per column
+- `BeamNrRows`: Number of rays in a beam per row
 - `BeamDistance`: Distance between two beams
 - `HideFirstPart`: Hide the first part of every ray that comes from the source and goes to the first point of reflection/refraction/nirvana
 - `MaxRayLength`: Maximum length of a ray
 - `MaxNrReflections`: Maximum number of reflections. This prevents endless loops if the ray is inside a mirror box.
 - `Ignored Optical Elements`: List of optical objects that will be ignored by the ray/beam.
+- `Base`: If a shape is selected here, an optical emitter will be created.
 
 ### ![SunRayIcon](./icons/raysun.svg) Ray (sun light)
 A number of rays with different wavelengths of visible light.  
@@ -66,6 +67,22 @@ Parameters:
 Rays coming from one point going to all directions  
 Parameters:  
 * Ray. `BeamNrColumns` and `BeamNrRows` must be > 1 `Spherical=True` to get a spherical beam
+
+### ![Optical Emitter](./icons/emitter.svg) Optical Emitter
+The FreeCAD objects in parameter Base will act as emitters  
+Select some FreeCAD objects, faces or edges, then create Optical Emitter
+![screenshot](./examples/Emitter.png)  
+Edges can also be selected as Base: 
+![screenshot](./examples/example_candle2D.png)
+
+The parameters are the same as in the Ray tool.
+Parameters with different meaning for Emitter:
+- `Power`: On or Off  
+- `Spherical`: (will be ignored for this feature)
+- `BeamNrColumns`: Number of rays per column distributed over every selected surface
+- `BeamNrRows`: Number of rays per row distributed over every selected surface
+- `BeamDistance`: (will be ignored for this feature)
+- `Base`: Base shape for optical emitter. If a solid is selected, rays will be created on every face. You can also select faces or edges separately.
 
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The FreeCAD objects in parameter Base will act as mirrors  
@@ -155,6 +172,9 @@ Go to the Spreadsheet workbench for doing further data processing or export the 
 
 ### ![Example](./optics_workbench_icon.svg) Example - Dispersion
 ![screenshot](https://pad.ccc-p.org/uploads/upload_210b4dd5466d2837eb76d5e63688a5c1.png)
+
+### ![Example](./optics_workbench_icon.svg) Example - Candle
+![screenshot](./examples/example_candle.png)
 
 ## Issues and Troubleshooting
 see [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)
