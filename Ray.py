@@ -38,7 +38,7 @@ class RayWorker:
                  order = 0,
                  coneAngle = 360,
                  ignoredElements=[],
-                 baseShapes = []):
+                 baseShape = []):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
         fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
@@ -51,7 +51,7 @@ class RayWorker:
         fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  'Order of the ray').Order = order        
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
         fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
-        fp.addProperty('App::PropertyLinkList',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShapes
+        fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShape
         
         fp.Proxy = self
         self.lastRefIdx = []
@@ -90,8 +90,15 @@ class RayWorker:
         pl = fp.Placement
         posdirarray = []
         
-        if fp.Base and len(fp.Base) > 0:
-            posdirarray = self.getPosDirFromFaces(fp)
+        if fp.Base:
+            faces = []
+            if len(fp.Base[1]) == 0:
+                faces += fp.Base[0].Shape.Faces
+            else:
+                for sub in fp.Base[1]:
+                    faces.append(fp.Base[0].getSubObject(sub))
+                        
+            posdirarray = self.getPosDirFromFaces(faces, fp.BeamNrRows, fp.BeamNrColumns)
             
         elif fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
             # make spherical beam pattern that has equally spaced rays.
@@ -179,17 +186,16 @@ class RayWorker:
         fp.ViewObject.Transparency = 50
         
         
-    def getPosDirFromFaces(self, fp):
-        posdirarray = []            
-        for obj in fp.Base:
-            for face in obj.Shape.Faces:
-                for row in range(0, int(fp.BeamNrRows)):
-                    for col in range(0, int(fp.BeamNrColumns)):
-                        param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / fp.BeamNrRows
-                        param2 = face.ParameterRange[2] + (face.ParameterRange[3] - face.ParameterRange[2]) * (col + 0.5) / fp.BeamNrColumns
-                        newdir = face.normalAt(param1, param2)
-                        newpos = face.valueAt(param1, param2)
-                        posdirarray.append((newpos, newdir))
+    def getPosDirFromFaces(self, subShapes, BeamNrRows, BeamNrColumns):
+        posdirarray = []    
+        for face in subShapes:
+            for row in range(0, int(BeamNrRows)):
+                for col in range(0, int(BeamNrColumns)):
+                    param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / BeamNrRows
+                    param2 = face.ParameterRange[2] + (face.ParameterRange[3] - face.ParameterRange[2]) * (col + 0.5) / BeamNrColumns
+                    newdir = face.normalAt(param1, param2)
+                    newpos = face.valueAt(param1, param2)
+                    posdirarray.append((newpos, newdir))
                         
         return posdirarray             
         
