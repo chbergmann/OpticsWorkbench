@@ -321,15 +321,15 @@ class RayWorker:
         for np in nearest_parts:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
-
-            hitname = 'HitsFrom' + fp.Label
-            if not hasattr(nearest_obj, hitname):
-                nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
-                setattr(nearest_obj, hitname, 1)
-            else:
-                setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
-
-            if nearest_obj.OpticalType == "absorber":
+     
+            if isRelevantOptic(fp, nearest_obj):
+                hitname = 'HitsFrom' + fp.Label
+                if not hasattr(nearest_obj, hitname):
+                    nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
+                    setattr(nearest_obj, hitname, 1)
+                else:
+                    setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
+    
                 # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
                 hitcoordsname = 'HitCoordsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitcoordsname):

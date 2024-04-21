@@ -212,7 +212,7 @@ def Hits2CSV():
     attr_names=[]
     coords_per_beam = []
     for eachObject in activeDocument().Objects:
-        if hasattr(eachObject, 'OpticalType') and eachObject.OpticalType == "absorber":
+        if Ray.isOpticalObject(eachObject):
             #all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
             for attr in dir(eachObject):
                 if attr.startswith('HitCoordsFrom'):

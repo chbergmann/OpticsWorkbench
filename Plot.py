@@ -22,7 +22,7 @@ class PlotRayHits():
             for eachObject in selectedObjList:
                 #print("Looping through: ", eachObject.Label)
                 try:
-                    if eachObject.OpticalType == "absorber":
+                    if Ray.isOpticalObject(eachObject):
                         #coords = []
                         attr_names[len(attr_names):] = [attr for attr in dir(eachObject) if attr.startswith('HitCoordsFrom')]
                         coords_per_beam[len(coords_per_beam):] = [getattr(eachObject, attr) for attr in attr_names]
