@@ -38,7 +38,7 @@ class RayWorker:
                  order = 0,
                  coneAngle = 360,
                  ignoredElements=[],
-                 baseShape = []):
+                 baseShape = None):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
         fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
@@ -52,7 +52,7 @@ class RayWorker:
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
         fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
         fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShape
-        
+
         fp.Proxy = self
         self.lastRefIdx = []
         self.iter = 0
@@ -70,14 +70,14 @@ class RayWorker:
             self.redrawRay(fp)
 
     def redrawRay(self, fp):
-        #hitname = 'HitsFrom' + fp.Label
-        #hitcoordsname = 'HitCoordsFrom' + fp.Label
-        #for optobj in activeDocument().Objects:
-        #    if isRelevantOptic(fp, optobj):
-        #        if hasattr(optobj, hitname):
-        #            setattr(optobj, hitname, 0)
-        #        if hasattr(optobj, hitcoordsname):
-        #            setattr(optobj, hitcoordsname, [])
+        hitname = 'HitsFrom' + fp.Label
+        hitcoordsname = 'HitCoordsFrom' + fp.Label
+        for optobj in activeDocument().Objects:
+            if isRelevantOptic(fp, optobj):
+                if hasattr(optobj, hitname):
+                    setattr(optobj, hitname, 0)
+                if hasattr(optobj, hitcoordsname):
+                    setattr(optobj, hitcoordsname, [])
 
 
         try: #check if the beam has the parameter coneAngle, this is a legacy check.
@@ -199,7 +199,11 @@ class RayWorker:
                         posdirarray.append((newpos, newdir))
                     elif len(face.ParameterRange) == 2:
                         param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / BeamNrRows
-                        newdir = face.normalAt(param1)
+                        try:
+                            newdir = face.normalAt(param1)
+                        except:
+                            newdir = Vector(1, 0, 0)
+                            
                         newpos = face.valueAt(param1)
                         posdirarray.append((newpos, newdir))
                         
@@ -318,20 +322,20 @@ class RayWorker:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
 
-            #hitname = 'HitsFrom' + fp.Label
-            #if not hasattr(nearest_obj, hitname):
-            #    nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
-            #    setattr(nearest_obj, hitname, 1)
-            #else:
-            #    setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
+            hitname = 'HitsFrom' + fp.Label
+            if not hasattr(nearest_obj, hitname):
+                nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
+                setattr(nearest_obj, hitname, 1)
+            else:
+                setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
 
-            #if nearest_obj.OpticalType == "absorber":
-            #    # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
-            #    hitcoordsname = 'HitCoordsFrom' + fp.Label
-            #    if not hasattr(nearest_obj, hitcoordsname):
-            #        nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject',   'Hit coordinates from ' + fp.Label + ' (read only)')
-            #        setattr(nearest_obj, hitcoordsname, [])
-                #setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
+            if nearest_obj.OpticalType == "absorber":
+                # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
+                hitcoordsname = 'HitCoordsFrom' + fp.Label
+                if not hasattr(nearest_obj, hitcoordsname):
+                    nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject',   'Hit coordinates from ' + fp.Label + ' (read only)')
+                    setattr(nearest_obj, hitcoordsname, [])
+                setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
 
             if fp.HideFirstPart == False or first == False:
                 linearray[len(linearray) - 1] = shortline
@@ -588,6 +592,9 @@ class RayViewProvider:
 
     def claimChildren(self):
         '''Return a list of objects that will be modified by this feature'''
+        if not self.Object.Base:
+            return []
+            
         return self.Object.Base
 
     def onDelete(self, feature, subelements):

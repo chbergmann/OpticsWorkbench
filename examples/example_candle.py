@@ -1,7 +1,7 @@
 from FreeCAD import Vector, Placement, Rotation
 import Sketcher
 import Part
-import FreeCAD as app
+import FreeCAD as App
 import FreeCADGui as Gui
 import OpticsWorkbench
 import os
@@ -40,18 +40,19 @@ def createSketch_Sketch(doc):
 
 
 def make_candle():
-    doc = app.activeDocument()
+    App.newDocument("Candle Example")
+    doc = App.activeDocument()
 
-    Candle1 = doc.addObject('Part::Cylinder', 'Docht')
+    Candle1 = doc.addObject('Part::Cylinder', 'Candle1')
     Candle1.Radius = 3.0
 
-    Candle2 = doc.addObject('Part::Cylinder', 'Candle')
-    Candle2.Height = 12.0
+    Candle2 = doc.addObject('Part::Cylinder', 'Candle2')
+    Candle2.Height = 12.5
     Candle2.Radius = 0.2
 
     Sketch = createSketch_Sketch(doc)
 
-    Revolve = doc.addObject('Part::Revolution', 'Revolve')
+    Revolve = doc.addObject('Part::Revolution', 'Flame')
     Revolve.Source = Sketch
     Revolve.ViewObject.LineColor = (1.00, 1.00, 1.00, 1.00)
     Revolve.ViewObject.LineColorArray = [(1.00, 1.00, 1.00, 1.00)]
@@ -62,7 +63,6 @@ def make_candle():
     OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=10, baseShape=Revolve)
     
     doc.recompute()
-    Gui.activeDocument().activeView().viewIsometric()
 
 
 class ExampleCandle():
