@@ -361,8 +361,8 @@ class OpticalEmitter():
         Gui.doCommand('objects = []')
         for sel in selection:
             Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
-                
-        Gui.doCommand('OpticsWorkbench.makeEmitter(objects)')               
+            
+        Gui.doCommand('OpticsWorkbench.makeRay(baseShapes=objects)')         
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions

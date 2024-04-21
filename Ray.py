@@ -7,7 +7,7 @@ __doc__ = 'A single ray for raytracing'
 
 import os
 import FreeCADGui as Gui
-from FreeCAD import Vector, Rotation, activeDocument
+from FreeCAD import Vector, Rotation, Placement, activeDocument
 #import FreeCADGui
 import Part
 import math
@@ -37,7 +37,8 @@ class RayWorker:
                  wavelength = 580,
                  order = 0,
                  coneAngle = 360,
-                 ignoredElements=[]):
+                 ignoredElements=[],
+                 baseShapes = []):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
         fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
@@ -50,6 +51,7 @@ class RayWorker:
         fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  'Order of the ray').Order = order        
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
         fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
+        fp.addProperty('App::PropertyLinkList',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShapes
         
         fp.Proxy = self
         self.lastRefIdx = []
@@ -68,15 +70,14 @@ class RayWorker:
             self.redrawRay(fp)
 
     def redrawRay(self, fp):
-        pl = fp.Placement
-        hitname = 'HitsFrom' + fp.Label
-        hitcoordsname = 'HitCoordsFrom' + fp.Label
-        for optobj in activeDocument().Objects:
-            if isRelevantOptic(fp, optobj):
-                if hasattr(optobj, hitname):
-                    setattr(optobj, hitname, 0)
-                if hasattr(optobj, hitcoordsname):
-                    setattr(optobj, hitcoordsname, [])
+        #hitname = 'HitsFrom' + fp.Label
+        #hitcoordsname = 'HitCoordsFrom' + fp.Label
+        #for optobj in activeDocument().Objects:
+        #    if isRelevantOptic(fp, optobj):
+        #        if hasattr(optobj, hitname):
+        #            setattr(optobj, hitname, 0)
+        #        if hasattr(optobj, hitcoordsname):
+        #            setattr(optobj, hitcoordsname, [])
 
 
         try: #check if the beam has the parameter coneAngle, this is a legacy check.
@@ -86,7 +87,8 @@ class RayWorker:
         except:
             coneAngle = 360
 
-        linearray = []
+        pl = fp.Placement
+        posdirarray = []
         if fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
             # make spherical beam pattern that has equally spaced rays.
             # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung,
@@ -114,14 +116,14 @@ class RayWorker:
                     angle2=0
                     dir = Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1))
                     Ncount = Ncount+1
-                    self.makeInitialRay(fp, linearray, pos, dir)
+                    posdirarray.append((pos, dir))
 
                 for n in range(0,M_angle2):
                     angle2 = 2*math.pi*n/M_angle2
                     dir = Vector(math.sin(angle1)*math.cos(angle2), math.sin(angle1)*math.sin(angle2), math.cos(angle1))
                     Ncount = Ncount+1
 
-                    self.makeInitialRay(fp, linearray, pos, dir)
+                    posdirarray.append((pos, dir))
             print("Number of rays created = ",Ncount)
 
         else:
@@ -145,10 +147,12 @@ class RayWorker:
                         r. Angle = row * math.pi / fp.BeamNrRows
                         dir = r.multVec(dir1)
 
-                    self.makeInitialRay(fp, linearray, pos, dir)
+                    posdirarray.append((pos, dir))
 
+        posdirarray = self.getNormalsFromFaces(fp, posdirarray)
+        linearray = self.makeInitialRay(fp, posdirarray)
 
-        for line in linearray:
+        for line in linearray:            
             r2 = Rotation(pl.Rotation)
             r2.invert()
             line.Placement.Rotation = r2
@@ -170,26 +174,46 @@ class RayWorker:
             fp.ViewObject.LineColor = (float(r), float(g), float(b), (0.0))
 
         fp.ViewObject.Transparency = 50
-
-
-    def makeInitialRay(self, fp, linearray, pos, dir):
-        pl = fp.Placement
-        ppos = pos + pl.Base
-        pdir = pl.Rotation.multVec(dir)
-        if fp.Power == True:
-            self.iter = fp.MaxNrReflections
-            ray = Part.makeLine(ppos, ppos + pdir * fp.MaxRayLength / pdir.Length)
+        
+        
+    def getNormalsFromFaces(self, fp, linearray):
+        newlinearray = []
+        if not fp.Base:
+            return linearray
             
-            linearray.append(ray)
-            self.lastRefIdx = []
+        for (pos, dir) in linearray:
+            for obj in fp.Base:
+                for face in obj.Shape.Faces:
+                    newpos = pos + face.CenterOfGravity
+                    p = face.Surface.parameter(face.CenterOfGravity)
+                    newdir = face.normalAt(p[0], p[1])
+                    newlinearray.append((newpos, newdir))
+                    
+        return newlinearray
+        
 
-            try:
-                self.traceRay(fp, linearray, True)
-            except Exception as ex:
-                print(ex)
-                traceback.print_exc()
-        else:
-            linearray.append(Part.makeLine(ppos, ppos + pdir))
+    def makeInitialRay(self, fp, posdirarray):
+        pl = fp.Placement
+        linearray = []
+        for (pos, dir) in posdirarray:
+            ppos = pos + pl.Base
+            pdir = pl.Rotation.multVec(dir)
+            if fp.Power == True:
+                self.iter = fp.MaxNrReflections
+                ray = Part.makeLine(ppos, ppos + pdir * fp.MaxRayLength / pdir.Length)
+                
+                linearray.append(ray)
+                self.lastRefIdx = []
+    
+                try:
+                    self.traceRay(fp, linearray, True)
+                except Exception as ex:
+                    print(ex)
+                    traceback.print_exc()
+            else:
+                linearray.append(Part.makeLine(ppos, ppos + pdir))
+                
+        return linearray
 
 
     def getIntersections(self, fp, line):
@@ -280,20 +304,20 @@ class RayWorker:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
 
-            hitname = 'HitsFrom' + fp.Label
-            if not hasattr(nearest_obj, hitname):
-                nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
-                setattr(nearest_obj, hitname, 1)
-            else:
-                setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
+            #hitname = 'HitsFrom' + fp.Label
+            #if not hasattr(nearest_obj, hitname):
+            #    nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
+            #    setattr(nearest_obj, hitname, 1)
+            #else:
+            #    setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
 
-            if nearest_obj.OpticalType == "absorber":
-                # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
-                hitcoordsname = 'HitCoordsFrom' + fp.Label
-                if not hasattr(nearest_obj, hitcoordsname):
-                    nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject',   'Hit coordinates from ' + fp.Label + ' (read only)')
-                    setattr(nearest_obj, hitcoordsname, [])
-                setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
+            #if nearest_obj.OpticalType == "absorber":
+            #    # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
+            #    hitcoordsname = 'HitCoordsFrom' + fp.Label
+            #    if not hasattr(nearest_obj, hitcoordsname):
+            #        nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject',   'Hit coordinates from ' + fp.Label + ' (read only)')
+            #        setattr(nearest_obj, hitcoordsname, [])
+                #setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
 
             if fp.HideFirstPart == False or first == False:
                 linearray[len(linearray) - 1] = shortline
@@ -530,6 +554,8 @@ class RayViewProvider:
 
     def getIcon(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        if self.Object.Base:
+            return os.path.join(_icondir_, 'emitter.svg')
         if self.Object.BeamNrColumns * self.Object.BeamNrRows <= 1:
             return os.path.join(_icondir_, 'ray.svg')
         elif self.Object.Spherical:
@@ -548,7 +574,7 @@ class RayViewProvider:
 
     def claimChildren(self):
         '''Return a list of objects that will be modified by this feature'''
-        return []
+        return self.Object.Base
 
     def onDelete(self, feature, subelements):
         '''Here we can do something when the feature will be deleted'''
