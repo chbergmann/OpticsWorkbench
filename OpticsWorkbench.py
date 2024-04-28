@@ -131,6 +131,13 @@ def allOff():
         if isRay(obj):
             obj.Power = False
             
+        elif Ray.isOpticalObject(obj):
+            hitname = 'HitsFrom'
+            hitcoordsname = 'HitCoordsFrom'
+            for a in dir(obj):
+                if a.startswith('HitsFrom') or a.startswith('HitCoordsFrom'):
+                    obj.removeProperty(a)
+            
     recompute()
 
 def makeMirror(base = []):
