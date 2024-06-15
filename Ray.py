@@ -196,7 +196,9 @@ class RayWorker:
                         param2 = face.ParameterRange[2] + (face.ParameterRange[3] - face.ParameterRange[2]) * (col + 0.5) / BeamNrColumns
                         newdir = face.normalAt(param1, param2)
                         newpos = face.valueAt(param1, param2)
-                        posdirarray.append((newpos, newdir))
+                        v = Part.Vertex(newpos)
+                        if face.distToShape(v)[0] < EPSILON:
+                            posdirarray.append((newpos, newdir))
                     elif len(face.ParameterRange) == 2:
                         param1 = face.ParameterRange[0] + (face.ParameterRange[1] - face.ParameterRange[0]) * (row + 0.5) / BeamNrRows
                         try:
