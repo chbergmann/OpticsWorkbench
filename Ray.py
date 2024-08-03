@@ -75,16 +75,9 @@ class RayWorker:
         for optobj in activeDocument().Objects:
             collectStatistics = isRelevantOptic(fp, optobj) and optobj.collectStatistics
             if hasattr(optobj, hitname):
-                if collectStatistics:
-                    setattr(optobj, hitname, 0)
-                else:
-                    delattr(optobj, hitname)
+                setattr(optobj, hitname, 0)
             if hasattr(optobj, hitcoordsname):
-                if collectStatistics:
-                    setattr(optobj, hitcoordsname, [])
-                else:
-                    delattr(optobj, hitcoordsname)
-
+                setattr(optobj, hitcoordsname, [])
 
         try: #check if the beam has the parameter coneAngle, this is a legacy check.
             coneAngle = float(fp.ConeAngle)
