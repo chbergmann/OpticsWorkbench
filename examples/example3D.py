@@ -48,7 +48,7 @@ def make_Test3D():
 
     doc.recompute()
 
-    OpticsWorkbench.makeMirror([Cube, Sphere, Cone])
+    OpticsWorkbench.makeMirror([Cube, Sphere, Cone], True)
     OpticsWorkbench.makeAbsorber([Cylinder])
     OpticsWorkbench.makeLens([HalfSphere])
 

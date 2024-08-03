@@ -86,27 +86,19 @@ Parameters with different meaning for Emitter:
 
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The FreeCAD objects in parameter Base will act as mirrors  
-Select some FreeCAD objects, then create Optical Mirror  
-After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear.  
-This is a counter of how many reflections you have from each ray.  
-**Important note:** Do not modify this value.
+* Select some FreeCAD objects, then create Optical Mirror  
+* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this mirror, if `collectStatistics` is true.  
+**Important note:** Do not modify this value.  
+`Hit coordinates from ... (read only)` records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram. 
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The FreeCAD objects in parameter `Base` will swallow the rays of light.  
 * Select some FreeCAD objects
 * Create Optical Absorber  
-* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this absorber. **Important note:** Do not modify this value.  
-
+* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this absorber, if `collectStatistics` is true.  
+**Important note:** Do not modify this value.  
 `Hit coordinates from ... (read only)` records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram.  
   
-![screenshot](./examples/ccd_xyplot.png)  
-  
-To show an XY plot, open a python console and type:  
-
-```python
-import OpticsWorkbench
-OpticsWorkbench.plot_xy(App.ActiveDocument.Absorber)
-```
 
 ### ![Diffraction grating](./icons/grating.svg) Diffraction grating
 The FreeCAD objects in parameter `Base` will do simple 1D grating simulation to the very superb OpticsWorkbench.  
@@ -143,8 +135,9 @@ The FreeCAD objects in parameter Base will act as lenses
 * Select some FreeCAD objects 
 * create Optical Lens  
 The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.  
-After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many refractions you have from each ray.  
-**Important note:** Do not modify this value.
+* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this absorber, if `collectStatistics` is true.  
+**Important note:** Do not modify this value.  
+`Hit coordinates from ... (read only)` records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram. 
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights
 Switches off all Rays and Beams
@@ -153,10 +146,11 @@ Switches off all Rays and Beams
 Switches on and recalculates all Rays and Beams
 
 ### ![plot3D](./icons/scatter3D.svg) 2D/3D Plot
-Select one or more absorber objects and display the location rays hitting them on a scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.  
+Select one or more optical objects with property `collectStatistics` = true and display the location rays hitting them on a scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.  
 If coordinates in all 3 dimensions are present, a 3D plot will be shown, otherwise you will see a 2D plot only.
 
 ![screenshot](./examples/plot3Dexample1.png) ![screenshot](./examples/plot3Dexample2.png)
+  
 
 ### ![CSVexport](./icons/ExportCSV.svg) CSV Ray Hits Export
 Creates a spreadsheet with the coordinates of all hits of all beams in all absorbers.  

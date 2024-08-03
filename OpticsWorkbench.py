@@ -140,38 +140,38 @@ def allOff():
             
     recompute()
 
-def makeMirror(base = []):
+def makeMirror(base = [], collectStatistics = False):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Mirror')
-    OpticalObject.OpticalObjectWorker(fp, base)
+    OpticalObject.OpticalObjectWorker(fp, base, collectStatistics)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp
 
-def makeAbsorber(base = []):
+def makeAbsorber(base = [], collectStatistics = False):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical light absorbers.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Absorber')
-    OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber')
+    OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber', collectStatistics = collectStatistics) 
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp
 
-def makeLens(base = [], RefractionIndex = 0, material = 'Quartz'):
+def makeLens(base = [], RefractionIndex = 0, material = 'Quartz', collectStatistics = False):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical lenses.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Lens')
-    OpticalObject.LensWorker(fp, base, RefractionIndex, material)
+    OpticalObject.LensWorker(fp, base, RefractionIndex, material, collectStatistics)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp
 
-def makeGrating(base=[], RefractionIndex=1, material='', lpm = 500, GratingType = "reflection", GratingLinesPlane = Vector(0,1,0), order = 1):
+def makeGrating(base=[], RefractionIndex=1, material='', lpm = 500, GratingType = "reflection", GratingLinesPlane = Vector(0,1,0), order = 1, collectStatistics = False):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be diffraction gratings.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Grating')
-    OpticalObject.GratingWorker(fp, base, RefractionIndex, material, lpm, GratingType, GratingLinesPlane, order)
+    OpticalObject.GratingWorker(fp, base, RefractionIndex, material, lpm, GratingType, GratingLinesPlane, order, collectStatistics)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp

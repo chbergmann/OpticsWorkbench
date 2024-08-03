@@ -73,11 +73,17 @@ class RayWorker:
         hitname = 'HitsFrom' + fp.Label
         hitcoordsname = 'HitCoordsFrom' + fp.Label
         for optobj in activeDocument().Objects:
-            if isRelevantOptic(fp, optobj):
-                if hasattr(optobj, hitname):
+            collectStatistics = isRelevantOptic(fp, optobj) and optobj.collectStatistics
+            if hasattr(optobj, hitname):
+                if collectStatistics:
                     setattr(optobj, hitname, 0)
-                if hasattr(optobj, hitcoordsname):
+                else:
+                    delattr(optobj, hitname)
+            if hasattr(optobj, hitcoordsname):
+                if collectStatistics:
                     setattr(optobj, hitcoordsname, [])
+                else:
+                    delattr(optobj, hitcoordsname)
 
 
         try: #check if the beam has the parameter coneAngle, this is a legacy check.
@@ -324,7 +330,7 @@ class RayWorker:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
      
-            if isRelevantOptic(fp, nearest_obj):
+            if isRelevantOptic(fp, nearest_obj) and nearest_obj.collectStatistics:
                 hitname = 'HitsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitname):
                     nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')

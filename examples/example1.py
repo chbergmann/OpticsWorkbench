@@ -89,7 +89,7 @@ def make_optics():
     Sketch_Prism = createSketch_Sketch_Prism(doc)
 
     OpticsWorkbench.makeMirror([Sketch_Mirror1, Sketch_Mirror2])
-    OpticsWorkbench.makeAbsorber([Sketch_Box])
+    OpticsWorkbench.makeAbsorber([Sketch_Box], True)
     OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='NBK7/Window glass')
     
     doc.recompute()

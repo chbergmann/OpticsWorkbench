@@ -19,9 +19,11 @@ class OpticalObjectWorker:
     def __init__(self, 
                  fp,    # an instance of Part::FeaturePython
                  base = [],
-                 type = 'mirror'):
+                 type = 'mirror',
+                 collectStatistics = False):
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   'FreeCAD objects to be mirrors or absorbers').Base = base
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   'Count number and coordinates of ray hits').collectStatistics = collectStatistics
         fp.OpticalType = type    
         fp.Proxy = self
     
@@ -37,7 +39,8 @@ class LensWorker:
                  fp,    # an instance of Part::FeaturePython
                  base = [],
                  RefractionIndex = 1,
-                 material = ''):
+                 material = '',
+                 collectStatistics = False):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Lens', '').OpticalType = ['lens'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   'FreeCAD objects to be lenses').Base = base
@@ -48,6 +51,7 @@ class LensWorker:
             'Lens',   
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n Usually noted in (µm)² in literature,\n (µm)²=10⁶(nm)².')
 
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   'Count number and coordinates of ray hits').collectStatistics = collectStatistics
         fp.OpticalType = 'lens'  
         
         material_names = list(getMaterials())  
@@ -97,7 +101,8 @@ class GratingWorker: ###
                  GratingType = "reflection",
                  GratingLinesPlane = FreeCAD.Vector(0,1,0),
                  order = 1, 
-                 ray_order_override = False):
+                 ray_order_override = False,
+                 collectStatistics = False):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Grating', '').OpticalType = ['grating'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',   'FreeCAD objects to be diffraction gratings').Base = base
@@ -118,6 +123,7 @@ class GratingWorker: ###
         material_names = list(getMaterials())
           
         fp.addProperty('App::PropertyEnumeration', 'Material', 'Grating', '').Material = material_names
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   'Count number and coordinates of ray hits').collectStatistics = collectStatistics
         
         self.update = True 
         fp.Proxy = self
