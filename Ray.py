@@ -52,6 +52,8 @@ class RayWorker:
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
         fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
         fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShape
+        if fp.Base:
+            fp.Placement = fp.Base[0].Placement
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -65,7 +67,10 @@ class RayWorker:
         '''Do something when a property has changed'''
         if not hasattr(fp, 'iter'): return
         
-        proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength', "ConeAngle", "Order"]
+        proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength', 'ConeAngle', 'Order', 'IgnoredOpticalElements', 'Base']
+        if prop == 'Base' and fp.Base:
+            fp.Placement = fp.Base[0].Placement
+
         if prop in proplist:
             self.redrawRay(fp)
 
@@ -88,6 +93,7 @@ class RayWorker:
 
         pl = fp.Placement
         posdirarray = []
+        sunObj = None
         
         if fp.Base:
             faces = []
@@ -95,9 +101,15 @@ class RayWorker:
                 faces += fp.Base[0].Shape.Faces
             else:
                 for sub in fp.Base[1]:
-                    faces.append(fp.Base[0].getSubObject(sub))
+                    sobj = fp.Base[0].getSubObject(sub)
+                    faces.append(sobj)
+
+            for f in faces:
+                f.Placement = Placement()
+
+            sunObj = Part.makeCompound(faces)
                         
-            posdirarray = self.getPosDirFromFaces(faces, fp.BeamNrRows, fp.BeamNrColumns)
+            posdirarray = self.getPosDirFromFaces(sunObj.Faces, fp.BeamNrRows, fp.BeamNrColumns)
             
         elif fp.Spherical == True and int(fp.BeamNrRows)>1:  #if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
             # make spherical beam pattern that has equally spaced rays.
@@ -161,14 +173,17 @@ class RayWorker:
 
         linearray = self.makeInitialRay(fp, posdirarray)
 
+            
         for line in linearray:            
             r2 = Rotation(pl.Rotation)
             r2.invert()
             line.Placement.Rotation = r2
             line.Placement.Base = r2.multVec(line.Placement.Base - pl.Base)
 
+        if sunObj:
+            linearray.append(sunObj)
+
         fp.Shape = Part.makeCompound(linearray)
-        fp.Placement = pl
         if fp.Power == False:
             fp.ViewObject.LineColor = (0.5, 0.5, 0.0)
         else:

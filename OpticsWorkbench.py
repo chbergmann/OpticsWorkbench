@@ -144,7 +144,7 @@ def makeMirror(base = [], collectStatistics = False):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Mirror')
-    OpticalObject.OpticalObjectWorker(fp, base, collectStatistics)
+    OpticalObject.OpticalObjectWorker(fp, base, type = 'mirror', collectStatistics = collectStatistics)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp
