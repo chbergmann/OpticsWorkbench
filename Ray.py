@@ -14,6 +14,7 @@ import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
+import Draft
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 
@@ -52,8 +53,6 @@ class RayWorker:
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
         fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
         fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShape
-        if fp.Base:
-            fp.Placement = fp.Base[0].Placement
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -68,8 +67,6 @@ class RayWorker:
         if not hasattr(fp, 'iter'): return
         
         proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength', 'ConeAngle', 'Order', 'IgnoredOpticalElements', 'Base']
-        if prop == 'Base' and fp.Base:
-            fp.Placement = fp.Base[0].Placement
 
         if prop in proplist:
             self.redrawRay(fp)
@@ -96,6 +93,7 @@ class RayWorker:
         sunObj = None
         
         if fp.Base:
+            fp.Placement = Placement()
             faces = []
             if len(fp.Base[1]) == 0:
                 faces += fp.Base[0].Shape.Faces
@@ -104,10 +102,10 @@ class RayWorker:
                     sobj = fp.Base[0].getSubObject(sub)
                     faces.append(sobj)
 
-            for f in faces:
-                f.Placement = Placement()
-
-            sunObj = Part.makeCompound(faces)
+            sunObj = Part.makeCompound(faces) 
+            r2 = Rotation(fp.Placement.Rotation)
+            r2.invert()        
+            sunObj.Placement.Rotation = r2
                         
             posdirarray = self.getPosDirFromFaces(sunObj.Faces, fp.BeamNrRows, fp.BeamNrColumns)
             
@@ -171,18 +169,14 @@ class RayWorker:
 
                     posdirarray.append((pos, dir))
 
-        linearray = self.makeInitialRay(fp, posdirarray)
+        linearray = self.makeInitialRay(fp, posdirarray)     
 
-            
-        for line in linearray:            
-            r2 = Rotation(pl.Rotation)
-            r2.invert()
-            line.Placement.Rotation = r2
-            line.Placement.Base = r2.multVec(line.Placement.Base - pl.Base)
+        for line in linearray:
+            self.substractPlacement(fp, line)
 
         if sunObj:
             linearray.append(sunObj)
-
+            
         fp.Shape = Part.makeCompound(linearray)
         if fp.Power == False:
             fp.ViewObject.LineColor = (0.5, 0.5, 0.0)
@@ -198,6 +192,13 @@ class RayWorker:
             fp.ViewObject.LineColor = (float(r), float(g), float(b), (0.0))
 
         fp.ViewObject.Transparency = 50
+
+
+    def substractPlacement(self, fp, obj):    
+        r2 = Rotation(fp.Placement.Rotation)
+        r2.invert()        
+        obj.Placement.Rotation = r2
+        obj.Placement.Base = r2.multVec(obj.Placement.Base - fp.Placement.Base)
         
         
     def getPosDirFromFaces(self, subShapes, BeamNrRows, BeamNrColumns):
@@ -222,7 +223,7 @@ class RayWorker:
                             
                         newpos = face.valueAt(param1)
                         posdirarray.append((newpos, newdir))
-                        
+
         return posdirarray             
         
 
