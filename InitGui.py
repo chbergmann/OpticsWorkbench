@@ -6,6 +6,12 @@ __url__ = ['http://www.freecadweb.org']
 __doc__ = 'Optics Workbench workbench'
 __version__ = '0.0.1'
 
+import FreeCADGui
+FreeCADGui.addLanguagePath('translations')
+FreeCADGui.updateLocale()
+
+def QT_TRANSLATE_NOOP(context, text):
+    return text
 
 class OpticsWorkbench (Workbench):
     def __init__(self):

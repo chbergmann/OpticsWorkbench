@@ -3,7 +3,6 @@
 __title__ = 'Ray'
 __author__ = 'Christian Bergmann'
 __license__ = 'LGPL 3.0'
-__doc__ = 'A single ray for raytracing'
 
 import os
 import FreeCADGui as Gui
@@ -14,9 +13,15 @@ import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
-import Draft
+
+import FreeCAD
+translate = FreeCAD.Qt.translate
+
+def QT_TRANSLATE_NOOP(context, text):
+    return text
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
+__doc__ = QT_TRANSLATE_NOOP('Ray', 'A single ray for raytracing')
 
 INFINITY = 1677216
 EPSILON = 1/INFINITY
@@ -40,19 +45,32 @@ class RayWorker:
                  coneAngle = 360,
                  ignoredElements=[],
                  baseShape = None):
-        fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  'False=Beam in one direction, True=Radial or spherical rays').Spherical = spherical
-        fp.addProperty('App::PropertyBool', 'Power', 'Ray',  'On or Off').Power = power
-        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',  'number of rays in a beam').BeamNrColumns = beamNrColumns
-        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrRows', 'Ray',  'number of rays in a beam').BeamNrRows = beamNrRows
-        fp.addProperty('App::PropertyFloat', 'BeamDistance', 'Ray',  'distance between two beams').BeamDistance = beamDistance
-        fp.addProperty('App::PropertyBool', 'HideFirstPart', 'Ray',  'hide the first part of every ray').HideFirstPart = hideFirst
-        fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',  'maximum length of a ray').MaxRayLength = maxRayLength
-        fp.addProperty('App::PropertyIntegerConstraint', 'MaxNrReflections', 'Ray',  'maximum number of reflections').MaxNrReflections = maxNrReflections
-        fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',  'Wavelength of the ray in nm').Wavelength = wavelength
-        fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  'Order of the ray').Order = order        
-        fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  'Angle of ray in case of Cone in degrees').ConeAngle = coneAngle
-        fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',   'Optical Objects to ignore in raytracing').IgnoredOpticalElements = ignoredElements
-        fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   'FreeCAD object used as optical emitter').Base = baseShape
+        fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  
+            translate('context', 'False=Beam in one direction, True=Radial or spherical rays')).Spherical = spherical
+        fp.addProperty('App::PropertyBool', 'Power', 'Ray',   
+            translate('context', 'On or Off')).Power = power
+        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',   
+            translate('context', 'number of rays in a beam')).BeamNrColumns = beamNrColumns
+        fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrRows', 'Ray',   
+            translate('context', 'number of rays in a beam')).BeamNrRows = beamNrRows
+        fp.addProperty('App::PropertyFloat', 'BeamDistance', 'Ray',   
+            translate('context', 'distance between two beams')).BeamDistance = beamDistance
+        fp.addProperty('App::PropertyBool', 'HideFirstPart', 'Ray',   
+            translate('context', 'hide the first part of every ray')).HideFirstPart = hideFirst
+        fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',   
+            translate('context', 'maximum length of a ray')).MaxRayLength = maxRayLength
+        fp.addProperty('App::PropertyIntegerConstraint', 'MaxNrReflections', 'Ray',   
+            translate('context', 'maximum number of reflections')).MaxNrReflections = maxNrReflections
+        fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',   
+            translate('context', 'Wavelength of the ray in nm')).Wavelength = wavelength
+        fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  
+            translate('context', 'Order of the ray')).Order = order        
+        fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  
+            translate('context', 'Angle of ray in case of Cone in degrees')).ConeAngle = coneAngle
+        fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',  
+            translate('context', 'Optical Objects to ignore in raytracing')).IgnoredOpticalElements = ignoredElements
+        fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   
+            translate('context', 'FreeCAD object used as optical emitter')).Base = baseShape
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -342,7 +360,9 @@ class RayWorker:
             if isRelevantOptic(fp, nearest_obj) and nearest_obj.collectStatistics:
                 hitname = 'HitsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitname):
-                    nearest_obj.addProperty('App::PropertyQuantity',  hitname,   'OpticalObject',   'Counts the hits from ' + fp.Label + ' (read only)')
+                    nearest_obj.addProperty('App::PropertyQuantity',  hitname, 'OpticalObject',   
+                        translate('context', 'Counts the hits from') + ' ' + fp.Label + ' (' +                          
+                        translate('context', 'read only') + ')')
                     setattr(nearest_obj, hitname, 1)
                 else:
                     setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
@@ -350,7 +370,9 @@ class RayWorker:
                 # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
                 hitcoordsname = 'HitCoordsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitcoordsname):
-                    nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject',   'Hit coordinates from ' + fp.Label + ' (read only)')
+                    nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject', 
+                        translate('context', 'Hit coordinates from') + ' ' + fp.Label + ' (' +                          
+                        translate('context', 'read only') + ')')
                     setattr(nearest_obj, hitcoordsname, [])
                 setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
 
@@ -656,7 +678,7 @@ class Ray():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'ray.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Ray (monochrome)',
+                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Ray (monochrome)'),
                 'ToolTip' : __doc__ }
 
 
@@ -681,8 +703,8 @@ class RaySun():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'raysun.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Ray (sun light)',
-                'ToolTip' : 'A bunch of rays with different wavelengths of visible light' }
+                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Ray (sun light)'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'A bunch of rays with different wavelengths of visible light') }
 
 class Beam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -706,8 +728,8 @@ class Beam2D():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'rayarray.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': '2D Beam',
-                'ToolTip' : 'A row of multiple rays for raytracing' }
+                'MenuText': QT_TRANSLATE_NOOP('Ray', '2D Beam'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'A row of multiple rays for raytracing') }
 
 class RadialBeam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -731,8 +753,8 @@ class RadialBeam2D():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'sun.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': '2D Radial Beam',
-                'ToolTip' : 'Rays coming from one point going to all directions in a 2D plane' }
+                'MenuText': QT_TRANSLATE_NOOP('Ray', '2D Radial Beam'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'Rays coming from one point going to all directions in a 2D plane') }
 
 
 class SphericalBeam():
@@ -757,8 +779,8 @@ class SphericalBeam():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'sun3D.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Spherical Beam',
-                'ToolTip' : 'Rays coming from one point going to all directions' }
+                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Spherical Beam'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'Rays coming from one point going to all directions') }
 
 
 class RedrawAll():
@@ -783,8 +805,8 @@ class RedrawAll():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Lit.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': '(Re)start simulation',
-                'ToolTip' : '(Re)start simulation' }
+                'MenuText': QT_TRANSLATE_NOOP('Ray', '(Re)start simulation'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray', '(Re)start simulation') }
 
 class AllOff():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -808,10 +830,8 @@ class AllOff():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Off.svg'), 
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Switch off lights',
-                'ToolTip' : 'Switch off all rays and beams' }
-
-
+                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Switch off lights'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'Switch off all rays and beams') }
 
 
 
