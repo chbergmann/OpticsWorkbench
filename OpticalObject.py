@@ -9,11 +9,9 @@ import os
 import FreeCADGui as Gui
 import FreeCAD
 import math
-import FreeCAD
 translate = FreeCAD.Qt.translate
 
-def QT_TRANSLATE_NOOP(context, text):
-    return text
+from PySide.QtCore import QT_TRANSLATE_NOOP
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
     
@@ -28,9 +26,9 @@ class OpticalObjectWorker:
                  collectStatistics = False):
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   
-                       translate('context', 'FreeCAD objects to be mirrors or absorbers')).Base = base
+                       translate('OpticalObject', 'FreeCAD objects to be mirrors or absorbers')).Base = base
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
-                       translate('context', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+                       translate('OpticalObject', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
         fp.OpticalType = type    
         fp.Proxy = self
     
@@ -50,20 +48,20 @@ class LensWorker:
                  collectStatistics = False):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 
-                       translate('context', 'Lens'), '').OpticalType = ['lens'] 
+                       translate('OpticalObject', 'Lens'), '').OpticalType = ['lens'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   
-                       translate('context', 'FreeCAD objects to be lenses')).Base = base
+                       translate('OpticalObject', 'FreeCAD objects to be lenses')).Base = base
         fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Lens',   
-                       translate('context', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
+                       translate('OpticalObject', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
             'App::PropertyFloatList',  
             'Sellmeier',   
             'Lens',   
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
-            translate('context', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
+            translate('OpticalObject', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
 
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
-                       translate('context', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+                       translate('OpticalObject', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
         fp.OpticalType = 'lens'  
         
         material_names = list(getMaterials())  
@@ -118,25 +116,25 @@ class GratingWorker: ###
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Grating', '').OpticalType = ['grating'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',   
-                       translate('context', 'FreeCAD objects to be diffraction gratings')).Base = base
+                       translate('OpticalObject', 'FreeCAD objects to be diffraction gratings')).Base = base
         fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Grating',   
-                       translate('context', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
+                       translate('OpticalObject', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
             'App::PropertyFloatList',  
             'Sellmeier',   
             'Grating',   
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
-            translate('context', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
+            translate('OpticalObject', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
         fp.addProperty('App::PropertyFloat', 'lpm', 'Grating',
-                        translate('context', 'lines per millimeter')).lpm = lpm
+                        translate('OpticalObject', 'lines per millimeter')).lpm = lpm
         fp.addProperty('App::PropertyEnumeration', 'GratingType', 'Grating', 
-            translate('context', 'reflection or transmission')).GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
+            translate('OpticalObject', 'reflection or transmission')).GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
         fp.addProperty('App::PropertyVector', 'GratingLinesPlane', 'Grating', 
-            translate('context', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines')).GratingLinesPlane = GratingLinesPlane
+            translate('OpticalObject', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines')).GratingLinesPlane = GratingLinesPlane
         fp.addProperty('App::PropertyFloat', 'order', 'Grating',  
-            translate('context', 'order of diffraction, set by grating')).order = order
+            translate('OpticalObject', 'order of diffraction, set by grating')).order = order
         fp.addProperty('App::PropertyBool', 'ray_order_override', 'Grating',  
-            translate('context', 'if true, order of grating overrides order of ray, if false, ray order is used')).ray_order_override = ray_order_override
+            translate('OpticalObject', 'if true, order of grating overrides order of ray, if false, ray order is used')).ray_order_override = ray_order_override
         fp.OpticalType = 'grating'
         fp.GratingType = GratingType  
         
@@ -144,7 +142,7 @@ class GratingWorker: ###
           
         fp.addProperty('App::PropertyEnumeration', 'Material', 'Grating', '').Material = material_names
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',  
-            translate('context', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+            translate('OpticalObject', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
         
         self.update = True 
         fp.Proxy = self

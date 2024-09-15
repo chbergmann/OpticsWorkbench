@@ -9,8 +9,7 @@ import FreeCADGui as Gui
 import FreeCAD
 translate = FreeCAD.Qt.translate
 
-def QT_TRANSLATE_NOOP(context, text):
-    return text
+from PySide.QtCore import QT_TRANSLATE_NOOP
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 __doc__ = translate('SunRay', 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers')

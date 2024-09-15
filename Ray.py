@@ -13,6 +13,7 @@ import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
+import FreeCADGui
 
 import FreeCAD
 translate = FreeCAD.Qt.translate
@@ -25,8 +26,6 @@ __doc__ = QT_TRANSLATE_NOOP('Ray', 'A single ray for raytracing')
 
 INFINITY = 1677216
 EPSILON = 1/INFINITY
-
-
 
 
 class RayWorker:
@@ -46,31 +45,31 @@ class RayWorker:
                  ignoredElements=[],
                  baseShape = None):
         fp.addProperty('App::PropertyBool', 'Spherical', 'Ray',  
-            translate('context', 'False=Beam in one direction, True=Radial or spherical rays')).Spherical = spherical
+            translate('Ray', 'False=Beam in one direction, True=Radial or spherical rays')).Spherical = spherical
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',   
-            translate('context', 'On or Off')).Power = power
+            translate('Ray', 'On or Off')).Power = power
         fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrColumns', 'Ray',   
-            translate('context', 'number of rays in a beam')).BeamNrColumns = beamNrColumns
+            translate('Ray', 'number of rays in a beam')).BeamNrColumns = beamNrColumns
         fp.addProperty('App::PropertyIntegerConstraint', 'BeamNrRows', 'Ray',   
-            translate('context', 'number of rays in a beam')).BeamNrRows = beamNrRows
+            translate('Ray', 'number of rays in a beam')).BeamNrRows = beamNrRows
         fp.addProperty('App::PropertyFloat', 'BeamDistance', 'Ray',   
-            translate('context', 'distance between two beams')).BeamDistance = beamDistance
+            translate('Ray', 'distance between two beams')).BeamDistance = beamDistance
         fp.addProperty('App::PropertyBool', 'HideFirstPart', 'Ray',   
-            translate('context', 'hide the first part of every ray')).HideFirstPart = hideFirst
+            translate('Ray', 'hide the first part of every ray')).HideFirstPart = hideFirst
         fp.addProperty('App::PropertyFloat', 'MaxRayLength', 'Ray',   
-            translate('context', 'maximum length of a ray')).MaxRayLength = maxRayLength
+            translate('Ray', 'maximum length of a ray')).MaxRayLength = maxRayLength
         fp.addProperty('App::PropertyIntegerConstraint', 'MaxNrReflections', 'Ray',   
-            translate('context', 'maximum number of reflections')).MaxNrReflections = maxNrReflections
+            translate('Ray', 'maximum number of reflections')).MaxNrReflections = maxNrReflections
         fp.addProperty('App::PropertyFloat', 'Wavelength', 'Ray',   
-            translate('context', 'Wavelength of the ray in nm')).Wavelength = wavelength
+            translate('Ray', 'Wavelength of the ray in nm')).Wavelength = wavelength
         fp.addProperty('App::PropertyIntegerConstraint', 'Order', 'Ray',  
-            translate('context', 'Order of the ray')).Order = order        
+            translate('Ray', 'Order of the ray')).Order = order        
         fp.addProperty('App::PropertyFloat', 'ConeAngle', 'Ray',  
-            translate('context', 'Angle of ray in case of Cone in degrees')).ConeAngle = coneAngle
+            translate('Ray', 'Angle of ray in case of Cone in degrees')).ConeAngle = coneAngle
         fp.addProperty('App::PropertyLinkList',  'IgnoredOpticalElements',   'Ray',  
-            translate('context', 'Optical Objects to ignore in raytracing')).IgnoredOpticalElements = ignoredElements
+            translate('Ray', 'Optical Objects to ignore in raytracing')).IgnoredOpticalElements = ignoredElements
         fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   
-            translate('context', 'FreeCAD object used as optical emitter')).Base = baseShape
+            translate('Ray', 'FreeCAD object used as optical emitter')).Base = baseShape
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -361,8 +360,8 @@ class RayWorker:
                 hitname = 'HitsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitname):
                     nearest_obj.addProperty('App::PropertyQuantity',  hitname, 'OpticalObject',   
-                        translate('context', 'Counts the hits from') + ' ' + fp.Label + ' (' +                          
-                        translate('context', 'read only') + ')')
+                        translate('Ray', 'Counts the hits from') + ' ' + fp.Label + ' (' +                          
+                        translate('Ray', 'read only') + ')')
                     setattr(nearest_obj, hitname, 1)
                 else:
                     setattr(nearest_obj, hitname, getattr(nearest_obj, hitname) + 1)
@@ -371,8 +370,8 @@ class RayWorker:
                 hitcoordsname = 'HitCoordsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitcoordsname):
                     nearest_obj.addProperty('App::PropertyVectorList',  hitcoordsname,   'OpticalObject', 
-                        translate('context', 'Hit coordinates from') + ' ' + fp.Label + ' (' +                          
-                        translate('context', 'read only') + ')')
+                        translate('Ray', 'Hit coordinates from') + ' ' + fp.Label + ' (' +                          
+                        translate('Ray', 'read only') + ')')
                     setattr(nearest_obj, hitcoordsname, [])
                 setattr(nearest_obj, hitcoordsname, getattr(nearest_obj, hitcoordsname) + [neworigin,] )
 

@@ -6,19 +6,20 @@ __url__ = ['http://www.freecadweb.org']
 __doc__ = 'Optics Workbench workbench'
 __version__ = '0.0.1'
 
-import FreeCADGui
-FreeCADGui.addLanguagePath('translations')
-FreeCADGui.updateLocale()
-
-def QT_TRANSLATE_NOOP(context, text):
-    return text
 
 class OpticsWorkbench (Workbench):
     def __init__(self):
         import os
         import OpticsWorkbench
-        self.__class__.MenuText = 'Optics'
-        self.__class__.ToolTip = 'Ray Tracing Simulation'
+        import FreeCADGui
+
+        translate = FreeCAD.Qt.translate
+        translations_path = os.path.join(OpticsWorkbench.get_module_path(), "translations")
+        FreeCADGui.addLanguagePath(translations_path)
+        FreeCADGui.updateLocale()
+        
+        self.__class__.MenuText = translate("Workbench", 'Optics')
+        self.__class__.ToolTip = translate("Workbench", 'Ray Tracing Simulation')
         self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), 'optics_workbench_icon.svg')
 
     def Initialize(self):
@@ -28,13 +29,25 @@ class OpticsWorkbench (Workbench):
         import OpticalObject
         import Plot
         from examples import example1, example3D, example_dispersion, example_candle
+        from PySide.QtCore import QT_TRANSLATE_NOOP
         
-        rays = ['Ray (monochrome)', 'Ray (sun light)', 'Beam', '2D Radial Beam', 'Spherical Beam']
-        optics = ['Emitter', 'Mirror', 'Grating', 'Absorber', 'Lens']
-        actions = ['Off', 'Start']
-        analysis= ['RayHits', 'Hits2CSV']
+        rays = [QT_TRANSLATE_NOOP('Workbench', 'Ray (monochrome)'),
+            QT_TRANSLATE_NOOP('Workbench', 'Ray (sun light)'),
+            QT_TRANSLATE_NOOP('Workbench', 'Beam'),
+            QT_TRANSLATE_NOOP('Workbench', '2D Radial Beam'),
+            QT_TRANSLATE_NOOP('Workbench', 'Spherical Beam')]
+        optics = [QT_TRANSLATE_NOOP('Workbench', 'Emitter'),
+            QT_TRANSLATE_NOOP('Workbench', 'Mirror'), 
+            QT_TRANSLATE_NOOP('Workbench', 'Grating'), 
+            QT_TRANSLATE_NOOP('Workbench', 'Absorber'), 
+            QT_TRANSLATE_NOOP('Workbench', 'Lens')]
+        actions = [QT_TRANSLATE_NOOP('Workbench', 'Off'), QT_TRANSLATE_NOOP('Workbench', 'Start')]
+        analysis= [QT_TRANSLATE_NOOP('Workbench', 'RayHits'), QT_TRANSLATE_NOOP('Workbench', 'Hits2CSV')]
         separator = ['Separator']
-        examples = ['Example2D', 'Example3D', 'ExampleDispersion', 'ExampleCandle']
+        examples = [QT_TRANSLATE_NOOP('Workbench', 'Example2D'), 
+            QT_TRANSLATE_NOOP('Workbench', 'Example3D'),
+            QT_TRANSLATE_NOOP('Workbench', 'ExampleDispersion'), 
+            QT_TRANSLATE_NOOP('Workbench', 'ExampleCandle')]
         self.list = rays + separator + optics + separator + actions + separator + analysis #A list of command names created in the line above
         self.menu = self.list + separator + examples
         

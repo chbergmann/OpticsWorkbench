@@ -4,6 +4,7 @@ import os
 from FreeCAD import Vector, Placement, Rotation
 import FreeCAD as app
 import OpticsWorkbench
+from PySide.QtCore import QT_TRANSLATE_NOOP
 
 _icondir_ = os.path.join(os.path.dirname(__file__), '..')
 
@@ -71,7 +72,7 @@ class Example3D():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': 'Example - 3D',
+                'MenuText': QT_TRANSLATE_NOOP('Workbench', 'Example - 3D'),
                 'ToolTip' : '' }
 
 Gui.addCommand('Example3D', Example3D())
