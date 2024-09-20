@@ -12,14 +12,14 @@ translate = FreeCAD.Qt.translate
 from PySide.QtCore import QT_TRANSLATE_NOOP
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
-__doc__ = translate('SunRay', 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers')
+__doc__ = translate('OpticsWorkbench', 'Declare your FreeCAD objects to be optical mirrors, lenses or absorbers')
     
 class SunRayWorker:
     def __init__(self, 
                  fp,    # an instance of Part::FeaturePython
                  rays = []):
         fp.addProperty('App::PropertyLinkList',  'Rays',   'SunRay', 
-                        translate('SunRay', 'Create rays of different wavelength')).Rays = rays   
+                        translate('OpticsWorkbench', 'Create rays of different wavelength')).Rays = rays   
         fp.Proxy = self
         self.update = True
     
@@ -103,8 +103,8 @@ class RaySun():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'raysun.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('SunRay', 'Ray (sun light)'),
-                'ToolTip' : QT_TRANSLATE_NOOP('SunRay', 'Declare your FreeCAD objects to be optical mirrors') }
+                'MenuText': QT_TRANSLATE_NOOP('OpticsWorkbench', 'Ray (sun light)'),
+                'ToolTip' : QT_TRANSLATE_NOOP('OpticsWorkbench', 'Declare your FreeCAD objects to be optical mirrors') }
 
       
 Gui.addCommand('Sun Ray', RaySun())
