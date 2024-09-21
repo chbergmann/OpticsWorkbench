@@ -5,6 +5,8 @@ from FreeCAD import activeDocument
 import os
 import Ray
 
+from PySide.QtCore import QT_TRANSLATE_NOOP
+
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
         
 class PlotRayHits():
@@ -95,8 +97,8 @@ class PlotRayHits():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'scatter3D.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': '2D/3D Plot',
-                'ToolTip' : 'Show selected absorbers ray hits in scatter plot' }
+                'MenuText': QT_TRANSLATE_NOOP('RayHits', '2D/3D Plot'),
+                'ToolTip' : QT_TRANSLATE_NOOP('RayHits', 'Show selected absorbers ray hits in scatter plot') }
                 
 
 class RayHits2CSV():
@@ -121,8 +123,8 @@ class RayHits2CSV():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'ExportCSV.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': 'Ray Hits to Spreadsheet',
-                'ToolTip' : 'Export Ray Hits to Spreadsheet' }
+                'MenuText': QT_TRANSLATE_NOOP('Hits2CSV', 'Ray Hits to Spreadsheet'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Hits2CSV', 'Export Ray Hits to Spreadsheet') }
                 
 
 Gui.addCommand('RayHits', PlotRayHits())

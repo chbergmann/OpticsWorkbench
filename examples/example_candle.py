@@ -80,7 +80,7 @@ class ExampleCandle():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Workbench', 'Example - Candle'),
+                'MenuText': QT_TRANSLATE_NOOP('ExampleCandle', 'Example - Candle'),
                 'ToolTip' : '' }
 
 Gui.addCommand('ExampleCandle', ExampleCandle())

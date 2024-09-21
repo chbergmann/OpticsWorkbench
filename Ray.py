@@ -702,8 +702,8 @@ class RaySun():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'raysun.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Ray (sun light)'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'A bunch of rays with different wavelengths of visible light') }
+                'MenuText': QT_TRANSLATE_NOOP('Ray (sun light)', 'Ray (sun light)'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Ray (sun light)', 'A bunch of rays with different wavelengths of visible light') }
 
 class Beam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -727,8 +727,8 @@ class Beam2D():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'rayarray.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', '2D Beam'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'A row of multiple rays for raytracing') }
+                'MenuText': QT_TRANSLATE_NOOP('Beam', '2D Beam'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Beam', 'A row of multiple rays for raytracing') }
 
 class RadialBeam2D():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -752,8 +752,8 @@ class RadialBeam2D():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'sun.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', '2D Radial Beam'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'Rays coming from one point going to all directions in a 2D plane') }
+                'MenuText': QT_TRANSLATE_NOOP('2D Radial Beam', '2D Radial Beam'),
+                'ToolTip' : QT_TRANSLATE_NOOP('2D Radial Beam', 'Rays coming from one point going to all directions in a 2D plane') }
 
 
 class SphericalBeam():
@@ -778,8 +778,8 @@ class SphericalBeam():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'sun3D.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Spherical Beam'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'Rays coming from one point going to all directions') }
+                'MenuText': QT_TRANSLATE_NOOP('Spherical Beam', 'Spherical Beam'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Spherical Beam', 'Rays coming from one point going to all directions') }
 
 
 class RedrawAll():
@@ -804,8 +804,8 @@ class RedrawAll():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Lit.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', '(Re)start simulation'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Ray', '(Re)start simulation') }
+                'MenuText': QT_TRANSLATE_NOOP('Start', '(Re)start simulation'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Start', '(Re)start simulation') }
 
 class AllOff():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
@@ -829,12 +829,12 @@ class AllOff():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'Anonymous_Lightbulb_Off.svg'), 
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Switch off lights'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Ray', 'Switch off all rays and beams') }
+                'MenuText': QT_TRANSLATE_NOOP('Off', 'Switch off lights'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Off', 'Switch off all rays and beams') }
 
 
 
-Gui.addCommand('Ray (monochrome)', Ray())
+Gui.addCommand('Ray', Ray())
 Gui.addCommand('Ray (sun light)', RaySun())
 Gui.addCommand('Beam', Beam2D())
 Gui.addCommand('2D Radial Beam', RadialBeam2D())

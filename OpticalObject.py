@@ -26,9 +26,9 @@ class OpticalObjectWorker:
                  collectStatistics = False):
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   
-                       translate('OpticsWorkbench', 'FreeCAD objects to be mirrors or absorbers')).Base = base
+                       translate('Mirror', 'FreeCAD objects to be mirrors or absorbers')).Base = base
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
-                       translate('OpticsWorkbench', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+                       translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
         fp.OpticalType = type    
         fp.Proxy = self
     
@@ -48,20 +48,20 @@ class LensWorker:
                  collectStatistics = False):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 
-                       translate('OpticsWorkbench', 'Lens'), '').OpticalType = ['lens'] 
+                       translate('Lens', 'Lens'), '').OpticalType = ['lens'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   
-                       translate('OpticsWorkbench', 'FreeCAD objects to be lenses')).Base = base
+                       translate('Lens', 'FreeCAD objects to be lenses')).Base = base
         fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Lens',   
-                       translate('OpticsWorkbench', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
+                       translate('Lens', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
             'App::PropertyFloatList',  
             'Sellmeier',   
             'Lens',   
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
-            translate('OpticsWorkbench', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
+            translate('Lens', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
 
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
-                       translate('OpticsWorkbench', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+                       translate('Lens', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
         fp.OpticalType = 'lens'  
         
         material_names = list(getMaterials())  
@@ -116,25 +116,25 @@ class GratingWorker: ###
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Grating', '').OpticalType = ['grating'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',   
-                       translate('OpticsWorkbench', 'FreeCAD objects to be diffraction gratings')).Base = base
+                       translate('Grating', 'FreeCAD objects to be diffraction gratings')).Base = base
         fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Grating',   
-                       translate('OpticsWorkbench', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
+                       translate('Grating', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
             'App::PropertyFloatList',  
             'Sellmeier',   
             'Grating',   
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
-            translate('OpticsWorkbench', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
+            translate('Grating', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
         fp.addProperty('App::PropertyFloat', 'lpm', 'Grating',
-                        translate('OpticsWorkbench', 'lines per millimeter')).lpm = lpm
+                        translate('Grating', 'lines per millimeter')).lpm = lpm
         fp.addProperty('App::PropertyEnumeration', 'GratingType', 'Grating', 
-            translate('OpticsWorkbench', 'reflection or transmission')).GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
+            translate('Grating', 'reflection or transmission')).GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
         fp.addProperty('App::PropertyVector', 'GratingLinesPlane', 'Grating', 
-            translate('OpticsWorkbench', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines')).GratingLinesPlane = GratingLinesPlane
+            translate('Grating', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines')).GratingLinesPlane = GratingLinesPlane
         fp.addProperty('App::PropertyFloat', 'order', 'Grating',  
-            translate('OpticsWorkbench', 'order of diffraction, set by grating')).order = order
+            translate('Grating', 'order of diffraction, set by grating')).order = order
         fp.addProperty('App::PropertyBool', 'ray_order_override', 'Grating',  
-            translate('OpticsWorkbench', 'if true, order of grating overrides order of ray, if false, ray order is used')).ray_order_override = ray_order_override
+            translate('Grating', 'if true, order of grating overrides order of ray, if false, ray order is used')).ray_order_override = ray_order_override
         fp.OpticalType = 'grating'
         fp.GratingType = GratingType  
         
@@ -142,7 +142,7 @@ class GratingWorker: ###
           
         fp.addProperty('App::PropertyEnumeration', 'Material', 'Grating', '').Material = material_names
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',  
-            translate('OpticsWorkbench', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+            translate('Grating', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
         
         self.update = True 
         fp.Proxy = self
@@ -292,8 +292,8 @@ class OpticalMirror():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'mirror.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('OpticsWorkbench', 'Optical Mirror'),
-                'ToolTip' : QT_TRANSLATE_NOOP('OpticsWorkbench','Declare your FreeCAD objects to be optical mirrors') }
+                'MenuText': QT_TRANSLATE_NOOP('Mirror', 'Optical Mirror'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Mirror','Declare your FreeCAD objects to be optical mirrors') }
 
 
 class OpticalAbsorber():
@@ -320,8 +320,8 @@ class OpticalAbsorber():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'absorber.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('OpticsWorkbench', 'Optical Absorber'),
-                'ToolTip' : QT_TRANSLATE_NOOP('OpticsWorkbench','Declare your FreeCAD objects to be optical absorbers') }
+                'MenuText': QT_TRANSLATE_NOOP('Absorber', 'Optical Absorber'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Absorber','Declare your FreeCAD objects to be optical absorbers') }
                 
 class OpticalLens():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -347,8 +347,8 @@ class OpticalLens():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'lens.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('OpticsWorkbench', 'Optical Lens'),
-                'ToolTip' : QT_TRANSLATE_NOOP('OpticsWorkbench','Declare your FreeCAD objects to be optical lenses') } 
+                'MenuText': QT_TRANSLATE_NOOP('Lens', 'Optical Lens'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Lens','Declare your FreeCAD objects to be optical lenses') } 
 
 class OpticalGrating():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -374,8 +374,8 @@ class OpticalGrating():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'grating.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('OpticsWorkbench', 'Diffraction grating'),
-                'ToolTip' : QT_TRANSLATE_NOOP('OpticsWorkbench', 'Declare your FreeCAD objects to be diffraction gratings') }               
+                'MenuText': QT_TRANSLATE_NOOP('Grating', 'Diffraction grating'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Grating', 'Declare your FreeCAD objects to be diffraction gratings') }               
 
 class OpticalEmitter():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
@@ -403,8 +403,8 @@ class OpticalEmitter():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'emitter.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('OpticsWorkbench', 'Optical Emitter'),
-                'ToolTip' : QT_TRANSLATE_NOOP('OpticsWorkbench', 'Declare your FreeCAD objects to be optical emitters') }  
+                'MenuText': QT_TRANSLATE_NOOP('Emitter', 'Optical Emitter'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Emitter', 'Declare your FreeCAD objects to be optical emitters') }  
                              
 Gui.addCommand('Emitter', OpticalEmitter())             
 Gui.addCommand('Mirror', OpticalMirror())

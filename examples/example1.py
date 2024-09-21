@@ -113,7 +113,7 @@ class Example1():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Workbench', 'Example - 2D'),
+                'MenuText': QT_TRANSLATE_NOOP('Example2D', 'Example - 2D'),
                 'ToolTip' : '' }
 
 Gui.addCommand('Example2D', Example1())
