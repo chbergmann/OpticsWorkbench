@@ -1,4 +1,5 @@
 # ![WorkbenchIcon](./optics_workbench_icon.svg) Optics Workbench
+[ >deutsch< ](README_de.md)
     
 Geometrical optics for FreeCAD.  
 Performs simple raytracing through your FreeCAD objects.
@@ -87,17 +88,13 @@ Parameters with different meaning for Emitter:
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The FreeCAD objects in parameter Base will act as mirrors  
 * Select some FreeCAD objects, then create Optical Mirror  
-* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this mirror, if `collectStatistics` is true.  
-**Important note:** Do not modify this value.  
-`Hit coordinates from ... (read only)` records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram. 
+see also [Statistics](#Statistics) 
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The FreeCAD objects in parameter `Base` will swallow the rays of light.  
 * Select some FreeCAD objects
 * Create Optical Absorber  
-* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this absorber, if `collectStatistics` is true.  
-**Important note:** Do not modify this value.  
-`Hit coordinates from ... (read only)` records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram.  
+see also [Statistics](#Statistics)  
   
 
 ### ![Diffraction grating](./icons/grating.svg) Diffraction grating
@@ -129,21 +126,25 @@ Diffraction at a grating object can be specified to be calculated using the orde
 ![screenshot](./examples/echelle_example.PNG)
 *Above: an example of a simple echelle spectrometer using a R2 52.91 lpm grating and a set of sunrays from order -47 to -82 (each order comprises ~5-10 nm, sampled by 15 rays around a center wavelength from blue to red) and a flint glass prism. Collimation and camera optics are thorlabs STEP files and a transparent absorber shows the resulting echelle spectrum. Entrance into the spectrometer design is by a 50 mu slit. This is an example with very long calculation time due to the high number of rays. **Note** that the sign of the order is not intuitive. If an error occurs stating that complex numbers are not supported, while diffraction with this order is considered valid by the user, try to change the sign of the order.* 
 
+see also [Statistics](#Statistics) 
 
 ### ![Optical Lens](./icons/lens.svg) Optical Lens
 The FreeCAD objects in parameter Base will act as lenses  
 * Select some FreeCAD objects 
 * create Optical Lens  
 The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.  
-* After a ray or beam has been added, a parameter `Hits From Ray/Beam...` will appear. This is a counter of how many rays have hit this absorber, if `collectStatistics` is true.  
-**Important note:** Do not modify this value.  
-`Hit coordinates from ... (read only)` records the position of each LIGHT RAY when it hits. This way, it is possible to visualize the image on the absorber in a XY diagram. 
+see also [Statistics](#Statistics) 
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights
 Switches off all Rays and Beams
 
 ### ![On](./icons/Anonymous_Lightbulb_Lit.svg) (Re)start simulation
 Switches on and recalculates all Rays and Beams
+
+## Statistics
+The optical objects have a parameter `collectStatistics`. If true, some statistics will be collected on every start of simulation:
+- `Hits From Ray/Beam...` This is a counter of how many rays have hit this mirror (read only)
+- `Hit coordinates from ...` records the position of each LIGHT RAY when it hits (read only). This way, it is possible to visualize the image on the absorber in a XY diagram.
 
 ### ![plot3D](./icons/scatter3D.svg) 2D/3D Plot
 Select one or more optical objects with property `collectStatistics` = true and display the location rays hitting them on a scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.  

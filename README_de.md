@@ -51,7 +51,7 @@ Parameter:
 
 ### ![SunRayIcon](./icons/raysun.svg) Sonnenstrahl
 Ein Bündel sich überlappender Lichtstrahlen mit verschiedenen Wellenlängen im sichtbaren Bereich.  
-Siehe [Beispiel - Lichtbrechung](#Beispiel---Lichtbrechung).
+Siehe [Beispiel - Lichtbrechung](#-Beispiel---Lichtbrechung).
 
 ### ![2D Beam](./icons/rayarray.svg) 2D Strahlenbündel
 Lichtstrahlen in einer Reihe angeordnet.  
