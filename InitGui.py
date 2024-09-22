@@ -18,7 +18,7 @@ class OpticsWorkbench (Workbench):
         FreeCADGui.addLanguagePath(translations_path)
         FreeCADGui.updateLocale()
         
-        self.__class__.MenuText = translate("Workbench", 'Optics')
+        self.__class__.MenuText = 'Optics'
         self.__class__.ToolTip = translate("Workbench", 'Ray Tracing Simulation')
         self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), 'optics_workbench_icon.svg')
 
