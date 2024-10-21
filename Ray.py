@@ -81,12 +81,9 @@ class RayWorker:
 
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        if not hasattr(fp, 'iter'): return
-        
-        proplist = ['Spherical', 'Power', 'HideFirstPart', 'BeamNrColumns', 'BeamNrRows', 'BeamDistance', 'MaxRayLength', 'MaxNrReflections', 'Wavelength', 'ConeAngle', 'Order', 'IgnoredOpticalElements', 'Base']
-
-        if prop in proplist:
-            self.redrawRay(fp)
+        if not hasattr(fp, 'Base'):
+            fp.addProperty('App::PropertyLinkSub',  'Base',   'Ray',   
+                translate('Ray', 'FreeCAD object used as optical emitter')).Base
 
     def redrawRay(self, fp):
         hitname = 'HitsFrom' + fp.Label
@@ -834,7 +831,7 @@ class AllOff():
 
 
 
-Gui.addCommand('Ray', Ray())
+Gui.addCommand('Ray (monochrome)', Ray())
 Gui.addCommand('Ray (sun light)', RaySun())
 Gui.addCommand('Beam', Beam2D())
 Gui.addCommand('2D Radial Beam', RadialBeam2D())
