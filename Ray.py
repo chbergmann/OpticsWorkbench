@@ -158,7 +158,7 @@ class RayWorker:
                     Ncount = Ncount+1
 
                     posdirarray.append((pos, dir))
-            print("Number of rays created = ",Ncount)
+            #print("Number of rays created = ",Ncount)
 
         else:
             for row in range(0, int(fp.BeamNrRows)):
@@ -576,10 +576,18 @@ class RayWorker:
 
 
     def isInsideLens(self, isec_struct, origin, lens):
-        for isec in isec_struct:
-            if lens == isec[0]:
-                return len(isec[1]) % 2 == 1
-
+        nr_solids = 0
+        for b in lens.Base:
+            for sol in b.Shape.Solids:
+                nr_solids += 1
+                if sol.isInside(origin, EPSILON, True):
+                    return True
+                
+        if nr_solids == 0:
+            for isec in isec_struct:
+                if lens == isec[0]:
+                    return len(isec[1]) % 2 == 1
+                
         return False
 
 
