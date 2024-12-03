@@ -1,5 +1,7 @@
 # ![WorkbenchIcon](./optics_workbench_icon.svg) Optics Workbench
+
 [ >deutsch< ](README_de.md)
+
 [ >English< ](README.md)
 
 FreeCAD 的幾何光學模組。  
@@ -155,7 +157,7 @@ FreeCAD 物件將作為透鏡
 ### ![On](./icons/Anonymous_Lightbulb_Lit.svg) (重新)啟動模擬
 啟動並重新計算所有光線和光束
 
-## 統計
+## Statistics
 光學物件有一個參數 `collectStatistics`。如果設為 `true`，則每次開始模擬時會收集一些統計資料：
 - `Hits From Ray/Beam...` 這是計數器，顯示有多少光線擊中了此鏡面（只讀）
 - `Hit coordinates from ...` 記錄每條光線擊中物體的位置（只讀）。這樣可以在吸收體上以 XY 圖表方式視覺化光線的影像。
