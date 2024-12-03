@@ -1,6 +1,7 @@
 # ![WorkbenchIcon](./optics_workbench_icon.svg) Optics Workbench
 [ >deutsch< ](README_de.md)
-    
+[ >中文< ](README_zh_TW.md)
+
 Geometrical optics for FreeCAD.  
 Performs simple raytracing through your FreeCAD objects.
 
