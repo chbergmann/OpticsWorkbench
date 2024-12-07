@@ -22,7 +22,7 @@ def QT_TRANSLATE_NOOP(context, text):
     return text
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
-__doc__ = QT_TRANSLATE_NOOP('Ray', 'A single ray for raytracing')
+__doc__ = QT_TRANSLATE_NOOP('Ray (monochrome)', 'A single ray for raytracing')
 
 INFINITY = 1677216
 EPSILON = 1/INFINITY
@@ -682,7 +682,7 @@ class Ray():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'ray.svg'),
                 'Accel' : '', # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Ray', 'Ray (monochrome)'),
+                'MenuText': QT_TRANSLATE_NOOP('Ray (monochrome)', 'Ray (monochrome)'),
                 'ToolTip' : __doc__ }
 
 
