@@ -417,6 +417,7 @@ class RayWorker:
         else:
             newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
 
+        dNewRays = []  # Collects all new ray directions
         for np in nearest_parts:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
@@ -473,8 +474,15 @@ class RayWorker:
                 return ret
 
             if nearest_obj.OpticalType == 'mirror':
-                dNewRay = self.mirror(dRay, normal)
+                # TODO: add splitter optic, for now use mirror as splitter
+                dNewRays.append(self.mirror(dRay, normal))
+                doLens = True
                 break
+
+            # elif nearest_obj.OpticalType == 'splitter':
+            #     dNewRays.append(self.mirror(dRay, normal))
+            #     doLens = True
+            #     break
 
             elif nearest_obj.OpticalType == 'lens':
                 doLens = True
@@ -518,11 +526,11 @@ class RayWorker:
                     grating_type = 2
 
                 if grating_type == 0:  # reflection grating
-                    dNewRay = self.grating_calculation(grating_type, order,
-                                                       fp.Wavelength, lpm,
-                                                       ray1, normal,
-                                                       grating_lines_plane,
-                                                       oldRefIdx, oldRefIdx)
+                    dNewRays.append(
+                        self.grating_calculation(grating_type, order,
+                                                 fp.Wavelength, lpm, ray1,
+                                                 normal, grating_lines_plane,
+                                                 oldRefIdx, oldRefIdx))
 
                 elif grating_type == 2:  # transmission grating with diffraction at first surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
@@ -537,18 +545,24 @@ class RayWorker:
                         self.lastRefIdx.append(n)
                         #print("enter t-grating 1s " + nearest_obj.Label)
                         #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        dNewRay = self.grating_calculation(
-                            grating_type, order, fp.Wavelength, lpm, ray1,
-                            normal, grating_lines_plane, oldRefIdx, newRefIdx)
+                        dNewRays.append(
+                            self.grating_calculation(grating_type, order,
+                                                     fp.Wavelength, lpm, ray1,
+                                                     normal,
+                                                     grating_lines_plane,
+                                                     oldRefIdx, newRefIdx))
 
                 elif grating_type == 1:  # transmission grating with diffraction at second surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
                         #print("leave t-grating 2s " + nearest_obj.Label)
                         oldRefIdx = n
                         #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        dNewRay = self.grating_calculation(
-                            grating_type, order, fp.Wavelength, lpm, ray1,
-                            normal, grating_lines_plane, oldRefIdx, newRefIdx)
+                        dNewRays.append(
+                            self.grating_calculation(grating_type, order,
+                                                     fp.Wavelength, lpm, ray1,
+                                                     normal,
+                                                     grating_lines_plane,
+                                                     oldRefIdx, newRefIdx))
                     else:
                         doLens = True
                         newRefIdx = n
@@ -560,13 +574,14 @@ class RayWorker:
                 return ret
 
         if doLens:
-            dNewRay = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+            dNewRays.append(self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal))
 
-        newline = Part.makeLine(
-            neworigin, neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length)
-
-        # TODO: add all new lines to list
-        newlines = [newline]
+        newlines = []
+        for dNewRay in dNewRays:
+            newlines.append(
+                Part.makeLine(
+                    neworigin,
+                    neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length))
 
         for line in newlines:
             ret.extend(self.traceRay(fp, line))
