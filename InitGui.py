@@ -37,9 +37,10 @@ class OpticsWorkbench (Workbench):
             QT_TRANSLATE_NOOP('Workbench', '2D Radial Beam'),
             QT_TRANSLATE_NOOP('Workbench', 'Spherical Beam')]
         optics = [QT_TRANSLATE_NOOP('Workbench', 'Emitter'),
-            QT_TRANSLATE_NOOP('Workbench', 'Mirror'), 
-            QT_TRANSLATE_NOOP('Workbench', 'Grating'), 
-            QT_TRANSLATE_NOOP('Workbench', 'Absorber'), 
+            QT_TRANSLATE_NOOP('Workbench', 'Mirror'),
+            QT_TRANSLATE_NOOP('Workbench', 'Splitter'),
+            QT_TRANSLATE_NOOP('Workbench', 'Grating'),
+            QT_TRANSLATE_NOOP('Workbench', 'Absorber'),
             QT_TRANSLATE_NOOP('Workbench', 'Lens')]
         actions = [QT_TRANSLATE_NOOP('Workbench', 'Off'), QT_TRANSLATE_NOOP('Workbench', 'Start')]
         analysis= [QT_TRANSLATE_NOOP('Workbench', 'RayHits'), QT_TRANSLATE_NOOP('Workbench', 'Hits2CSV')]

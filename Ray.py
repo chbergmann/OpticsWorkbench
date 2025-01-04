@@ -474,15 +474,13 @@ class RayWorker:
                 return ret
 
             if nearest_obj.OpticalType == 'mirror':
-                # TODO: add splitter optic, for now use mirror as splitter
+                dNewRays.append(self.mirror(dRay, normal))
+                break
+
+            elif nearest_obj.OpticalType == 'splitter':
                 dNewRays.append(self.mirror(dRay, normal))
                 doLens = True
                 break
-
-            # elif nearest_obj.OpticalType == 'splitter':
-            #     dNewRays.append(self.mirror(dRay, normal))
-            #     doLens = True
-            #     break
 
             elif nearest_obj.OpticalType == 'lens':
                 doLens = True

@@ -296,6 +296,34 @@ class OpticalMirror():
                 'ToolTip' : QT_TRANSLATE_NOOP('Mirror','Declare your FreeCAD objects to be optical mirrors') }
 
 
+class OpticalSplitter():
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
+    def Activated(self):
+        selection = Gui.Selection.getSelectionEx()
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('objects = []')
+        for sel in selection:
+            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
+
+        Gui.doCommand('OpticsWorkbench.makeSplitter(objects)')
+
+    def IsActive(self):
+        '''Here you can define if the command must be active or not (greyed) if certain conditions
+        are met or not. This function is optional.'''
+        if FreeCAD.ActiveDocument:
+            return(True)
+        else:
+            return(False)
+
+    def GetResources(self):
+        '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
+        return {'Pixmap'  : os.path.join(_icondir_, 'splitter.svg'),
+                'Accel' : '', # a default shortcut (optional)
+                'MenuText': QT_TRANSLATE_NOOP('Splitter', 'Beam Splitter'),
+                'ToolTip' : QT_TRANSLATE_NOOP('Splitter','Declare your FreeCAD objects to be beam splitters') }
+
+
 class OpticalAbsorber():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
@@ -408,6 +436,7 @@ class OpticalEmitter():
                              
 Gui.addCommand('Emitter', OpticalEmitter())             
 Gui.addCommand('Mirror', OpticalMirror())
+Gui.addCommand('Splitter', OpticalSplitter())
 Gui.addCommand('Absorber', OpticalAbsorber())
 Gui.addCommand('Lens', OpticalLens())
 Gui.addCommand('Grating', OpticalGrating())

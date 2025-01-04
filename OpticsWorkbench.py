@@ -149,6 +149,15 @@ def makeMirror(base = [], collectStatistics = False):
     recompute()
     return fp
 
+def makeSplitter(base = [], collectStatistics = False):
+    #reload(OpticalObject)
+    '''All FreeCAD objects in base will be optical mirrors.'''
+    fp = activeDocument().addObject('Part::FeaturePython', 'Splitter')
+    OpticalObject.OpticalObjectWorker(fp, base, type = 'splitter', collectStatistics = collectStatistics)
+    OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
+    recompute()
+    return fp
+
 def makeAbsorber(base = [], collectStatistics = False):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical light absorbers.'''
