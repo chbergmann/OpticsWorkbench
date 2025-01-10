@@ -93,6 +93,13 @@ The FreeCAD objects in parameter Base will act as mirrors
 * Select some FreeCAD objects, then create Optical Mirror  
 see also [Statistics](#Statistics) 
 
+### ![Optical Splitter](./icons/splitter.svg) Optical Splitter
+The FreeCAD objects in parameter Base will act as simple beamsplitters. There is no power tracking: the splitter just creates two new rays; one transmitted (without refraction), one reflected.
+* Select FreeCAD objects that are single faces or planes (i.e. no solids), then turn them into beamsplitters
+![screenshot](./examples/example_simple_beamsplitter.png)
+Turning a solid, like a cube, into a splitter will cause transmitted rays to be reflected inside the object until the maximum iteration number is reached, adding many further rays that are transmitted to the outside.
+see also [Statistics](#Statistics)
+
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The FreeCAD objects in parameter `Base` will swallow the rays of light.  
 * Select some FreeCAD objects
