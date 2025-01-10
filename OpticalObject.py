@@ -187,6 +187,10 @@ class OpticalObjectViewProvider:
         if self.Object.OpticalType == 'mirror':
             return os.path.join(_icondir_, 'mirror.svg')
             
+
+        if self.Object.OpticalType == 'splitter':
+            return os.path.join(_icondir_, 'splitter.svg')
+
         if self.Object.OpticalType == 'absorber':
             return os.path.join(_icondir_, 'absorber.svg')
 
