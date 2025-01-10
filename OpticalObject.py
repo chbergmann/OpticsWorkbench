@@ -24,8 +24,8 @@ class OpticalObjectWorker:
                  base = [],
                  type = 'mirror',
                  collectStatistics = False):
-        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
-        fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'splitter', 'absorber']
+        fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',
                        translate('Mirror', 'FreeCAD objects to be mirrors or absorbers')).Base = base
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
                        translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
