@@ -213,6 +213,7 @@ def Hits2CSV():
     sheet.set('C1','X-axis')
     sheet.set('D1','Y-axis')
     sheet.set('E1','Z-axis')
+    sheet.set('F1','Energy %')
     row = 1
     
     coords = []
@@ -221,6 +222,7 @@ def Hits2CSV():
     for eachObject in activeDocument().Objects:
         if Ray.isOpticalObject(eachObject):
             #all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
+            lastrow = row
             for attr in dir(eachObject):
                 if attr.startswith('HitCoordsFrom'):
                     coords_per_beam = getattr(eachObject, attr)
@@ -231,6 +233,13 @@ def Hits2CSV():
                         sheet.set('C' + str(row), str(co[0]))
                         sheet.set('D' + str(row), str(co[1]))
                         sheet.set('E' + str(row), str(co[2]))
+
+                if attr.startswith('EnergyFrom'):
+                    energy = getattr(eachObject, attr)
+                    row = lastrow
+                    for e in energy:
+                        row += 1
+                        sheet.set('F' + str(row), str(e))
     
     sheet.recompute()
     sheet.ViewObject.doubleClicked()

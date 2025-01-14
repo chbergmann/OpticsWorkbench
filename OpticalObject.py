@@ -23,12 +23,16 @@ class OpticalObjectWorker:
                  fp,    # an instance of Part::FeaturePython
                  base = [],
                  type = 'mirror',
-                 collectStatistics = False):
+                 collectStatistics = False,
+                 transparency = 0):
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
         fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   
                        translate('Mirror', 'FreeCAD objects to be mirrors or absorbers')).Base = base
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
                        translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+        fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
+                       translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = transparency
+
         fp.OpticalType = type    
         fp.Proxy = self
     
@@ -36,7 +40,10 @@ class OpticalObjectWorker:
         pass
         
     def onChanged(self, fp, prop):
-        pass
+        # backwards compatiblity
+        if not hasattr(fp, 'Transparency'):
+            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
+                        translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = 0
 
 
 class LensWorker:

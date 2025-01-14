@@ -7,14 +7,11 @@ __license__ = 'LGPL 3.0'
 import os
 import FreeCADGui as Gui
 from FreeCAD import Vector, Rotation, Placement, activeDocument
-#import FreeCADGui
 import Part
 import math
 import traceback
 from wavelength_to_rgb.gentable import wavelen2rgb
 import OpticalObject
-import FreeCADGui
-
 import FreeCAD
 
 translate = FreeCAD.Qt.translate
@@ -123,8 +120,6 @@ class RayWorker:
         hitname = 'HitsFrom' + fp.Label
         hitcoordsname = 'HitCoordsFrom' + fp.Label
         for optobj in activeDocument().Objects:
-            collectStatistics = isRelevantOptic(
-                fp, optobj) and optobj.collectStatistics
             if hasattr(optobj, hitname):
                 setattr(optobj, hitname, 0)
             if hasattr(optobj, hitcoordsname):
@@ -205,7 +200,7 @@ class RayWorker:
                     Ncount = Ncount + 1
 
                     posdirarray.append((pos, dir))
-            #print("Number of rays created = ",Ncount)
+            # print("Number of rays created = ",Ncount)
 
         else:
             for row in range(0, int(fp.BeamNrRows)):
@@ -253,8 +248,6 @@ class RayWorker:
             g = rgb[1] / 255.0
             b = rgb[2] / 255.0
             fp.ViewObject.LineColor = (float(r), float(g), float(b), (0.0))
-
-        fp.ViewObject.Transparency = 50
 
     def substractPlacement(self, fp, obj):
         r2 = Rotation(fp.Placement.Rotation)
@@ -307,7 +300,7 @@ class RayWorker:
                 self.lastRefIdx = []
 
                 try:
-                    tracedLines = self.traceRay(fp, firstLine)
+                    tracedLines = self.traceRay(fp, (firstLine, 100))
 
                     if fp.HideFirstPart:
                         # Remove/hide first line.
@@ -384,10 +377,12 @@ class RayWorker:
 
         return isec_struct
 
-    def traceRay(self, fp, line):
+    def traceRay(self, fp, lineAndEnergy):
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_parts = []
         doLens = False
+        line = lineAndEnergy[0]
+        energy = lineAndEnergy[1]
 
         isec_struct = self.getIntersections(fp, line)
         origin = PointVec(line.Vertexes[0])
@@ -422,8 +417,7 @@ class RayWorker:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
 
-            if isRelevantOptic(fp,
-                               nearest_obj) and nearest_obj.collectStatistics:
+            if isRelevantOptic(fp, nearest_obj) and nearest_obj.collectStatistics:
                 hitname = 'HitsFrom' + fp.Label
                 if not hasattr(nearest_obj, hitname):
                     nearest_obj.addProperty(
@@ -445,14 +439,23 @@ class RayWorker:
                         fp.Label + ' (' + translate('Ray', 'read only') + ')')
                     setattr(nearest_obj, hitcoordsname, [])
                 setattr(nearest_obj, hitcoordsname,
-                        getattr(nearest_obj, hitcoordsname) + [
-                            neworigin,
-                        ])
+                        getattr(nearest_obj, hitcoordsname) + [neworigin])
+                
+                energyname = 'EnergyFrom' + fp.Label
+                if not hasattr(nearest_obj, energyname):
+                    nearest_obj.addProperty(
+                        'App::PropertyFloatList', energyname,
+                        'OpticalObject',
+                        translate('Ray', 'Energy from') + ' ' +
+                        fp.Label + ' (' + translate('Ray', 'read only') + ')')
+                    setattr(nearest_obj, hitcoordsname, [])
+                setattr(nearest_obj, energyname,
+                        getattr(nearest_obj, energyname) + [energy])
 
-            #if fp.HideFirstPart == False or first == False:
+            # if fp.HideFirstPart == False or first == False:
             # When it is the first part that shall be hidden, linearray[-1]
             # was already removed at this point
-            #linearray[-1] = shortline
+            # linearray[-1] = shortline
 
             # The current line ends at the surface of the current optical
             # element.
@@ -474,7 +477,11 @@ class RayWorker:
                 return ret
 
             if nearest_obj.OpticalType == 'mirror':
-                dNewRays.append(self.mirror(dRay, normal))
+                dNewRays.append((self.mirror(dRay, normal),
+                                energy * (100 - nearest_obj.Transparency) / 100))
+                if nearest_obj.Transparency > 0:
+                    dNewRays.append(
+                        (-dRay, energy * nearest_obj.Transparency / 100))
                 break
 
             elif nearest_obj.OpticalType == 'lens':
@@ -486,13 +493,13 @@ class RayWorker:
                     n = nearest_obj.RefractionIndex
 
                 if self.isInsideLens(isec_struct, origin, nearest_obj):
-                    #print("leave " + nearest_obj.Label)
+                    # print("leave " + nearest_obj.Label)
                     oldRefIdx = n
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                     # print()
                 else:
-                    #print("enter " + nearest_obj.Label)
+                    # print("enter " + nearest_obj.Label)
                     newRefIdx = n
                     self.lastRefIdx.append(n)
 
@@ -519,62 +526,63 @@ class RayWorker:
                     grating_type = 2
 
                 if grating_type == 0:  # reflection grating
-                    dNewRays.append(
-                        self.grating_calculation(grating_type, order,
+                    g = self.grating_calculation(grating_type, order,
                                                  fp.Wavelength, lpm, ray1,
                                                  normal, grating_lines_plane,
-                                                 oldRefIdx, oldRefIdx))
+                                                 oldRefIdx, oldRefIdx)
+                    dNewRays.append((g, 100))
 
                 elif grating_type == 2:  # transmission grating with diffraction at first surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
                         doLens = True
-                        #print("leave t-grating 1s " + nearest_obj.Label)
+                        # print("leave t-grating 1s " + nearest_obj.Label)
                         oldRefIdx = n
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
                         if len(self.lastRefIdx) > 0:
                             self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                     else:
                         newRefIdx = n
                         self.lastRefIdx.append(n)
-                        #print("enter t-grating 1s " + nearest_obj.Label)
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        dNewRays.append(
-                            self.grating_calculation(grating_type, order,
+                        # print("enter t-grating 1s " + nearest_obj.Label)
+                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        g = self.grating_calculation(grating_type, order,
                                                      fp.Wavelength, lpm, ray1,
                                                      normal,
                                                      grating_lines_plane,
-                                                     oldRefIdx, newRefIdx))
+                                                     oldRefIdx, newRefIdx)
+                        dNewRays.append((g, 100))
 
                 elif grating_type == 1:  # transmission grating with diffraction at second surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
-                        #print("leave t-grating 2s " + nearest_obj.Label)
+                        # print("leave t-grating 2s " + nearest_obj.Label)
                         oldRefIdx = n
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        dNewRays.append(
-                            self.grating_calculation(grating_type, order,
+                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        g = self.grating_calculation(grating_type, order,
                                                      fp.Wavelength, lpm, ray1,
                                                      normal,
                                                      grating_lines_plane,
-                                                     oldRefIdx, newRefIdx))
+                                                     oldRefIdx, newRefIdx)
+                        dNewRays.append((g, 100))
                     else:
                         doLens = True
                         newRefIdx = n
                         self.lastRefIdx.append(n)
-                        #print("enter t-grating 2s " + nearest_obj.Label)
-                        #print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                        # print("enter t-grating 2s " + nearest_obj.Label)
+                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
 
             else:
                 return ret
 
         if doLens:
-            dNewRays.append(self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal))
+            newray = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+            dNewRays.append((newray, 100))
 
         newlines = []
         for dNewRay in dNewRays:
-            newlines.append(
-                Part.makeLine(
+            nl = Part.makeLine(
                     neworigin,
-                    neworigin - dNewRay * fp.MaxRayLength / dNewRay.Length))
+                    neworigin - dNewRay[0] * fp.MaxRayLength / neworigin.Length)
+            newlines.append((nl, dNewRay[1]))
 
         for line in newlines:
             ret.extend(self.traceRay(fp, line))
@@ -634,43 +642,43 @@ class RayWorker:
         P = P / P.Length
         # print("P",P)
         D = surf_norma.cross(P)
-        #print("D", D)
+        # print("D", D)
         D = D / D.Length
         mu = n1 / n2
-        #print("mu", mu)
+        # print("mu", mu)
         d = 1000 / lpm
         # print("d",d)
         T = (order * wavelength) / (n1 * d)
-        #print("T", T)
-        #print("ray", ray[0], ray[1], ray[2])
+        # print("T", T)
+        # print("ray", ray[0], ray[1], ray[2])
         V = (mu * (ray[0] * surf_norma[0] + ray[1] * surf_norma[1] +
                    ray[2] * surf_norma[2])) / surf_norma.dot(surf_norma)
-        #print("V", V)
+        # print("V", V)
         W = (mu**2 - 1 + T**2 - 2 * mu * T *
              (ray[0] * D[0] + ray[1] * D[1] + ray[2] * D[2])
              ) / surf_norma.dot(surf_norma)
-        #print("W", W)
-        #print("calc_test ", (ray[0]*D[0]+ray[1]*D[1]+ray[2]*D[2]))
-        #print ("W>V**2? ", W>V**2)
+        # print("W", W)
+        # print("calc_test ", (ray[0]*D[0]+ray[1]*D[1]+ray[2]*D[2]))
+        # print ("W>V**2? ", W>V**2)
         Q = ((-2 * V + ((2 * V)**2 - 4 * W)**0.5) / 2,
              (-2 * V - ((2 * V)**2 - 4 * W)**0.5) / 2)
         # print("Q",Q)
 
         if grating_type == 0:  # reflection grating
-            #S_ = mu*ray_trans-T*D+max(Q)*surf_norma_trans
+            # S_ = mu*ray_trans-T*D+max(Q)*surf_norma_trans
             S_0 = mu * ray[0] - T * D[0] + max(Q) * surf_norma[0]
             S_1 = mu * ray[1] - T * D[1] + max(Q) * surf_norma[1]
             S_2 = mu * ray[2] - T * D[2] + max(Q) * surf_norma[2]
             S_ = Vector(S_0, S_1, S_2)
         else:  # transmission grating
-            #S_ = mu*ray-T*D+min(Q)*surf_norma
+            # S_ = mu*ray-T*D+min(Q)*surf_norma
             S_0 = mu * ray[0] - T * D[0] + min(Q) * surf_norma[0]
             S_1 = mu * ray[1] - T * D[1] + min(Q) * surf_norma[1]
             S_2 = mu * ray[2] - T * D[2] + min(Q) * surf_norma[2]
             S_ = Vector(S_0, S_1, S_2)
 
         S_ = -S_
-        #print("S_", S_)
+        # print("S_", S_)
         return S_
 
     def check2D(self, objlist):
