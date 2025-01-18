@@ -119,11 +119,14 @@ class RayWorker:
     def redrawRay(self, fp):
         hitname = 'HitsFrom' + fp.Label
         hitcoordsname = 'HitCoordsFrom' + fp.Label
+        energyname = 'EnergyFrom' + fp.Label
         for optobj in activeDocument().Objects:
             if hasattr(optobj, hitname):
                 setattr(optobj, hitname, 0)
             if hasattr(optobj, hitcoordsname):
                 setattr(optobj, hitcoordsname, [])
+            if hasattr(optobj, energyname):
+                setattr(optobj, energyname, [])
 
         try:  # check if the beam has the parameter coneAngle, this is a legacy check.
             coneAngle = float(fp.ConeAngle)
@@ -448,7 +451,7 @@ class RayWorker:
                         'OpticalObject',
                         translate('Ray', 'Energy from') + ' ' +
                         fp.Label + ' (' + translate('Ray', 'read only') + ')')
-                    setattr(nearest_obj, hitcoordsname, [])
+                    setattr(nearest_obj, energyname, [])
                 setattr(nearest_obj, energyname,
                         getattr(nearest_obj, energyname) + [energy])
 

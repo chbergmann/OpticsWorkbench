@@ -132,10 +132,8 @@ def allOff():
             obj.Power = False
             
         elif Ray.isOpticalObject(obj):
-            hitname = 'HitsFrom'
-            hitcoordsname = 'HitCoordsFrom'
             for a in dir(obj):
-                if a.startswith('HitsFrom') or a.startswith('HitCoordsFrom'):
+                if a.startswith('HitsFrom') or a.startswith('HitCoordsFrom') or a.startswith('EnergyFrom'):
                     obj.removeProperty(a)
             
     recompute()
@@ -216,15 +214,13 @@ def Hits2CSV():
     sheet.set('F1','Energy %')
     row = 1
     
-    coords = []
-    attr_names=[]
     coords_per_beam = []
     for eachObject in activeDocument().Objects:
         if Ray.isOpticalObject(eachObject):
             #all_coords = np.array([coord for coords in coords_per_beam for coord in coords])
-            lastrow = row
             for attr in dir(eachObject):
                 if attr.startswith('HitCoordsFrom'):
+                    lastrow = row
                     coords_per_beam = getattr(eachObject, attr)
                     for co in coords_per_beam:
                         row += 1
@@ -234,12 +230,13 @@ def Hits2CSV():
                         sheet.set('D' + str(row), str(co[1]))
                         sheet.set('E' + str(row), str(co[2]))
 
-                if attr.startswith('EnergyFrom'):
-                    energy = getattr(eachObject, attr)
-                    row = lastrow
-                    for e in energy:
-                        row += 1
-                        sheet.set('F' + str(row), str(e))
+                    eneryname = 'EnergyFrom' + attr[13:]
+                    if hasattr(eachObject, eneryname):
+                        energy = getattr(eachObject, eneryname)
+                        row = lastrow
+                        for e in energy:
+                            row += 1
+                            sheet.set('F' + str(row), str(e))
     
     sheet.recompute()
     sheet.ViewObject.doubleClicked()
