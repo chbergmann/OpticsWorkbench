@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from PySide.QtCore import QT_TRANSLATE_NOOP
 __title__ = 'OpticalObject'
 __author__ = 'Christian Bergmann'
 __license__ = 'LGPL 3.0'
@@ -11,229 +12,241 @@ import FreeCAD
 import math
 translate = FreeCAD.Qt.translate
 
-from PySide.QtCore import QT_TRANSLATE_NOOP
 
 _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
-    
-INFINITY = 1677216  
+
+INFINITY = 1677216
 EPSILON = 1/INFINITY
-    
+
+
 class OpticalObjectWorker:
-    def __init__(self, 
+    def __init__(self,
                  fp,    # an instance of Part::FeaturePython
-                 base = [],
-                 type = 'mirror',
-                 collectStatistics = False,
-                 transparency = 0):
-        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'OpticalObject', '').OpticalType = ['mirror', 'absorber'] 
-        fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',   
+                 base=[],
+                 type='mirror',
+                 collectStatistics=False,
+                 transparency=0):
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType',
+                       'OpticalObject', '').OpticalType = ['mirror', 'absorber']
+        fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',
                        translate('Mirror', 'FreeCAD objects to be mirrors or absorbers')).Base = base
-        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',
                        translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
-        fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
+        fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
                        translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = transparency
 
-        fp.OpticalType = type    
+        fp.OpticalType = type
         fp.Proxy = self
-    
+
     def execute(self, fp):
         pass
-        
+
     def onChanged(self, fp, prop):
         # backwards compatiblity
         if not hasattr(fp, 'Transparency'):
-            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
-                        translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = 0
+            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
+                           translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = 0
 
 
 class LensWorker:
-    def __init__(self, 
+    def __init__(self,
                  fp,    # an instance of Part::FeaturePython
-                 base = [],
-                 RefractionIndex = 1,
-                 material = '',
-                 collectStatistics = False,
-                 transparency = 100):
-        self.update = False 
-        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 
-                       translate('Lens', 'Lens'), '').OpticalType = ['lens'] 
-        fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',   
+                 base=[],
+                 RefractionIndex=1,
+                 material='',
+                 collectStatistics=False,
+                 transparency=100):
+        self.update = False
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType',
+                       'Lens', '').OpticalType = ['lens']
+        fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',
                        translate('Lens', 'FreeCAD objects to be lenses')).Base = base
-        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Lens',   
+        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Lens',
                        translate('Lens', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
-            'App::PropertyFloatList',  
-            'Sellmeier',   
-            'Lens',   
+            'App::PropertyFloatList',
+            'Sellmeier',
+            'Lens',
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
             translate('Lens', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
 
-        fp.addProperty('App::PropertyBool',  'collectStatistics',   'Lens',   
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'Lens',
                        translate('Lens', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
-        fp.addProperty('App::PropertyPercent',  'Transparency',   'Lens',   
+        fp.addProperty('App::PropertyPercent',  'Transparency',   'Lens',
                        translate('Lens', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = transparency
-        fp.OpticalType = 'lens'  
-        
-        material_names = list(getMaterials())  
+        fp.OpticalType = 'lens'
 
-        fp.addProperty('App::PropertyEnumeration', 'Material', 'Lens', '').Material = material_names
-        
-        self.update = True 
+        material_names = list(getMaterials())
+
+        fp.addProperty('App::PropertyEnumeration', 'Material',
+                       'Lens', '').Material = material_names
+
+        self.update = True
         fp.Proxy = self
-        
+
         if material in material_names:
             fp.Material = material
         else:
             fp.Material = '?'
-            
 
     def execute(self, fp):
         pass
-        
+
     def onChanged(self, fp, prop):
-        if not self.update: return
+        if not self.update:
+            return
         self.update = False
-        
-        if not hasattr(fp, 'Sellmeier'): return
-        
+
+        if not hasattr(fp, 'Sellmeier'):
+            return
+
         if prop == 'Material':
-            #sellmeier = self.getMaterials()[fp.Material]
+            # sellmeier = self.getMaterials()[fp.Material]
             sellmeier = getMaterials()[fp.Material]
             fp.Sellmeier = sellmeier
-            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
+            fp.RefractionIndex = refraction_index_from_sellmeier(
+                wavelength=580, sellmeier=fp.Sellmeier)
 
         if prop == 'Sellmeier':
-            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
-                    
+            fp.RefractionIndex = refraction_index_from_sellmeier(
+                wavelength=580, sellmeier=fp.Sellmeier)
+
         if prop == 'RefractionIndex':
             fp.Material = '?'
             fp.Sellmeier = []
-            
+
         # backwards compatiblity
         if not hasattr(fp, 'Transparency'):
-            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
-                        translate('Mirror', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = 100
-            
+            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
+                           translate('Mirror', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = 100
+
         self.update = True
 
-class GratingWorker: ### 
-    def __init__(self, 
+
+class GratingWorker:
+    def __init__(self,
                  fp,    # an instance of Part::FeaturePython
-                 base = [],
-                 RefractionIndex = 1,
-                 material = '',
-                 lpm = 500,
-                 GratingType = "reflection",
-                 GratingLinesPlane = FreeCAD.Vector(0,1,0),
-                 order = 1, 
-                 ray_order_override = False,
-                 collectStatistics = False):
-        self.update = False 
-        fp.addProperty('App::PropertyEnumeration', 'OpticalType', 'Grating', '').OpticalType = ['grating'] 
-        fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',   
+                 base=[],
+                 RefractionIndex=1,
+                 material='',
+                 lpm=500,
+                 GratingType="reflection",
+                 GratingLinesPlane=FreeCAD.Vector(0, 1, 0),
+                 order=1,
+                 ray_order_override=False,
+                 collectStatistics=False):
+        self.update = False
+        fp.addProperty('App::PropertyEnumeration', 'OpticalType',
+                       'Grating', '').OpticalType = ['grating']
+        fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',
                        translate('Grating', 'FreeCAD objects to be diffraction gratings')).Base = base
-        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Grating',   
+        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Grating',
                        translate('Grating', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
-            'App::PropertyFloatList',  
-            'Sellmeier',   
-            'Grating',   
+            'App::PropertyFloatList',
+            'Sellmeier',
+            'Grating',
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
             translate('Grating', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
         fp.addProperty('App::PropertyFloat', 'lpm', 'Grating',
-                        translate('Grating', 'lines per millimeter')).lpm = lpm
-        fp.addProperty('App::PropertyEnumeration', 'GratingType', 'Grating', 
-            translate('Grating', 'reflection or transmission')).GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
-        fp.addProperty('App::PropertyVector', 'GratingLinesPlane', 'Grating', 
-            translate('Grating', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines')).GratingLinesPlane = GratingLinesPlane
-        fp.addProperty('App::PropertyFloat', 'order', 'Grating',  
-            translate('Grating', 'order of diffraction, set by grating')).order = order
-        fp.addProperty('App::PropertyBool', 'ray_order_override', 'Grating',  
-            translate('Grating', 'if true, order of grating overrides order of ray, if false, ray order is used')).ray_order_override = ray_order_override
+                       translate('Grating', 'lines per millimeter')).lpm = lpm
+        fp.addProperty('App::PropertyEnumeration', 'GratingType', 'Grating',
+                       translate('Grating', 'reflection or transmission')).GratingType = ["reflection", "transmission - diffraction at 2nd surface", "transmission - diffraction at 1st surface"]
+        fp.addProperty('App::PropertyVector', 'GratingLinesPlane', 'Grating',
+                       translate('Grating', 'Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines')).GratingLinesPlane = GratingLinesPlane
+        fp.addProperty('App::PropertyFloat', 'order', 'Grating',
+                       translate('Grating', 'order of diffraction, set by grating')).order = order
+        fp.addProperty('App::PropertyBool', 'ray_order_override', 'Grating',
+                       translate('Grating', 'if true, order of grating overrides order of ray, if false, ray order is used')).ray_order_override = ray_order_override
         fp.OpticalType = 'grating'
-        fp.GratingType = GratingType  
-        
+        fp.GratingType = GratingType
+
         material_names = list(getMaterials())
-          
-        fp.addProperty('App::PropertyEnumeration', 'Material', 'Grating', '').Material = material_names
-        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',  
-            translate('Grating', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
-        
-        self.update = True 
+
+        fp.addProperty('App::PropertyEnumeration', 'Material',
+                       'Grating', '').Material = material_names
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',
+                       translate('Grating', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+
+        self.update = True
         fp.Proxy = self
-        
+
         if material in material_names:
             fp.Material = material
         else:
             fp.Material = '?'
-             
 
     def execute(self, fp):
         pass
-        
+
     def onChanged(self, fp, prop):
-        if not self.update: return
+        if not self.update:
+            return
         self.update = False
-        
-        if not hasattr(fp, 'Sellmeier'): return
-        
+
+        if not hasattr(fp, 'Sellmeier'):
+            return
+
         if prop == 'Material':
             sellmeier = getMaterials()[fp.Material]
             fp.Sellmeier = sellmeier
-            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
+            fp.RefractionIndex = refraction_index_from_sellmeier(
+                wavelength=580, sellmeier=fp.Sellmeier)
 
         if prop == 'Sellmeier':
-            fp.RefractionIndex = refraction_index_from_sellmeier(wavelength=580, sellmeier=fp.Sellmeier)
-                    
+            fp.RefractionIndex = refraction_index_from_sellmeier(
+                wavelength=580, sellmeier=fp.Sellmeier)
+
         if prop == 'RefractionIndex':
             fp.Material = '?'
             fp.Sellmeier = []
-            
-        self.update = True    
-    
+
+        self.update = True
+
+
 class OpticalObjectViewProvider:
     def __init__(self, vobj):
         '''Set this object to the proxy object of the actual view provider'''
         vobj.Proxy = self
         self.Object = vobj.Object
-            
+
     def getIcon(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         if self.Object.OpticalType == 'mirror':
             return os.path.join(_icondir_, 'mirror.svg')
-            
+
         if self.Object.OpticalType == 'absorber':
             return os.path.join(_icondir_, 'absorber.svg')
 
-        if self.Object.OpticalType == 'grating': ### this paragraph was provided by OpenAI chatgpt at feb.01.2023 
+        if self.Object.OpticalType == 'grating':  # this paragraph was provided by OpenAI chatgpt at feb.01.2023
             return os.path.join(_icondir_, 'grating.svg')
-            
+
         if self.Object.OpticalType == 'emitter':
             return os.path.join(_icondir_, 'emitter.svg')
-            
+
         return os.path.join(_icondir_, 'lens.svg')
 
     def attach(self, vobj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
         self.Object = vobj.Object
         self.onChanged(vobj, '')
- 
+
     def updateData(self, fp, prop):
         '''If a property of the handled feature has changed we have the chance to handle this here'''
         pass
-    
+
     def claimChildren(self):
         '''Return a list of objects that will be modified by this feature'''
         return self.Object.Base
-        
+
     def onDelete(self, feature, subelements):
         '''Here we can do something when the feature will be deleted'''
         return True
-    
+
     def onChanged(self, fp, prop):
         '''Here we can do something when a single property got changed'''
         pass
-    
+
     def __getstate__(self):
         '''When saving the document this object gets stored using Python's json module.\
                 Since we have some un-serializable parts here we must define this method\
@@ -247,181 +260,194 @@ class OpticalObjectViewProvider:
 
 
 def getMaterials():
-        # https://refractiveindex.info/, from glass-spec-sheets directly or fitted with lambda-n data
-        return {
-            '?':                 (0, 0, 0, 0, 0, 0),
-            'Vacuum':            (0, 0, 0, 0, 0, 0),
-            'Air':               (4.334446e-4, 3.470339e-5, 1.118728e-4, 1.118728e4, 0, 0),  #https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
-            # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
-            # 'Ethanol':           (0, 0, 0, 0, 0, 0),
-            # 'Olive oil':         (0, 0, 0, 0, 0, 0),
-            # 'Ice':               (0, 0, 0, 0, 0, 0),
-            'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
-            'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
-            'NBK7/Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
-            'NSF2':      (1.47343127, 0.163681849, 1.36920899, 10901.9098, 58568.3687,  127404933),
-            'NBKA4':      (1.28834642, 0.132817724, 0.945395373, 7799.80626, 31563.1177,  105965875),
-            'SF5':      (1.46141885, 0.247713019, 0.949995832, 11182.6126, 50859.4669,  112041888),
-            'DLAK6':      (1.79674556, 0.00384614025, 1.6647332, 10953.7412, 78018.5022,  131153263),
-            'B270':      (1.05963142, 0.229442956, 1.10647397, 3520.36549, 32098.963,  95281358),
-            'NBAF10':      (1.5851495, 0.143559385, 1.08521269, 9266.81282, 42448.9805,  105613573),
-            'NSF10':      (1.62153902, 0.256287842, 1.64447552, 12224.1457, 59573.6775,  147468793),
-            'NSF11':      (1.73759695, 0.313747346, 1.89878101, 13188.707, 62306.8142,  155236290),
-            'silica glass':      (1.0007668, 0.102419414, 3.0344236, 8391.82477, 8277.39389,  312601508),
-            'NSF6HT':      (1.77931763, 0.338149866, 2.08734474, 13371.4182, 61753.3621,  174017590),
-            'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
-            # 'Flint glass':       (0, 0, 0, 0, 0, 0),
-            # 'Sapphire':          (0, 0, 0, 0, 0, 0),
-            # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
-            # 'Diamond':           (0, 0, 0, 0, 0, 0),
-        }
+    # https://refractiveindex.info/, from glass-spec-sheets directly or fitted with lambda-n data
+    return {
+        '?':                 (0, 0, 0, 0, 0, 0),
+        'Vacuum':            (0, 0, 0, 0, 0, 0),
+        # https://physics.stackexchange.com/questions/138584/sellmeier-refractive-index-of-standard-air/138617
+        'Air':               (4.334446e-4, 3.470339e-5, 1.118728e-4, 1.118728e4, 0, 0),
+        # 'Water':             (0, 0, 0, 0, 0, 0),  # 20°C
+        # 'Ethanol':           (0, 0, 0, 0, 0, 0),
+        # 'Olive oil':         (0, 0, 0, 0, 0, 0),
+        # 'Ice':               (0, 0, 0, 0, 0, 0),
+        'Quartz':            (0.6961663, 0.4079426, 0.8974794, 4.67914826e+03, 1.35120631e+04, 9.79340025e+07),
+        'PMMA (plexiglass)': (1.1819, 0, 0, 11313, 0,  0),
+        'NBK7/Window glass':      (1.03961212, 0.231792344, 1.01046945, 6000.69867, 20017.9144,  103560653),
+        'NSF2':      (1.47343127, 0.163681849, 1.36920899, 10901.9098, 58568.3687,  127404933),
+        'NBKA4':      (1.28834642, 0.132817724, 0.945395373, 7799.80626, 31563.1177,  105965875),
+        'SF5':      (1.46141885, 0.247713019, 0.949995832, 11182.6126, 50859.4669,  112041888),
+        'DLAK6':      (1.79674556, 0.00384614025, 1.6647332, 10953.7412, 78018.5022,  131153263),
+        'B270':      (1.05963142, 0.229442956, 1.10647397, 3520.36549, 32098.963,  95281358),
+        'NBAF10':      (1.5851495, 0.143559385, 1.08521269, 9266.81282, 42448.9805,  105613573),
+        'NSF10':      (1.62153902, 0.256287842, 1.64447552, 12224.1457, 59573.6775,  147468793),
+        'NSF11':      (1.73759695, 0.313747346, 1.89878101, 13188.707, 62306.8142,  155236290),
+        'silica glass':      (1.0007668, 0.102419414, 3.0344236, 8391.82477, 8277.39389,  312601508),
+        'NSF6HT':      (1.77931763, 0.338149866, 2.08734474, 13371.4182, 61753.3621,  174017590),
+        'Polycarbonate':     (1.4182, 0, 0, 21304, 0, 0),
+        # 'Flint glass':       (0, 0, 0, 0, 0, 0),
+        # 'Sapphire':          (0, 0, 0, 0, 0, 0),
+        # 'Cubic zirconia':    (0, 0, 0, 0, 0, 0),
+        # 'Diamond':           (0, 0, 0, 0, 0, 0),
+    }
+
 
 def refraction_index_from_sellmeier(wavelength, sellmeier):
     b1, b2, b3, c1, c2, c3 = sellmeier
     l = wavelength
-    n = math.sqrt(1 + b1*l**2/(l**2 - c1) + b2*l**2/(l**2 - c2) + b3*l**2/(l**2 - c3))
+    n = math.sqrt(1 + b1*l**2/(l**2 - c1) + b2*l**2 /
+                  (l**2 - c2) + b3*l**2/(l**2 - c3))
     return n
-    
-                
+
+
 class OpticalMirror():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
-            
-        Gui.doCommand('OpticsWorkbench.makeMirror(objects)')              
+            Gui.doCommand(
+                'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
+
+        Gui.doCommand('OpticsWorkbench.makeMirror(objects)')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
-            return(True)
+            return (True)
         else:
-            return(False)
-        
+            return (False)
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'mirror.svg'),
-                'Accel' : '', # a default shortcut (optional)
+        return {'Pixmap': os.path.join(_icondir_, 'mirror.svg'),
+                'Accel': '',  # a default shortcut (optional)
                 'MenuText': QT_TRANSLATE_NOOP('Mirror', 'Optical Mirror'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Mirror','Declare your FreeCAD objects to be optical mirrors') }
+                'ToolTip': QT_TRANSLATE_NOOP('Mirror', 'Declare your FreeCAD objects to be optical mirrors')}
 
 
 class OpticalAbsorber():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
-                
-        Gui.doCommand('OpticsWorkbench.makeAbsorber(objects)')               
+            Gui.doCommand(
+                'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
+
+        Gui.doCommand('OpticsWorkbench.makeAbsorber(objects)')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
-            return(True)
+            return (True)
         else:
-            return(False)
-        
+            return (False)
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'absorber.svg'),
-                'Accel' : '', # a default shortcut (optional)
+        return {'Pixmap': os.path.join(_icondir_, 'absorber.svg'),
+                'Accel': '',  # a default shortcut (optional)
                 'MenuText': QT_TRANSLATE_NOOP('Absorber', 'Optical Absorber'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Absorber','Declare your FreeCAD objects to be optical absorbers') }
-                
+                'ToolTip': QT_TRANSLATE_NOOP('Absorber', 'Declare your FreeCAD objects to be optical absorbers')}
+
+
 class OpticalLens():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
-                
-        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Quartz")')               
+            Gui.doCommand(
+                'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
+
+        Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Quartz")')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
-            return(True)
+            return (True)
         else:
-            return(False)
-        
+            return (False)
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'lens.svg'),
-                'Accel' : '', # a default shortcut (optional)
+        return {'Pixmap': os.path.join(_icondir_, 'lens.svg'),
+                'Accel': '',  # a default shortcut (optional)
                 'MenuText': QT_TRANSLATE_NOOP('Lens', 'Optical Lens'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Lens','Declare your FreeCAD objects to be optical lenses') } 
+                'ToolTip': QT_TRANSLATE_NOOP('Lens', 'Declare your FreeCAD objects to be optical lenses')}
+
 
 class OpticalGrating():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
         for sel in selection:
-            Gui.doCommand('objects.append(FreeCAD.ActiveDocument.getObject("%s"))'%(sel.ObjectName))
-            
-        Gui.doCommand('OpticsWorkbench.makeGrating(objects)')              
+            Gui.doCommand(
+                'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
+
+        Gui.doCommand('OpticsWorkbench.makeGrating(objects)')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
-            return(True)
+            return (True)
         else:
-            return(False)
-        
+            return (False)
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'grating.svg'),
-                'Accel' : '', # a default shortcut (optional)
+        return {'Pixmap': os.path.join(_icondir_, 'grating.svg'),
+                'Accel': '',  # a default shortcut (optional)
                 'MenuText': QT_TRANSLATE_NOOP('Grating', 'Diffraction grating'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Grating', 'Declare your FreeCAD objects to be diffraction gratings') }               
+                'ToolTip': QT_TRANSLATE_NOOP('Grating', 'Declare your FreeCAD objects to be diffraction gratings')}
+
 
 class OpticalEmitter():
-    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
-      
+    '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
+
     def Activated(self):
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         if len(selection) > 0:
-            Gui.doCommand('obj = FreeCAD.ActiveDocument.getObject("%s")'%(selection[0].ObjectName))
+            Gui.doCommand('obj = FreeCAD.ActiveDocument.getObject("%s")' % (
+                selection[0].ObjectName))
             faces = []
             for sub in selection[0].SubElementNames:
                 faces.append(sub)
-                                         
-            Gui.doCommand('OpticsWorkbench.makeRay(baseShape=[obj, %s])'%faces)
+
+            Gui.doCommand(
+                'OpticsWorkbench.makeRay(baseShape=[obj, %s])' % faces)
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
         are met or not. This function is optional.'''
         if FreeCAD.ActiveDocument:
-            return(True)
+            return (True)
         else:
-            return(False)
-        
+            return (False)
+
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'emitter.svg'),
-                'Accel' : '', # a default shortcut (optional)
+        return {'Pixmap': os.path.join(_icondir_, 'emitter.svg'),
+                'Accel': '',  # a default shortcut (optional)
                 'MenuText': QT_TRANSLATE_NOOP('Emitter', 'Optical Emitter'),
-                'ToolTip' : QT_TRANSLATE_NOOP('Emitter', 'Declare your FreeCAD objects to be optical emitters') }  
-                             
-Gui.addCommand('Emitter', OpticalEmitter())             
+                'ToolTip': QT_TRANSLATE_NOOP('Emitter', 'Declare your FreeCAD objects to be optical emitters')}
+
+
+Gui.addCommand('Emitter', OpticalEmitter())
 Gui.addCommand('Mirror', OpticalMirror())
 Gui.addCommand('Absorber', OpticalAbsorber())
 Gui.addCommand('Lens', OpticalLens())

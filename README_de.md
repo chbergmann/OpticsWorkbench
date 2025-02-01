@@ -96,14 +96,14 @@ Die FreeCAD Objekte im Parameter Base werden optische Spiegel.
 * Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Spiegel.  
 Parameter:
 - `Transparency`: Prozentsatz des Lichts, das den Spiegel passiert. Der Rest wird an der Oberfläche reflektiert
-siehe auch [Statistik](#Statistik)
+- `collectStatistics` siehe [Statistik](#Statistik)
 
 ### ![Optical Absorber](./icons/absorber.svg) Optischer Absorber
 Die FreeCAD Objekte im Parameter Base verschlucken alle auftreffenden Lichtstrahlen. 
 * Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Absorber.
 Parameter:
 - `Transparency`: Prozentsatz des Lichts, das den Absorber passiert
-siehe auch [Statistik](#Statistik)
+- `collectStatistics` siehe [Statistik](#Statistik)
 
 ### ![Diffraction grating](./icons/grating.svg) Optisches Gitter
 Die FreeCAD Objekte im Parameter Base werden optische Gitter.  
