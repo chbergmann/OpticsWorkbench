@@ -94,11 +94,15 @@ Parameter wie in Lichtstrahl (monochrom):
 ### ![Optical Mirror](./icons/mirror.svg) Optischer Spiegel
 Die FreeCAD Objekte im Parameter Base werden optische Spiegel.  
 * Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Spiegel.  
+Parameter:
+- `Transparency`: Prozentsatz des Lichts, das den Spiegel passiert. Der Rest wird an der Oberfläche reflektiert
 siehe auch [Statistik](#Statistik)
 
 ### ![Optical Absorber](./icons/absorber.svg) Optischer Absorber
 Die FreeCAD Objekte im Parameter Base verschlucken alle auftreffenden Lichtstrahlen. 
-* Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Absorber.  
+* Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Absorber.
+Parameter:
+- `Transparency`: Prozentsatz des Lichts, das den Absorber passiert
 siehe auch [Statistik](#Statistik)
 
 ### ![Diffraction grating](./icons/grating.svg) Optisches Gitter
@@ -137,7 +141,8 @@ Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optische Linse.
 Parameter:
 - `RefractionIndex` Brechungsindex
 - `Sellmeier` Brechungsindex in Abhängigkeit der Wellenlänge
-- `Material` Die Auswahl eines Material stellt Brechungsindex und Sellmeier Parameter ein.
+- `Material` Die Auswahl eines Material stellt Brechungsindex und Sellmeier Parameter ein
+- `Transparency`: Prozentsatz des Lichts, das die Linse passiert. Der Rest wird an der Oberfläche reflektiert
 - `collectStatistics` siehe [Statistik](#Statistik)
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Licht ausschalten
@@ -175,6 +180,9 @@ Weitere Datenverarbeitung und Speichern in Datei ist dann über die Spreadsheet 
 
 ### ![Example](./optics_workbench_icon.svg) Beispiel - Emitter
 ![screenshot](./examples/example_candle.png)
+-
+### ![Example](./optics_workbench_icon.svg) Beispiel - Halb-Transparenz
+![screenshot](./examples/example_semi.png)
 
 ## Fehlersuche und Report (englisch)
 siehe [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)

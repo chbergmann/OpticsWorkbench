@@ -4,12 +4,12 @@
 <context>
     <name>2D Radial Beam</name>
     <message>
-        <location filename="../Ray.py" line="755"/>
+        <location filename="../Ray.py" line="948"/>
         <source>2D Radial Beam</source>
         <translation>2D punktförmige Lichtquelle</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="756"/>
+        <location filename="../Ray.py" line="950"/>
         <source>Rays coming from one point going to all directions in a 2D plane</source>
         <translation>Lichtstrahlen ausgehend von einem Punkt in einer 2D Ebene</translation>
     </message>
@@ -17,12 +17,12 @@
 <context>
     <name>Absorber</name>
     <message>
-        <location filename="../OpticalObject.py" line="323"/>
+        <location filename="../OpticalObject.py" line="338"/>
         <source>Optical Absorber</source>
         <translation>Optischer Absorber</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="324"/>
+        <location filename="../OpticalObject.py" line="339"/>
         <source>Declare your FreeCAD objects to be optical absorbers</source>
         <translation>Deklariere deine FreeCAD Objekte zu optischen Absorbern</translation>
     </message>
@@ -30,12 +30,12 @@
 <context>
     <name>Beam</name>
     <message>
-        <location filename="../Ray.py" line="730"/>
+        <location filename="../Ray.py" line="916"/>
         <source>2D Beam</source>
         <translation>2D Strahlenbündel</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="731"/>
+        <location filename="../Ray.py" line="918"/>
         <source>A row of multiple rays for raytracing</source>
         <translation>eine Reihe Lichtstrahlen</translation>
     </message>
@@ -43,12 +43,12 @@
 <context>
     <name>Emitter</name>
     <message>
-        <location filename="../OpticalObject.py" line="406"/>
+        <location filename="../OpticalObject.py" line="421"/>
         <source>Optical Emitter</source>
         <translation>Optischer Emitter</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="407"/>
+        <location filename="../OpticalObject.py" line="422"/>
         <source>Declare your FreeCAD objects to be optical emitters</source>
         <translation>Deklariere deine FreeCAD Objekte zu optischen Emittern</translation>
     </message>
@@ -56,7 +56,7 @@
 <context>
     <name>Example2D</name>
     <message>
-        <location filename="../examples/example1.py" line="116"/>
+        <location filename="../examples/example1.py" line="11"/>
         <source>Example - 2D</source>
         <translation>Beispiel - 2D</translation>
     </message>
@@ -64,7 +64,7 @@
 <context>
     <name>Example3D</name>
     <message>
-        <location filename="../examples/example3D.py" line="75"/>
+        <location filename="../examples/example3D.py" line="77"/>
         <source>Example - 3D</source>
         <translation>Beispiel - 3D</translation>
     </message>
@@ -86,59 +86,67 @@
     </message>
 </context>
 <context>
+    <name>ExampleSemi</name>
+    <message>
+        <location filename="../examples/example_semi.py" line="11"/>
+        <source>Example - Semi transparent</source>
+        <translation>Beispiel - Halb-Transparenz</translation>
+    </message>
+</context>
+<context>
     <name>Grating</name>
     <message>
-        <location filename="../OpticalObject.py" line="118"/>
+        <location filename="../OpticalObject.py" line="133"/>
         <source>FreeCAD objects to be diffraction gratings</source>
         <translation>Deklariere deine FreeCAD Objekte zu optischen Gittern</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="120"/>
+        <location filename="../OpticalObject.py" line="135"/>
         <source>Refractive Index at 580nm (depends on material)</source>
         <translation>Brechungsindex bei 580nm (Material abhängig)</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="122"/>
+        <location filename="../OpticalObject.py" line="137"/>
         <source>Usually noted in (µm)² in literature,</source>
         <translation>Gewöhnlich in (μm)² in der Literatur</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="128"/>
+        <location filename="../OpticalObject.py" line="143"/>
         <source>lines per millimeter</source>
         <translation>Linien pro Millimeter</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="130"/>
+        <location filename="../OpticalObject.py" line="145"/>
         <source>reflection or transmission</source>
         <translation>Reflexion oder Durchgang</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="132"/>
+        <location filename="../OpticalObject.py" line="147"/>
         <source>Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines</source>
         <translation>Normal of a hypothetical set of planes that intersect the grating surface, to define the rulings of the grating as these intersection lines</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="134"/>
+        <location filename="../OpticalObject.py" line="149"/>
         <source>order of diffraction, set by grating</source>
         <translation>Ordnungszahl der Brechung</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="136"/>
+        <location filename="../OpticalObject.py" line="151"/>
         <source>if true, order of grating overrides order of ray, if false, ray order is used</source>
         <translation>Ordnungszahl des Gitters überschreibt Ordnungszahl des Lichtstrahls</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="144"/>
+        <location filename="../OpticalObject.py" line="159"/>
         <source>Count number and coordinates of ray hits</source>
         <translation>Anzahl und Koordination von Strahl-Treffpunkten</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="377"/>
+        <location filename="../OpticalObject.py" line="392"/>
         <source>Diffraction grating</source>
         <translation>Optisches Gitter</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="378"/>
+        <location filename="../OpticalObject.py" line="393"/>
         <source>Declare your FreeCAD objects to be diffraction gratings</source>
         <translation>Deklariere deine FreeCAD Objekte zu optischen Gittern</translation>
     </message>
@@ -159,73 +167,88 @@
 <context>
     <name>Lens</name>
     <message>
-        <location filename="../OpticalObject.py" line="50"/>
+        <location filename="../OpticalObject.py" line="58"/>
         <source>Lens</source>
         <translation>Linse</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="52"/>
+        <location filename="../OpticalObject.py" line="60"/>
         <source>FreeCAD objects to be lenses</source>
         <translation>FreeCAD Objekte als optische Linsen</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="54"/>
+        <location filename="../OpticalObject.py" line="62"/>
         <source>Refractive Index at 580nm (depends on material)</source>
         <translation>Brechungsindex bei 580nm (Material abhängig)</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="56"/>
+        <location filename="../OpticalObject.py" line="64"/>
         <source>Usually noted in (µm)² in literature,</source>
         <translation>Gewöhnlich in (μm)² in der Literatur</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="63"/>
+        <location filename="../OpticalObject.py" line="71"/>
         <source>Count number and coordinates of ray hits</source>
         <translation>Anzahl und Koordination von Strahl-Treffpunkten</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="350"/>
+        <location filename="../OpticalObject.py" line="365"/>
         <source>Optical Lens</source>
         <translation>Optische Linse</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="351"/>
+        <location filename="../OpticalObject.py" line="366"/>
         <source>Declare your FreeCAD objects to be optical lenses</source>
         <translation>Deklariere deine FreeCAD Objekte zu optischen Linsen</translation>
+    </message>
+    <message>
+        <location filename="../OpticalObject.py" line="73"/>
+        <source>Percentage of light that passes through the lens. The rest will be mirrored at the outside</source>
+        <translation>Prozentsatz des Lichts, die Linse passiert. Der Rest wird an der Oberfläche reflektiert</translation>
     </message>
 </context>
 <context>
     <name>Mirror</name>
     <message>
-        <location filename="../OpticalObject.py" line="28"/>
+        <location filename="../OpticalObject.py" line="29"/>
         <source>FreeCAD objects to be mirrors or absorbers</source>
         <translation>FreeCAD Objekte als optische Elemente</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="30"/>
+        <location filename="../OpticalObject.py" line="31"/>
         <source>Count number and coordinates of ray hits</source>
         <translation>Anzahl und Koordination von Strahl-Treffpunkten</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="295"/>
+        <location filename="../OpticalObject.py" line="310"/>
         <source>Optical Mirror</source>
         <translation>Optischer Spiegel</translation>
     </message>
     <message>
-        <location filename="../OpticalObject.py" line="296"/>
+        <location filename="../OpticalObject.py" line="311"/>
         <source>Declare your FreeCAD objects to be optical mirrors</source>
         <translation>Deklariere deine FreeCAD Objekte zu optischen Spiegeln</translation>
+    </message>
+    <message>
+        <location filename="../OpticalObject.py" line="45"/>
+        <source>Percentage of light that passes through the semi transparent mirror</source>
+        <translation>Prozentsatz des Lichts, das den Spiegel passiert. Der Rest wird an der Oberfläche reflektiert</translation>
+    </message>
+    <message>
+        <location filename="../OpticalObject.py" line="114"/>
+        <source>Percentage of light that passes through the lens. The rest will be mirrored at the outside</source>
+        <translation>Prozentsatz des Lichts, der die Linse passiert. Der Rest wird an der Oberfläche reflektiert</translation>
     </message>
 </context>
 <context>
     <name>Off</name>
     <message>
-        <location filename="../Ray.py" line="832"/>
+        <location filename="../Ray.py" line="1041"/>
         <source>Switch off lights</source>
         <translation>Licht ausschalten</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="833"/>
+        <location filename="../Ray.py" line="1042"/>
         <source>Switch off all rays and beams</source>
         <translation>Alle Lichtstrahlen deaktivieren</translation>
     </message>
@@ -268,12 +291,12 @@
     <message>
         <location filename="../Ray.py" line="25"/>
         <source>A single ray for raytracing</source>
-        <translation>Ein Lichtstrahl für optische Simulation</translation>
+        <translation type="obsolete">Ein Lichtstrahl für optische Simulation</translation>
     </message>
     <message>
         <location filename="../Ray.py" line="680"/>
         <source>Ray (monochrome)</source>
-        <translation>Lichtstrahl (monochrom)</translation>
+        <translation type="obsolete">Lichtstrahl (monochrom)</translation>
     </message>
     <message>
         <location filename="../Ray.py" line="705"/>
@@ -326,90 +349,108 @@
         <translation type="obsolete">Alle Lichtstrahlen deaktivieren</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="47"/>
+        <location filename="../Ray.py" line="49"/>
         <source>False=Beam in one direction, True=Radial or spherical rays</source>
         <translation>Radialer oder spherischer Lichtstrahl</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="49"/>
+        <location filename="../Ray.py" line="55"/>
         <source>On or Off</source>
         <translation>An oder Aus</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="53"/>
+        <location filename="../Ray.py" line="62"/>
         <source>number of rays in a beam</source>
         <translation>Anzahl Lichtstrahlen im Bündel</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="55"/>
+        <location filename="../Ray.py" line="66"/>
         <source>distance between two beams</source>
         <translation>Distanz zwischen zwei Strahlen</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="57"/>
+        <location filename="../Ray.py" line="71"/>
         <source>hide the first part of every ray</source>
         <translation>Ersten Teil des Lichtstrahls ausblenden</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="59"/>
+        <location filename="../Ray.py" line="76"/>
         <source>maximum length of a ray</source>
         <translation>Maximale Länge eines Lichtstrahls</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="61"/>
+        <location filename="../Ray.py" line="80"/>
         <source>maximum number of reflections</source>
         <translation>Maximale Anzahl von Reflektionen</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="63"/>
+        <location filename="../Ray.py" line="83"/>
         <source>Wavelength of the ray in nm</source>
         <translation>Wellenlänge in nm</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="65"/>
+        <location filename="../Ray.py" line="87"/>
         <source>Order of the ray</source>
         <translation>Ordnungszahl</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="67"/>
+        <location filename="../Ray.py" line="89"/>
         <source>Angle of ray in case of Cone in degrees</source>
         <translation>Lichtkegel-Winkel in Grad</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="69"/>
+        <location filename="../Ray.py" line="93"/>
         <source>Optical Objects to ignore in raytracing</source>
         <translation>Zu ignorierende optische Elemente</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="71"/>
+        <location filename="../Ray.py" line="114"/>
         <source>FreeCAD object used as optical emitter</source>
         <translation>FreeCAD Objekt als optischer Emitter</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="362"/>
+        <location filename="../Ray.py" line="386"/>
         <source>Counts the hits from</source>
         <translation>Anzahl Treffer von</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="372"/>
+        <location filename="../Ray.py" line="409"/>
         <source>read only</source>
         <translation>read only</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="372"/>
+        <location filename="../Ray.py" line="398"/>
         <source>Hit coordinates from</source>
         <translation>Hit coordinates from</translation>
+    </message>
+    <message>
+        <location filename="../Ray.py" line="409"/>
+        <source>Energy from</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>Ray (monochrome)</name>
+    <message>
+        <location filename="../Ray.py" line="25"/>
+        <source>A single ray for raytracing</source>
+        <translation>Ein Lichtstrahl für optische Simulation</translation>
+    </message>
+    <message>
+        <location filename="../Ray.py" line="851"/>
+        <source>Ray (monochrome)</source>
+        <translation>Lichtstrahl (monochrom)</translation>
     </message>
 </context>
 <context>
     <name>Ray (sun light)</name>
     <message>
-        <location filename="../Ray.py" line="705"/>
+        <location filename="../Ray.py" line="882"/>
         <source>Ray (sun light)</source>
         <translation>Sonnenstrahl</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="706"/>
+        <location filename="../Ray.py" line="884"/>
         <source>A bunch of rays with different wavelengths of visible light</source>
         <translation>Ein Bündel Lichtstrahlen mit unterschiedlichen Wellenlängen im sichtbaren Spektrum</translation>
     </message>
@@ -419,7 +460,7 @@
     <message>
         <location filename="../Plot.py" line="100"/>
         <source>2D/3D Plot</source>
-        <translation type="unfinished"></translation>
+        <translation>2D/3D Grafik</translation>
     </message>
     <message>
         <location filename="../Plot.py" line="101"/>
@@ -430,12 +471,12 @@
 <context>
     <name>Spherical Beam</name>
     <message>
-        <location filename="../Ray.py" line="781"/>
+        <location filename="../Ray.py" line="984"/>
         <source>Spherical Beam</source>
         <translation>Spherisches Strahlenbündel</translation>
     </message>
     <message>
-        <location filename="../Ray.py" line="782"/>
+        <location filename="../Ray.py" line="986"/>
         <source>Rays coming from one point going to all directions</source>
         <translation>Lichtstrahlen ausgehend von einem Punkt im 3D Raum</translation>
     </message>
@@ -443,7 +484,7 @@
 <context>
     <name>Start</name>
     <message>
-        <location filename="../Ray.py" line="808"/>
+        <location filename="../Ray.py" line="1015"/>
         <source>(Re)start simulation</source>
         <translation>Simulation neu starten</translation>
     </message>
@@ -499,7 +540,7 @@
     <message>
         <location filename="../InitGui.py" line="21"/>
         <source>Optics</source>
-        <translation>Optik</translation>
+        <translation type="obsolete">Optik</translation>
     </message>
     <message>
         <location filename="../InitGui.py" line="22"/>
@@ -615,6 +656,11 @@
         <location filename="../examples/example_dispersion.py" line="67"/>
         <source>Example - Dispersion</source>
         <translation type="obsolete">Beispiel - Lichtbrechung</translation>
+    </message>
+    <message>
+        <location filename="../InitGui.py" line="51"/>
+        <source>ExampleSemi</source>
+        <translation>Beispiel - Halb-Transparenz</translation>
     </message>
 </context>
 </TS>

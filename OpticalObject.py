@@ -109,6 +109,11 @@ class LensWorker:
             fp.Material = '?'
             fp.Sellmeier = []
             
+        # backwards compatiblity
+        if not hasattr(fp, 'Transparency'):
+            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
+                        translate('Mirror', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = 100
+            
         self.update = True
 
 class GratingWorker: ### 

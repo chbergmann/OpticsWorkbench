@@ -91,12 +91,16 @@ Parameters with different meaning for Emitter:
 ### ![Optical Mirror](./icons/mirror.svg) Optical Mirror
 The FreeCAD objects in parameter Base will act as mirrors  
 * Select some FreeCAD objects, then create Optical Mirror  
+Parameters:  
+- `Transparency`: Percentage of light that passes through the semi transparent mirror
 see also [Statistics](#Statistics) 
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
 The FreeCAD objects in parameter `Base` will swallow the rays of light.  
 * Select some FreeCAD objects
 * Create Optical Absorber  
+Parameters:  
+- `Transparency`: Percentage of light that passes through the semi transparent absorber
 see also [Statistics](#Statistics)  
   
 
@@ -135,7 +139,11 @@ see also [Statistics](#Statistics)
 The FreeCAD objects in parameter Base will act as lenses  
 * Select some FreeCAD objects 
 * create Optical Lens  
-The Refration Index has to be provided. The parameter Material contains a list with pre defined refraction indexes.  
+Parameters:  
+- `Material`: contains a list with pre defined refraction indexes ans Sellmeier coefficients.
+- `Refration Index`: has to be provided if no material is selected
+- `Sellmeier`: wavelength dependent refraction index coefficents
+- `Transparency`: Percentage of light that passes through the lens. The rest will be mirrored at the outside
 see also [Statistics](#Statistics) 
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights
@@ -146,18 +154,19 @@ Switches on and recalculates all Rays and Beams
 
 ## Statistics
 The optical objects have a parameter `collectStatistics`. If true, some statistics will be collected on every start of simulation:
-- `Hits From Ray/Beam...` This is a counter of how many rays have hit this mirror (read only)
-- `Hit coordinates from ...` records the position of each LIGHT RAY when it hits (read only). This way, it is possible to visualize the image on the absorber in a XY diagram.
+- `Hits From Ray/Beam...`: This is a counter of how many rays have hit this mirror (read only)
+- `Hit coordinates from ...`: records the position of each LIGHT RAY when it hits (read only). This way, it is possible to visualize the image on the absorber in a XY diagram.
+- `Energy from ...`: records the energy level of evey coordinate. Relevant if you are using semi transparent objects.
 
 ### ![plot3D](./icons/scatter3D.svg) 2D/3D Plot
-Select one or more optical objects with property `collectStatistics` = true and display the location rays hitting them on a scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.  
+Select one or more optical objects with parameter `collectStatistics` = true and display the location rays hitting them on a scatter graph. It will ignore objects other than absorbers. To only display hits from select beam sources turn off the power for the beams to be ignored. Toggling beams or absorbers visibility in the document tree does not affect the 3D scatter plot output.  
 If coordinates in all 3 dimensions are present, a 3D plot will be shown, otherwise you will see a 2D plot only.
 
 ![screenshot](./examples/plot3Dexample1.png) ![screenshot](./examples/plot3Dexample2.png)
   
 
 ### ![CSVexport](./icons/ExportCSV.svg) CSV Ray Hits Export
-Creates a spreadsheet with the coordinates of all hits of all beams in all absorbers.  
+Creates a spreadsheet with the coordinates of all hits of all beams in all optical objects with parameter `collectStatistics` = true.  
 Go to the Spreadsheet workbench for doing further data processing or export the data to a file.
 
 ![screenshot](./examples/RayHits.png)
@@ -173,6 +182,9 @@ Go to the Spreadsheet workbench for doing further data processing or export the 
 
 ### ![Example](./optics_workbench_icon.svg) Example - Candle
 ![screenshot](./examples/example_candle.png)
+
+### ![Example](./optics_workbench_icon.svg) Example - Semi transparency
+![screenshot](./examples/example_semi.png)
 
 ## Issues and Troubleshooting
 see [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)
