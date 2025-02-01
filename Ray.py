@@ -379,6 +379,7 @@ class RayWorker:
                     isec_struct.append((optobj, isec_parts))
 
         return isec_struct
+    
 
     def traceRay(self, fp, lineAndEnergy):
         nearest = Vector(INFINITY, INFINITY, INFINITY)
@@ -473,6 +474,13 @@ class RayWorker:
             dRay = neworigin - origin
             ray1 = dRay / dRay.Length
 
+            if hasattr(nearest_obj, 'Transparency'):
+                P_pass = energy * (nearest_obj.Transparency) / 100
+                P_reflect = energy * (100 - nearest_obj.Transparency) / 100
+            else:
+                P_pass = energy
+                P_reflect = 0
+
             normal = self.getNormal(nearest_obj, nearest_part, origin,
                                     neworigin)
             if normal.Length == 0:
@@ -480,12 +488,12 @@ class RayWorker:
                 return ret
 
             if nearest_obj.OpticalType == 'mirror':
-                dNewRays.append((self.mirror(dRay, normal),
-                                energy * (100 - nearest_obj.Transparency) / 100))
+                if nearest_obj.Transparency < 100:
+                    dNewRays.append((self.mirror(dRay, normal), P_reflect))
+                
+            if nearest_obj.OpticalType == 'mirror' or nearest_obj.OpticalType == 'absorber':
                 if nearest_obj.Transparency > 0:
-                    dNewRays.append(
-                        (-dRay, energy * nearest_obj.Transparency / 100))
-                break
+                    dNewRays.append((-dRay, P_pass))
 
             elif nearest_obj.OpticalType == 'lens':
                 doLens = True
@@ -501,10 +509,16 @@ class RayWorker:
                     if len(self.lastRefIdx) > 0:
                         self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
                     # print()
+                    P_pass = energy
                 else:
                     # print("enter " + nearest_obj.Label)
                     newRefIdx = n
                     self.lastRefIdx.append(n)
+
+                    if nearest_obj.Transparency < 100:
+                        root = 1 - oldRefIdx / newRefIdx * oldRefIdx / newRefIdx * normal.cross(ray1) * normal.cross(ray1)
+                        if root > 0: # no total reflection
+                            dNewRays.append((self.mirror(dRay, normal), P_reflect))
 
             elif nearest_obj.OpticalType == 'grating':
                 if len(nearest_obj.Sellmeier) == 6:
@@ -533,7 +547,7 @@ class RayWorker:
                                                  fp.Wavelength, lpm, ray1,
                                                  normal, grating_lines_plane,
                                                  oldRefIdx, oldRefIdx)
-                    dNewRays.append((g, 100))
+                    dNewRays.append((g, P_pass))
 
                 elif grating_type == 2:  # transmission grating with diffraction at first surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
@@ -553,7 +567,7 @@ class RayWorker:
                                                      normal,
                                                      grating_lines_plane,
                                                      oldRefIdx, newRefIdx)
-                        dNewRays.append((g, 100))
+                        dNewRays.append((g, P_pass))
 
                 elif grating_type == 1:  # transmission grating with diffraction at second surface
                     if self.isInsideLens(isec_struct, origin, nearest_obj):
@@ -565,7 +579,7 @@ class RayWorker:
                                                      normal,
                                                      grating_lines_plane,
                                                      oldRefIdx, newRefIdx)
-                        dNewRays.append((g, 100))
+                        dNewRays.append((g, P_pass))
                     else:
                         doLens = True
                         newRefIdx = n
@@ -578,7 +592,7 @@ class RayWorker:
 
         if doLens:
             newray = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-            dNewRays.append((newray, 100))
+            dNewRays.append((newray, P_pass))
 
         newlines = []
         for dNewRay in dNewRays:

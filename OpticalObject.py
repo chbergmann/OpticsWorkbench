@@ -52,7 +52,8 @@ class LensWorker:
                  base = [],
                  RefractionIndex = 1,
                  material = '',
-                 collectStatistics = False):
+                 collectStatistics = False,
+                 transparency = 100):
         self.update = False 
         fp.addProperty('App::PropertyEnumeration', 'OpticalType', 
                        translate('Lens', 'Lens'), '').OpticalType = ['lens'] 
@@ -69,6 +70,8 @@ class LensWorker:
 
         fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
                        translate('Lens', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
+        fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
+                       translate('Mirror', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = transparency
         fp.OpticalType = 'lens'  
         
         material_names = list(getMaterials())  
