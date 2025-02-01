@@ -379,12 +379,157 @@ class RayWorker:
                     isec_struct.append((optobj, isec_parts))
 
         return isec_struct
-    
+
+    def collectStatistics(self, fp, nearest_obj, neworigin, energy):
+        hitname = 'HitsFrom' + fp.Label
+        if not hasattr(nearest_obj, hitname):
+            nearest_obj.addProperty(
+                'App::PropertyQuantity', hitname, 'OpticalObject',
+                translate('Ray', 'Counts the hits from') + ' ' +
+                fp.Label + ' (' + translate('Ray', 'read only') + ')')
+            setattr(nearest_obj, hitname, 1)
+        else:
+            setattr(nearest_obj, hitname,
+                    getattr(nearest_obj, hitname) + 1)
+
+        # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
+        hitcoordsname = 'HitCoordsFrom' + fp.Label
+        if not hasattr(nearest_obj, hitcoordsname):
+            nearest_obj.addProperty(
+                'App::PropertyVectorList', hitcoordsname,
+                'OpticalObject',
+                translate('Ray', 'Hit coordinates from') + ' ' +
+                fp.Label + ' (' + translate('Ray', 'read only') + ')')
+            setattr(nearest_obj, hitcoordsname, [])
+        setattr(nearest_obj, hitcoordsname,
+                getattr(nearest_obj, hitcoordsname) + [neworigin])
+
+        energyname = 'EnergyFrom' + fp.Label
+        if not hasattr(nearest_obj, energyname):
+            nearest_obj.addProperty(
+                'App::PropertyFloatList', energyname,
+                'OpticalObject',
+                translate('Ray', 'Energy from') + ' ' +
+                fp.Label + ' (' + translate('Ray', 'read only') + ')')
+            setattr(nearest_obj, energyname, [])
+        setattr(nearest_obj, energyname,
+                getattr(nearest_obj, energyname) + [energy])
+
+    def traceLens(self, fp, nearest_obj, ray1, normal, isec_struct, origin):
+        if len(self.lastRefIdx) == 0:
+            oldRefIdx = 1
+        else:
+            oldRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
+
+        if len(self.lastRefIdx) < 2:
+            newRefIdx = 1
+        else:
+            newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
+
+        if len(nearest_obj.Sellmeier) == 6:
+            n = OpticalObject.refraction_index_from_sellmeier(
+                fp.Wavelength, nearest_obj.Sellmeier)
+        else:
+            n = nearest_obj.RefractionIndex
+
+        if self.isInsideLens(isec_struct, origin, nearest_obj):
+            # print("leave " + nearest_obj.Label)
+            oldRefIdx = n
+            if len(self.lastRefIdx) > 0:
+                self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
+            # print()
+        else:
+            # print("enter " + nearest_obj.Label)
+            newRefIdx = n
+            self.lastRefIdx.append(n)
+
+        return self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+
+    def traceGrating(self, fp, nearest_obj, ray1, normal, isec_struct, origin):
+        g = None
+        doLens = False
+
+        if len(self.lastRefIdx) == 0:
+            oldRefIdx = 1
+        else:
+            oldRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
+
+        if len(self.lastRefIdx) < 2:
+            newRefIdx = 1
+        else:
+            newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
+
+        if len(nearest_obj.Sellmeier) == 6:
+            n = OpticalObject.refraction_index_from_sellmeier(
+                fp.Wavelength, nearest_obj.Sellmeier)
+        else:
+            n = nearest_obj.RefractionIndex
+
+        lpm = nearest_obj.lpm
+        grating_lines_plane = nearest_obj.GratingLinesPlane
+
+        if nearest_obj.ray_order_override == True:
+            order = nearest_obj.order
+        else:
+            order = fp.Order
+
+        if nearest_obj.GratingType == "reflection":
+            grating_type = 0
+        elif nearest_obj.GratingType == "transmission - diffraction at 2nd surface":
+            grating_type = 1
+        else:
+            grating_type = 2
+
+        if grating_type == 0:  # reflection grating
+            g = self.grating_calculation(grating_type, order,
+                                         fp.Wavelength, lpm, ray1,
+                                         normal, grating_lines_plane,
+                                         oldRefIdx, oldRefIdx)
+
+        elif grating_type == 2:  # transmission grating with diffraction at first surface
+            if self.isInsideLens(isec_struct, origin, nearest_obj):
+                doLens = True
+                # print("leave t-grating 1s " + nearest_obj.Label)
+                oldRefIdx = n
+                # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                if len(self.lastRefIdx) > 0:
+                    self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
+            else:
+                newRefIdx = n
+                self.lastRefIdx.append(n)
+                # print("enter t-grating 1s " + nearest_obj.Label)
+                # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                g = self.grating_calculation(grating_type, order,
+                                             fp.Wavelength, lpm, ray1,
+                                             normal,
+                                             grating_lines_plane,
+                                             oldRefIdx, newRefIdx)
+
+        elif grating_type == 1:  # transmission grating with diffraction at second surface
+            if self.isInsideLens(isec_struct, origin, nearest_obj):
+                # print("leave t-grating 2s " + nearest_obj.Label)
+                oldRefIdx = n
+                # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                g = self.grating_calculation(grating_type, order,
+                                             fp.Wavelength, lpm, ray1,
+                                             normal,
+                                             grating_lines_plane,
+                                             oldRefIdx, newRefIdx)
+            else:
+                doLens = True
+                newRefIdx = n
+                self.lastRefIdx.append(n)
+                # print("enter t-grating 2s " + nearest_obj.Label)
+                # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+
+        if doLens:
+            return self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
+
+        return (g, False)
 
     def traceRay(self, fp, lineAndEnergy):
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_parts = []
-        doLens = False
         line = lineAndEnergy[0]
         energy = lineAndEnergy[1]
 
@@ -406,55 +551,13 @@ class RayWorker:
         if len(nearest_parts) == 0:
             return [line]
 
-        if len(self.lastRefIdx) == 0:
-            oldRefIdx = 1
-        else:
-            oldRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 1]
-
-        if len(self.lastRefIdx) < 2:
-            newRefIdx = 1
-        else:
-            newRefIdx = self.lastRefIdx[len(self.lastRefIdx) - 2]
-
         dNewRays = []  # Collects all new ray directions
         for np in nearest_parts:
             (neworigin, nearest_part, nearest_obj) = np
             shortline = Part.makeLine(origin, neworigin)
 
             if isRelevantOptic(fp, nearest_obj) and nearest_obj.collectStatistics:
-                hitname = 'HitsFrom' + fp.Label
-                if not hasattr(nearest_obj, hitname):
-                    nearest_obj.addProperty(
-                        'App::PropertyQuantity', hitname, 'OpticalObject',
-                        translate('Ray', 'Counts the hits from') + ' ' +
-                        fp.Label + ' (' + translate('Ray', 'read only') + ')')
-                    setattr(nearest_obj, hitname, 1)
-                else:
-                    setattr(nearest_obj, hitname,
-                            getattr(nearest_obj, hitname) + 1)
-
-                # print("A RAY coming from", fp.Label, "hits the receiver at", tuple(neworigin))
-                hitcoordsname = 'HitCoordsFrom' + fp.Label
-                if not hasattr(nearest_obj, hitcoordsname):
-                    nearest_obj.addProperty(
-                        'App::PropertyVectorList', hitcoordsname,
-                        'OpticalObject',
-                        translate('Ray', 'Hit coordinates from') + ' ' +
-                        fp.Label + ' (' + translate('Ray', 'read only') + ')')
-                    setattr(nearest_obj, hitcoordsname, [])
-                setattr(nearest_obj, hitcoordsname,
-                        getattr(nearest_obj, hitcoordsname) + [neworigin])
-                
-                energyname = 'EnergyFrom' + fp.Label
-                if not hasattr(nearest_obj, energyname):
-                    nearest_obj.addProperty(
-                        'App::PropertyFloatList', energyname,
-                        'OpticalObject',
-                        translate('Ray', 'Energy from') + ' ' +
-                        fp.Label + ' (' + translate('Ray', 'read only') + ')')
-                    setattr(nearest_obj, energyname, [])
-                setattr(nearest_obj, energyname,
-                        getattr(nearest_obj, energyname) + [energy])
+                self.collectStatistics(fp, nearest_obj, neworigin, energy)
 
             # if fp.HideFirstPart == False or first == False:
             # When it is the first part that shall be hidden, linearray[-1]
@@ -490,115 +593,33 @@ class RayWorker:
             if nearest_obj.OpticalType == 'mirror':
                 if nearest_obj.Transparency < 100:
                     dNewRays.append((self.mirror(dRay, normal), P_reflect))
-                
+
             if nearest_obj.OpticalType == 'mirror' or nearest_obj.OpticalType == 'absorber':
                 if nearest_obj.Transparency > 0:
                     dNewRays.append((-dRay, P_pass))
 
             elif nearest_obj.OpticalType == 'lens':
-                doLens = True
-                if len(nearest_obj.Sellmeier) == 6:
-                    n = OpticalObject.refraction_index_from_sellmeier(
-                        fp.Wavelength, nearest_obj.Sellmeier)
-                else:
-                    n = nearest_obj.RefractionIndex
-
+                (newray, totalReflection) = self.traceLens(fp, nearest_obj, ray1, normal, isec_struct, origin)
                 if self.isInsideLens(isec_struct, origin, nearest_obj):
-                    # print("leave " + nearest_obj.Label)
-                    oldRefIdx = n
-                    if len(self.lastRefIdx) > 0:
-                        self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
-                    # print()
                     P_pass = energy
-                else:
-                    # print("enter " + nearest_obj.Label)
-                    newRefIdx = n
-                    self.lastRefIdx.append(n)
+                elif nearest_obj.Transparency < 100 and not totalReflection:
+                    dNewRays.append((self.mirror(dRay, normal), P_reflect))
 
-                    if nearest_obj.Transparency < 100:
-                        root = 1 - oldRefIdx / newRefIdx * oldRefIdx / newRefIdx * normal.cross(ray1) * normal.cross(ray1)
-                        if root > 0: # no total reflection
-                            dNewRays.append((self.mirror(dRay, normal), P_reflect))
+                dNewRays.append((newray, P_pass))            
 
             elif nearest_obj.OpticalType == 'grating':
-                if len(nearest_obj.Sellmeier) == 6:
-                    n = OpticalObject.refraction_index_from_sellmeier(
-                        fp.Wavelength, nearest_obj.Sellmeier)
-                else:
-                    n = nearest_obj.RefractionIndex
-
-                lpm = nearest_obj.lpm
-                grating_lines_plane = nearest_obj.GratingLinesPlane
-
-                if nearest_obj.ray_order_override == True:
-                    order = nearest_obj.order
-                else:
-                    order = fp.Order
-
-                if nearest_obj.GratingType == "reflection":
-                    grating_type = 0
-                elif nearest_obj.GratingType == "transmission - diffraction at 2nd surface":
-                    grating_type = 1
-                else:
-                    grating_type = 2
-
-                if grating_type == 0:  # reflection grating
-                    g = self.grating_calculation(grating_type, order,
-                                                 fp.Wavelength, lpm, ray1,
-                                                 normal, grating_lines_plane,
-                                                 oldRefIdx, oldRefIdx)
-                    dNewRays.append((g, P_pass))
-
-                elif grating_type == 2:  # transmission grating with diffraction at first surface
-                    if self.isInsideLens(isec_struct, origin, nearest_obj):
-                        doLens = True
-                        # print("leave t-grating 1s " + nearest_obj.Label)
-                        oldRefIdx = n
-                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        if len(self.lastRefIdx) > 0:
-                            self.lastRefIdx.pop(len(self.lastRefIdx) - 1)
-                    else:
-                        newRefIdx = n
-                        self.lastRefIdx.append(n)
-                        # print("enter t-grating 1s " + nearest_obj.Label)
-                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        g = self.grating_calculation(grating_type, order,
-                                                     fp.Wavelength, lpm, ray1,
-                                                     normal,
-                                                     grating_lines_plane,
-                                                     oldRefIdx, newRefIdx)
-                        dNewRays.append((g, P_pass))
-
-                elif grating_type == 1:  # transmission grating with diffraction at second surface
-                    if self.isInsideLens(isec_struct, origin, nearest_obj):
-                        # print("leave t-grating 2s " + nearest_obj.Label)
-                        oldRefIdx = n
-                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
-                        g = self.grating_calculation(grating_type, order,
-                                                     fp.Wavelength, lpm, ray1,
-                                                     normal,
-                                                     grating_lines_plane,
-                                                     oldRefIdx, newRefIdx)
-                        dNewRays.append((g, P_pass))
-                    else:
-                        doLens = True
-                        newRefIdx = n
-                        self.lastRefIdx.append(n)
-                        # print("enter t-grating 2s " + nearest_obj.Label)
-                        # print("old RefIdx: ", oldRefIdx, "new RefIdx: ", newRefIdx)
+                (newray, totalReflection) = self.traceGrating(
+                    fp, nearest_obj, ray1, normal, isec_struct, origin)
+                dNewRays.append((newray, P_pass))
 
             else:
                 return ret
 
-        if doLens:
-            newray = self.snellsLaw(ray1, oldRefIdx, newRefIdx, normal)
-            dNewRays.append((newray, P_pass))
-
         newlines = []
         for dNewRay in dNewRays:
             nl = Part.makeLine(
-                    neworigin,
-                    neworigin - dNewRay[0] * fp.MaxRayLength / neworigin.Length)
+                neworigin,
+                neworigin - dNewRay[0] * fp.MaxRayLength / neworigin.Length)
             newlines.append((nl, dNewRay[1]))
 
         for line in newlines:
@@ -635,9 +656,12 @@ class RayWorker:
     def snellsLaw(self, ray, n1, n2, normal):
         root = 1 - n1 / n2 * n1 / n2 * normal.cross(ray) * normal.cross(ray)
         if root < 0:  # total reflection
-            return self.mirror(ray, normal)
-        return -n1 / n2 * normal.cross(
+            return (self.mirror(ray, normal), True)
+
+        refractedRay = -n1 / n2 * normal.cross(
             (-normal).cross(ray)) - normal * math.sqrt(root)
+
+        return (refractedRay, False)
 
     def grating_calculation(self, grating_type, order, wavelength, lpm, ray,
                             normal, g_g_p_vector, n1, n2):  # from Ludwig 1970
