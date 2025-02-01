@@ -61,7 +61,7 @@ def make_candle():
     Revolve.ViewObject.PointColorArray = [(1.00, 1.00, 1.00, 1.00)]
 
     OpticsWorkbench.makeAbsorber([Candle1, Candle2])
-    OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=10, baseShape=Revolve)
+    OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=10, baseShape=Revolve, maxRayLength=100)
     
     doc.recompute()
 
@@ -71,7 +71,7 @@ class ExampleCandle():
 
     def Activated(self):
         make_candle()
-        Gui.activeDocument().activeView().viewTop()
+        Gui.activeDocument().activeView().viewIsometric()
 
     def IsActive(self):
         return(True)

@@ -68,10 +68,10 @@ class LensWorker:
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
             translate('Lens', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
 
-        fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',   
+        fp.addProperty('App::PropertyBool',  'collectStatistics',   'Lens',   
                        translate('Lens', 'Count number and coordinates of ray hits')).collectStatistics = collectStatistics
-        fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',   
-                       translate('Mirror', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = transparency
+        fp.addProperty('App::PropertyPercent',  'Transparency',   'Lens',   
+                       translate('Lens', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = transparency
         fp.OpticalType = 'lens'  
         
         material_names = list(getMaterials())  

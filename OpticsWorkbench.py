@@ -138,29 +138,29 @@ def allOff():
             
     recompute()
 
-def makeMirror(base = [], collectStatistics = False):
+def makeMirror(base = [], collectStatistics = False, transparency=0):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Mirror')
-    OpticalObject.OpticalObjectWorker(fp, base, type = 'mirror', collectStatistics = collectStatistics)
+    OpticalObject.OpticalObjectWorker(fp, base, type = 'mirror', collectStatistics = collectStatistics, transparency = transparency)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp
 
-def makeAbsorber(base = [], collectStatistics = False):
+def makeAbsorber(base = [], collectStatistics = False, transparency=0):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical light absorbers.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Absorber')
-    OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber', collectStatistics = collectStatistics) 
+    OpticalObject.OpticalObjectWorker(fp, base, type = 'absorber', collectStatistics = collectStatistics, transparency = transparency) 
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp
 
-def makeLens(base = [], RefractionIndex = 0, material = 'Quartz', collectStatistics = False):
+def makeLens(base = [], RefractionIndex = 0, material = 'Quartz', collectStatistics = False, transparency=100):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical lenses.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Lens')
-    OpticalObject.LensWorker(fp, base, RefractionIndex, material, collectStatistics)
+    OpticalObject.LensWorker(fp, base, RefractionIndex, material, collectStatistics, transparency = transparency)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()
     return fp

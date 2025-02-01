@@ -64,6 +64,8 @@ class Example3D():
 
     def Activated(self):
         make_Test3D()
+        Gui.activeDocument().activeView().viewDimetric()
+        Gui.SendMsgToActiveView("ViewFit")
 
     def IsActive(self):
         return(True)

@@ -8,6 +8,7 @@ import os
 from PySide.QtCore import QT_TRANSLATE_NOOP
 
 _icondir_ = os.path.join(os.path.dirname(__file__), '..')
+_exname_ = QT_TRANSLATE_NOOP('Example2D', 'Example - 2D')
 
 def createSketch_Sketch_Mirror1(doc):
     Sketch_Mirror1 = doc.addObject('Sketcher::SketchObject', 'Sketch_Mirror1')
@@ -31,9 +32,9 @@ def createSketch_Sketch_Mirror1(doc):
 
 def createSketch_Sketch_Box(doc):
     Sketch_Box = doc.addObject('Sketcher::SketchObject', 'Sketch_Box')
-    Sketch_Box.addGeometry(Part.LineSegment(Vector (-0.14878900000000073, 11.406045000000002, 0.0), Vector (40.936604, 11.406045000000002, 0.0)))
-    Sketch_Box.addGeometry(Part.LineSegment(Vector (40.936604, 11.406045000000002, 0.0), Vector (40.936604, -21.699192, 0.0)))
-    Sketch_Box.addGeometry(Part.LineSegment(Vector (40.936604, -21.699192, 0.0), Vector (-0.14878900000000073, -21.699192, 0.0)))
+    Sketch_Box.addGeometry(Part.LineSegment(Vector (-0.14878900000000073, 11.406045000000002, 0.0), Vector (40.0, 11.406045000000002, 0.0)))
+    Sketch_Box.addGeometry(Part.LineSegment(Vector (40.0, 11.406045000000002, 0.0), Vector (40.0, -21.699192, 0.0)))
+    Sketch_Box.addGeometry(Part.LineSegment(Vector (40.0, -21.699192, 0.0), Vector (-0.14878900000000073, -21.699192, 0.0)))
     Sketch_Box.addGeometry(Part.LineSegment(Vector (-0.14878900000000073, -21.699192, 0.0), Vector (-0.14878900000000073, 11.406045000000002, 0.0)))
     Sketch_Box.addConstraint(Sketcher.Constraint('Coincident', 0, 2, 1, 1))
     Sketch_Box.addConstraint(Sketcher.Constraint('Coincident', 1, 2, 2, 1))
@@ -80,17 +81,19 @@ def createSketch_Sketch_Prism(doc):
     return Sketch_Prism
 
 def make_optics():
-    App.newDocument("Example 2D")
+    App.newDocument()
     doc = App.activeDocument()
 
     Sketch_Mirror1 = createSketch_Sketch_Mirror1(doc)
-    Sketch_Box = createSketch_Sketch_Box(doc)
+    Sketch_Box1 = createSketch_Sketch_Box(doc)
+    Sketch_Box2 = createSketch_Sketch_Box(doc)
+    Sketch_Box2.Placement.Base.x += 41
     Sketch_Mirror2 = createSketch_Sketch_Mirror2(doc)
     Sketch_Lens = createSketch_Sketch_Lens(doc)
     Sketch_Prism = createSketch_Sketch_Prism(doc)
 
     OpticsWorkbench.makeMirror([Sketch_Mirror1, Sketch_Mirror2])
-    OpticsWorkbench.makeAbsorber([Sketch_Box], True)
+    OpticsWorkbench.makeAbsorber([Sketch_Box1, Sketch_Box2], True)
     OpticsWorkbench.makeLens([Sketch_Lens, Sketch_Prism], material='NBK7/Window glass')
     
     doc.recompute()
@@ -104,7 +107,8 @@ class Example1():
 
     def Activated(self):
         make_optics()
-        Gui.activeDocument().activeView().viewTop()
+        Gui.runCommand('Std_OrthographicCamera',1)
+        Gui.SendMsgToActiveView("ViewFit")
 
     def IsActive(self):
         return(True)
@@ -113,7 +117,7 @@ class Example1():
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         return {'Pixmap'  : os.path.join(_icondir_, 'optics_workbench_icon.svg'),
                 'Accel' : "", # a default shortcut (optional)
-                'MenuText': QT_TRANSLATE_NOOP('Example2D', 'Example - 2D'),
+                'MenuText': _exname_,
                 'ToolTip' : '' }
 
 Gui.addCommand('Example2D', Example1())
