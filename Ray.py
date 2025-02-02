@@ -596,6 +596,9 @@ class RayWorker:
 
             if nearest_obj.OpticalType == 'mirror' or nearest_obj.OpticalType == 'absorber':
                 if nearest_obj.Transparency > 0:
+                    if self.isInsideSolid(origin, nearest_obj):
+                        P_pass = energy
+                        
                     dNewRays.append((-dRay, P_pass))
 
             elif nearest_obj.OpticalType == 'lens':
@@ -735,6 +738,14 @@ class RayWorker:
 
         return nvec
 
+    def isInsideSolid(self, origin, lens):
+        for b in lens.Base:
+            for sol in b.Shape.Solids:
+                if sol.isInside(origin, EPSILON, True):
+                    return True
+                
+        return False
+                
     def isInsideLens(self, isec_struct, origin, lens):
         nr_solids = 0
         for b in lens.Base:
@@ -745,7 +756,7 @@ class RayWorker:
 
         if nr_solids == 0:
             for isec in isec_struct:
-                if lens == isec[0]:
+                if lens == isec[0]:                    
                     return len(isec[1]) % 2 == 1
 
         return False

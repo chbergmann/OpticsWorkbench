@@ -1,4 +1,4 @@
-from FreeCAD import Vector
+from FreeCAD import Vector, Placement, Rotation
 import Sketcher
 import Part
 import FreeCAD as App
@@ -15,15 +15,6 @@ def createSketch_Sketch(doc):
     geo0 = Sketch.addGeometry(Part.LineSegment(Vector (17.57187, 4.200229, 0.0), Vector (3.394269999999999, -5.662041000000004, 0.0)))
     Sketch.AttacherEngine = 'Engine Plane'
     return Sketch
-
-def createSketch_Sketch001(doc):
-    Sketch001 = doc.addObject('Sketcher::SketchObject', 'Sketch001')
-    geo0 = Sketch001.addGeometry(Part.LineSegment(Vector (27.457035, 10.623341, 0.0), Vector (27.457035, -11.596225999999998, 0.0)))
-    Sketch001.addConstraint(Sketcher.Constraint('Vertical', geo0))
-    Sketch001.AttacherEngine = 'Engine Plane'
-    Sketch001.ViewObject.LineColor = (0.501960813999176, 0.501960813999176, 0.501960813999176, 0.0)
-    Sketch001.ViewObject.LineColorArray = [(0.501960813999176, 0.501960813999176, 0.501960813999176, 0.0)]
-    return Sketch001
 
 def createSketch_Sketch002(doc):
     Sketch002 = doc.addObject('Sketcher::SketchObject', 'Sketch002')
@@ -62,8 +53,12 @@ def make_semi():
     Mirror_semi40 = OpticsWorkbench.makeMirror([Sketch], True, 40)
     Mirror_semi40.Label = "Mirror_semi40"
 
-    Sketch001 = createSketch_Sketch001(doc)
-    Absorber_semi50 = OpticsWorkbench.makeAbsorber([Sketch001], True, 50)
+    Cube = doc.addObject('Part::Box', 'Cube')
+    Cube.Height = 2.0
+    Cube.Length = 2.0
+    Cube.Placement = Placement(Vector(27.0, -5.0, -1.0), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cube.ViewObject.Transparency = 50
+    Absorber_semi50 = OpticsWorkbench.makeAbsorber([Cube], True, 50)
     Absorber_semi50.Label = "Absorber_semi50"
 
     Sketch002 = createSketch_Sketch002(doc)
