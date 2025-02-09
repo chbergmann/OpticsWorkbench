@@ -622,7 +622,7 @@ class RayWorker:
         for dNewRay in dNewRays:
             nl = Part.makeLine(
                 neworigin,
-                neworigin - dNewRay[0] * fp.MaxRayLength / neworigin.Length)
+                neworigin - dNewRay[0] * fp.MaxRayLength / dNewRay[0].Length)
             newlines.append((nl, dNewRay[1]))
 
         for line in newlines:
