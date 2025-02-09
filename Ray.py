@@ -338,7 +338,8 @@ class RayWorker:
                 dir = PointVec(optobj_line.Vertexes[1]) - origin
                 isec_parts = []
                 for obj in optobj.Base:
-                    if obj.Shape.BoundBox.intersect(origin, dir):
+                    obj_boundbox = obj.Shape.BoundBox
+                    if obj_boundbox.isValid() and obj_boundbox.intersect(origin, dir):
                         if len(obj.Shape.Solids) == 0 and len(
                                 obj.Shape.Shells) == 0:
                             for edge in obj.Shape.Edges:
