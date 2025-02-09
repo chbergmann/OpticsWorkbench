@@ -28,7 +28,7 @@ class OpticsWorkbench (Workbench):
         import Ray
         import OpticalObject
         import Plot
-        from examples import example1, example3D, example_dispersion, example_candle, example_semi
+        from examples import example1, example3D, example_dispersion, example_candle, example_semi, example_hierarchy2D, example_hierarchy3D
         from PySide.QtCore import QT_TRANSLATE_NOOP
         
         rays = [QT_TRANSLATE_NOOP('Workbench', 'Ray (monochrome)'),
@@ -48,7 +48,9 @@ class OpticsWorkbench (Workbench):
             QT_TRANSLATE_NOOP('Workbench', 'Example3D'),
             QT_TRANSLATE_NOOP('Workbench', 'ExampleDispersion'), 
             QT_TRANSLATE_NOOP('Workbench', 'ExampleCandle'), 
-            QT_TRANSLATE_NOOP('Workbench', 'ExampleSemi')]
+            QT_TRANSLATE_NOOP('Workbench', 'ExampleSemi'), 
+            QT_TRANSLATE_NOOP('Workbench', 'ExampleHierarchy2D'), 
+            QT_TRANSLATE_NOOP('Workbench', 'ExampleHierarchy3D')]
         self.list = rays + separator + optics + separator + actions + separator + analysis #A list of command names created in the line above
         self.menu = self.list + separator + examples
         
