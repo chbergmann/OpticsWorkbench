@@ -238,6 +238,12 @@ class RayWorker:
         if sunObj:
             linearray.append(sunObj)
 
+        # transform global ray coordinate to local
+        if fp.Parents:
+            ray_placement_matrix = fp.getGlobalPlacement().inverse().Matrix
+            ray_placement_matrix *= fp.Placement.Matrix
+            for line in linearray:
+                line.transformShape(ray_placement_matrix)
         fp.Shape = Part.makeCompound(linearray)
         if fp.Power == False:
             fp.ViewObject.LineColor = (0.5, 0.5, 0.0)
@@ -290,7 +296,8 @@ class RayWorker:
         return posdirarray
 
     def makeInitialRay(self, fp, posdirarray):
-        pl = fp.Placement
+        # initialize ray in global coordinate
+        pl = fp.getGlobalPlacement()
         linearray = []
         for (pos, dir) in posdirarray:
             ppos = pos + pl.Base
@@ -322,11 +329,13 @@ class RayWorker:
     def getIntersections(self, fp, line):
         '''returns [(OpticalObject, [(edge/face, intersection point)] )]'''
         isec_struct = []
-        origin = PointVec(line.Vertexes[0])
-
-        dir = PointVec(line.Vertexes[1]) - origin
         for optobj in activeDocument().Objects:
             if isRelevantOptic(fp, optobj):
+                # transform ray to optobj coordinate to prevent transforming all shapes to global coordinate
+                optobj_placement_matrix = optobj.getGlobalPlacement().Matrix
+                optobj_line = line.transformed(optobj_placement_matrix.inverse())
+                origin = PointVec(optobj_line.Vertexes[0])
+                dir = PointVec(optobj_line.Vertexes[1]) - origin
                 isec_parts = []
                 for obj in optobj.Base:
                     if obj.Shape.BoundBox.intersect(origin, dir):
@@ -346,7 +355,7 @@ class RayWorker:
                                 normal = dir.cross(edgedir)
                                 if normal.Length > EPSILON:
                                     plane = Part.Plane(origin, normal)
-                                    isec = line.Curve.intersect2d(
+                                    isec = optobj_line.Curve.intersect2d(
                                         edge.Curve, plane)
                                     if isec:
                                         for p in isec:
@@ -356,12 +365,15 @@ class RayWorker:
                                             if dist.Length > EPSILON and vert.distToShape(
                                                     edge
                                             )[0] < EPSILON and vert.distToShape(
-                                                    line)[0] < EPSILON:
+                                                    optobj_line)[0] < EPSILON:
+                                                # transform edge and ray back to global coordinate
+                                                p2.transform(optobj_placement_matrix)
+                                                edge.transform(optobj_placement_matrix)
                                                 isec_parts.append((edge, p2))
 
                         for face in obj.Shape.Faces:
                             if face.BoundBox.intersect(origin, dir):
-                                isec = line.Curve.intersect(face.Surface)
+                                isec = optobj_line.Curve.intersect(face.Surface)
                                 if isec:
                                     for p in isec[0]:
                                         dist = Vector(p.X - origin.x,
@@ -371,7 +383,10 @@ class RayWorker:
                                         if dist.Length > EPSILON and vert.distToShape(
                                                 face
                                         )[0] < EPSILON and vert.distToShape(
-                                                line)[0] < EPSILON:
+                                                optobj_line)[0] < EPSILON:
+                                            # transform face and ray back to global coordinate
+                                            p.transform(optobj_placement_matrix)
+                                            face.transformShape(optobj_placement_matrix)
                                             isec_parts.append(
                                                 (face, PointVec(p)))
 
