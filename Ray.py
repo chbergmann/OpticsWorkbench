@@ -756,6 +756,8 @@ class RayWorker:
         return nvec
 
     def isInsideSolid(self, origin, lens):
+        lens_placement_matrix = lens.getGlobalPlacement().Matrix
+        origin = lens_placement_matrix.inverse().multVec(origin)
         for b in lens.Base:
             for sol in b.Shape.Solids:
                 if sol.isInside(origin, EPSILON, True):
@@ -764,6 +766,8 @@ class RayWorker:
         return False
                 
     def isInsideLens(self, isec_struct, origin, lens):
+        lens_placement_matrix = lens.getGlobalPlacement().Matrix
+        origin = lens_placement_matrix.inverse().multVec(origin)
         nr_solids = 0
         for b in lens.Base:
             for sol in b.Shape.Solids:
