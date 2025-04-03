@@ -561,7 +561,7 @@ class RayWorker:
                     if abs(dist.Length - nearest.Length) < EPSILON:
                         if isec[0].OpticalType == 'absorber':
                             nearest_parts = [np]
-                        elif len(nearest_parts) == 0 or nearest_parts[0].OpticalType == 'absorber':
+                        elif len(nearest_parts) == 0 or nearest_parts[0][2].OpticalType == 'absorber':
                             nearest_parts.append(np)
                     else:
                         nearest_parts = [np]
