@@ -7,10 +7,10 @@ __doc__ = 'Optics Workbench workbench'
 __version__ = '0.0.1'
 
 
-class OpticsWorkbench (Workbench):
+class OpticsWorkbenchPRX (Workbench):
     def __init__(self):
         import os
-        import OpticsWorkbench
+        import OpticsWorkbenchPRX as OpticsWorkbench
         import FreeCADGui
 
         translate = FreeCAD.Qt.translate
@@ -18,7 +18,7 @@ class OpticsWorkbench (Workbench):
         FreeCADGui.addLanguagePath(translations_path)
         FreeCADGui.updateLocale()
         
-        self.__class__.MenuText = 'Optics'
+        self.__class__.MenuText = 'OpticsPRX'
         self.__class__.ToolTip = translate("Workbench", 'Ray Tracing Simulation')
         self.__class__.Icon = os.path.join(OpticsWorkbench.get_module_path(), 'optics_workbench_icon.svg')
 
@@ -36,6 +36,7 @@ class OpticsWorkbench (Workbench):
             QT_TRANSLATE_NOOP('Workbench', 'Beam'),
             QT_TRANSLATE_NOOP('Workbench', '2D Radial Beam'),
             QT_TRANSLATE_NOOP('Workbench', 'Spherical Beam')]
+        custom = [QT_TRANSLATE_NOOP('Workbench', 'Grid Focal Beam')]
         optics = [QT_TRANSLATE_NOOP('Workbench', 'Emitter'),
             QT_TRANSLATE_NOOP('Workbench', 'Mirror'), 
             QT_TRANSLATE_NOOP('Workbench', 'Grating'), 
@@ -51,7 +52,7 @@ class OpticsWorkbench (Workbench):
             QT_TRANSLATE_NOOP('Workbench', 'ExampleSemi'), 
             QT_TRANSLATE_NOOP('Workbench', 'ExampleHierarchy2D'), 
             QT_TRANSLATE_NOOP('Workbench', 'ExampleHierarchy3D')]
-        self.list = rays + separator + optics + separator + actions + separator + analysis #A list of command names created in the line above
+        self.list = rays + separator + custom + separator + optics + separator + actions + separator + analysis
         self.menu = self.list + separator + examples
         
         self.appendToolbar(self.__class__.MenuText, self.list) # creates a new toolbar with your commands
@@ -75,4 +76,4 @@ class OpticsWorkbench (Workbench):
         return 'Gui::PythonWorkbench'
 
 
-Gui.addWorkbench(OpticsWorkbench())
+Gui.addWorkbench(OpticsWorkbenchPRX())

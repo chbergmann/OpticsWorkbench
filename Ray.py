@@ -99,6 +99,10 @@ class RayWorker:
             translate(
                 'Ray',
                 'FreeCAD object used as optical emitter')).Base = baseShape
+        fp.addProperty(
+            'App::PropertyVector', 'FocalPoint', 'Ray',
+            translate('Ray', 'Optional focal point for directed beams')
+        ).FocalPoint = Vector(0, 0, 100)
 
         fp.Proxy = self
         self.lastRefIdx = []
@@ -206,29 +210,43 @@ class RayWorker:
             # print("Number of rays created = ",Ncount)
 
         else:
-            for row in range(0, int(fp.BeamNrRows)):
-                for n in range(0, int(fp.BeamNrColumns)):
-                    if fp.Spherical == False:
-                        pos = pl.Rotation.multVec(
-                            Vector(0, fp.BeamDistance * n,
-                                   fp.BeamDistance * row))
-                        dir = Vector(1, 0, 0)
-                    else:
-                        r = Rotation()
-                        r.Axis = Vector(0, 0, 1)
-                        r.Angle = n * 2 * math.pi / fp.BeamNrColumns * coneAngle / 360
-                        pos = Vector(0, 0, 0)
-                        dir1 = r.multVec(Vector(1, 0, 0))
-
-                        if row % 2 == 0:
-                            r.Axis = Vector(0, 1, 0)
+            if hasattr(fp, "FocalPoint") and not fp.Spherical:
+                for row in range(fp.BeamNrRows):
+                    for col in range(fp.BeamNrColumns):
+                        pos = Vector(
+                            fp.BeamDistance * (col - (fp.BeamNrColumns - 1) / 2),
+                            fp.BeamDistance * (row - (fp.BeamNrRows - 1) / 2),
+                            0
+                        )
+                        # Transform position relative to placement
+                        pos = pl.Rotation.multVec(pos)
+                        dir = (fp.FocalPoint - pos).normalize()
+                        posdirarray.append((pos, dir))
+            else:
+                for row in range(0, int(fp.BeamNrRows)):
+                    for n in range(0, int(fp.BeamNrColumns)):
+                        if fp.Spherical == False:
+                            pos = pl.Rotation.multVec(
+                                Vector(0, fp.BeamDistance * n,
+                                       fp.BeamDistance * row))
+                            dir = Vector(1, 0, 0)
                         else:
-                            r.Axis = Vector(1, 0, 0)
+                            r = Rotation()
+                            r.Axis = Vector(0, 0, 1)
+                            r.Angle = n * 2 * math.pi / fp.BeamNrColumns * coneAngle / 360
+                            pos = Vector(0, 0, 0)
+                            dir1 = r.multVec(Vector(1, 0, 0))
 
-                        r.Angle = row * math.pi / fp.BeamNrRows
-                        dir = r.multVec(dir1)
+                            if row % 2 == 0:
+                                r.Axis = Vector(0, 1, 0)
+                            else:
+                                r.Axis = Vector(1, 0, 0)
 
-                    posdirarray.append((pos, dir))
+                            r.Angle = row * math.pi / fp.BeamNrRows
+                            dir = r.multVec(dir1)
+
+                        posdirarray.append((pos, dir))
+            
 
         linearray = self.makeInitialRay(fp, posdirarray)
 
@@ -822,6 +840,8 @@ class RayViewProvider:
             return os.path.join(_icondir_, 'ray.svg')
         elif self.Object.Spherical:
             return os.path.join(_icondir_, 'sun.svg')
+        elif hasattr(self.Object, 'FocalPoint'):
+            return os.path.join(_icondir_, 'raygridfocal.svg')
         else:
             return os.path.join(_icondir_, 'rayarray.svg')
 
@@ -1078,6 +1098,24 @@ class AllOff():
                                          'Switch off all rays and beams')
         }
 
+class GridToFocalBeam():
+    '''A grid of rays converging toward a focal point'''
+
+    def Activated(self):
+        Gui.doCommand('import OpticsWorkbench')
+        Gui.doCommand('r = OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=3, beamDistance=1.0)')
+        Gui.doCommand('r.FocalPoint = FreeCAD.Vector(0, 0, 100)')
+
+    def IsActive(self):
+        return activeDocument() is not None
+
+    def GetResources(self):
+        return {
+            'Pixmap': os.path.join(_icondir_, 'raygridfocal.svg'),  # You can add your own icon
+            'Accel': '',
+            'MenuText': QT_TRANSLATE_NOOP('Grid Focal Beam', 'Grid Focal Beam'),
+            'ToolTip': QT_TRANSLATE_NOOP('Grid Focal Beam', 'Grid of rays all directed toward a focal point')
+        }
 
 Gui.addCommand('Ray (monochrome)', Ray())
 Gui.addCommand('Ray (sun light)', RaySun())
@@ -1086,3 +1124,4 @@ Gui.addCommand('2D Radial Beam', RadialBeam2D())
 Gui.addCommand('Spherical Beam', SphericalBeam())
 Gui.addCommand('Start', RedrawAll())
 Gui.addCommand('Off', AllOff())
+Gui.addCommand('Grid Focal Beam', GridToFocalBeam())
