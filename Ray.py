@@ -129,6 +129,10 @@ class RayWorker:
                     'Shape of ray bundle')
             ).RayBundleType = [ 'parallel', 'spherical', 'focal' ]
 
+        # backwards compatiblity
+        if hasattr(fp, 'Spherical') and fp.Spherical:
+            fp.RayBundleType = 'spherical'
+
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
         self.redrawRay(fp)
