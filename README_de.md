@@ -41,7 +41,7 @@ Nach der Installation der Optics Workbench muss FreeCAD neu gestartet werden.
 Ein einzelner Lichtstrahl für die optische Simulation.  
 Parameter:
 - `Power`: An oder aus  
-- `Spherical`: Punktförmige Lichtquelle
+- `RayBundleType`: `parallel`: alle Lichtstrahlen gehen in die selbe Richtng, `spherical`: Punktförmige Lichtquelle, `focal`: alle Lichtstrahlen schneiden sich in FocalPoint
 - `BeamNrColumns`: Anzahl Lichtstrahlen pro Spalte
 - `BeamNrRows`: Anzahl Lichtstrahlen pro Reihe
 - `BeamDistance`: Abstand zwischen Strahlen
@@ -51,6 +51,7 @@ Parameter:
 - `MaxNrReflections`: Maximale Anzahl von Reflexionen, um Endlosschleifen in geschlossenen Spiegeln zu vermeiden
 - `Ignored Optical Elements`: Liste von Ojekten, die ignoriert werden sollen
 - `Base`: Falls vorhanden, wird ein Emitter auf Basis dieses Elements generiert
+- `FocalPoint`: mit `RayBundleType=focal`: schneiden sich alle Lichtstrahlen in diesem Punkt
 
 ### ![SunRayIcon](./icons/raysun.svg) Sonnenstrahl
 Ein Bündel sich überlappender Lichtstrahlen mit verschiedenen Wellenlängen im sichtbaren Bereich.  
@@ -69,6 +70,11 @@ Parameter:
 - `BeamNrRows` muss 1 sein
 - `Spherical`: Punktförmige Lichtquelle, muss True sein
 - `Cone Angle`: Lichtkegel Öffnungswinkel
+
+### ![Grid Focal Beam](./icons/raygridfocal.svg) Fokussierte Lichtquelle
+Alle Strahlen des Bündels schneiden ich in FocalPoint 
+Parameters:  
+* Ray. `BeamNrColumns` and `BeamNrRows` must be > 1 `RayBundleType=focal` to get a spherical beam
 
 ### ![Spherical Beam](./icons/sun3D.svg) Optischer Emitter
 Punktförmige Lichtquelle im 3D Raum.  

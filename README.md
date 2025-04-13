@@ -43,7 +43,7 @@ Select a material in the Lens properties or provide a refraction index.
 A single ray for raytracing  
 Parameters:
 - `Power`: On or Off  
-- `Spherical`: `False=Beam` in one direction, `True=Radial` or `spherical` rays
+- `RayBundleType`: `parallel` line or rectangle of beams into one direction, `spherical` all rays start at the same point, `focal` All rays are passing a focal point
 - `BeamNrColumns`: Number of rays in a beam per column
 - `BeamNrRows`: Number of rays in a beam per row
 - `BeamDistance`: Distance between two beams
@@ -52,6 +52,7 @@ Parameters:
 - `MaxNrReflections`: Maximum number of reflections. This prevents endless loops if the ray is inside a mirror box.
 - `Ignored Optical Elements`: List of optical objects that will be ignored by the ray/beam.
 - `Base`: If a shape is selected here, an optical emitter will be created.
+- `FocalPoint`: set RayBundleType to `focal` to direct all rays to this point
 
 ### ![SunRayIcon](./icons/raysun.svg) Ray (sun light)
 A number of rays with different wavelengths of visible light.  
@@ -60,17 +61,22 @@ The rays overlap. If they hit a lens, they will be dispersed. See [Example - Dis
 ### ![2D Beam](./icons/rayarray.svg) 2D Beam
 A row of multiple rays for raytracing  
 Parameters: 
-* Ray. `BeamNrColumns` must be > 1 to get a beam
+* Ray. `BeamNrColumns` must be > 1 and `RayBundleType=parallel` to get a beam
 
 ### ![Radial Beam](./icons/sun.svg) 2D Radial Beam
 Rays coming from one point going to all directions in a 2D plane  
 Parameters: 
-* Ray. `BeamNrColumns` must be > 1 and `BeamNrRows=1` and `Spherical=True` to get a radial beam
+* Ray. `BeamNrColumns` must be > 1 and `BeamNrRows=1` and `RayBundleType=spherical` to get a radial beam
 
 ### ![Spherical Beam](./icons/sun3D.svg) Spherical Beam
 Rays coming from one point going to all directions  
 Parameters:  
-* Ray. `BeamNrColumns` and `BeamNrRows` must be > 1 `Spherical=True` to get a spherical beam
+* Ray. `BeamNrColumns` and `BeamNrRows` must be > 1 `RayBundleType=spherical` to get a spherical beam
+
+### ![Grid Focal Beam](./icons/raygridfocal.svg) Grid Focal Beam
+Rays coming from a grid going to a focal point  
+Parameters:  
+* Ray. `BeamNrColumns` and `BeamNrRows` must be > 1 `RayBundleType=focal` to get a spherical beam
 
 ### ![Optical Emitter](./icons/emitter.svg) Optical Emitter
 The FreeCAD objects in parameter Base will act as emitters  
