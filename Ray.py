@@ -45,13 +45,10 @@ class RayWorker:
             order=0,
             coneAngle=360,
             ignoredElements=[],
-            baseShape=None):
-        fp.addProperty(
-            'App::PropertyBool', 'Spherical', 'Ray',
-            translate(
-                'Ray',
-                'False=Beam in one direction, True=Radial or spherical rays')
-        ).Spherical = spherical
+            baseShape=None,
+            focalPoint=Vector(0, 0, 100),
+            rayBundleType=''):
+
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',
                        translate('Ray', 'On or Off')).Power = power
         fp.addProperty(
@@ -94,19 +91,43 @@ class RayWorker:
             'App::PropertyLinkList', 'IgnoredOpticalElements', 'Ray',
             translate('Ray', 'Optical Objects to ignore in raytracing')
         ).IgnoredOpticalElements = ignoredElements
-        fp.addProperty(
-            'App::PropertyLinkSub', 'Base', 'Ray',
-            translate(
-                'Ray',
-                'FreeCAD object used as optical emitter')).Base = baseShape
-        fp.addProperty(
-            'App::PropertyVector', 'FocalPoint', 'Ray',
-            translate('Ray', 'Optional focal point for directed beams')
-        ).FocalPoint = Vector(0, 0, 100)
+
+        self.addNewProperties(fp)
+        fp.Base = baseShape
+        fp.FocalPoint = focalPoint    
+
+        if rayBundleType == '':
+            if spherical:
+                fp.RayBundleType = 'spherical'
+            else:
+                fp.RayBundleType = 'parallel'
+        else:
+            fp.RayBundleType = rayBundleType
 
         fp.Proxy = self
         self.lastRefIdx = []
         self.iter = 0
+
+    def addNewProperties(self, fp):
+        if not hasattr(fp, 'Base'):
+            fp.addProperty(
+                'App::PropertyLinkSub', 'Base', 'Ray',
+                translate('Ray',
+                          'FreeCAD object used as optical emitter'))
+            
+        if not hasattr(fp, 'FocalPoint'):
+            fp.addProperty(
+                'App::PropertyVector', 'FocalPoint', 'Ray',
+                translate('Ray', 'Optional focal point for directed beams')
+            ).FocalPoint = Vector(0, 0, 100)
+                    
+        if not hasattr(fp, 'RayBundleType'):
+            fp.addProperty(
+                'App::PropertyEnumeration', 'RayBundleType', 'Ray',
+                translate(
+                    'Ray',
+                    'Shape of ray bundle')
+            ).RayBundleType = [ 'parallel', 'spherical', 'focal' ]
 
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
@@ -114,11 +135,8 @@ class RayWorker:
 
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        if not hasattr(fp, 'Base'):
-            fp.addProperty(
-                'App::PropertyLinkSub', 'Base', 'Ray',
-                translate('Ray',
-                          'FreeCAD object used as optical emitter')).Base
+        # for backwards compatiblity
+        self.addNewProperties(fp)
 
     def redrawRay(self, fp):
         hitname = 'HitsFrom' + fp.Label
@@ -162,7 +180,7 @@ class RayWorker:
                                                   fp.BeamNrColumns)
 
         # if a spherical 3d ray is requested create an evenly spaced ray bundle in 3d
-        elif fp.Spherical == True and int(fp.BeamNrRows) > 1:
+        elif fp.RayBundleType == 'spherical':
             # make spherical beam pattern that has equally spaced rays.
             # code based from a paper by Markus Deserno from the Max-Plank_Institut fur PolymerForschung,
             # link https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
@@ -210,7 +228,7 @@ class RayWorker:
             # print("Number of rays created = ",Ncount)
 
         else:
-            if hasattr(fp, "FocalPoint") and not fp.Spherical:
+            if fp.RayBundleType == 'focal':
                 for row in range(fp.BeamNrRows):
                     for col in range(fp.BeamNrColumns):
                         pos = Vector(
@@ -225,7 +243,7 @@ class RayWorker:
             else:
                 for row in range(0, int(fp.BeamNrRows)):
                     for n in range(0, int(fp.BeamNrColumns)):
-                        if fp.Spherical == False:
+                        if fp.RayBundleType == 'parallel':
                             pos = pl.Rotation.multVec(
                                 Vector(0, fp.BeamDistance * n,
                                        fp.BeamDistance * row))
@@ -836,14 +854,15 @@ class RayViewProvider:
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
         if self.Object.Base:
             return os.path.join(_icondir_, 'emitter.svg')
-        if self.Object.BeamNrColumns * self.Object.BeamNrRows <= 1:
-            return os.path.join(_icondir_, 'ray.svg')
-        elif self.Object.Spherical:
+        elif self.Object.RayBundleType == 'spherical':
             return os.path.join(_icondir_, 'sun.svg')
-        elif hasattr(self.Object, 'FocalPoint'):
+        elif self.Object.RayBundleType == 'focal':
             return os.path.join(_icondir_, 'raygridfocal.svg')
         else:
-            return os.path.join(_icondir_, 'rayarray.svg')
+            if self.Object.BeamNrColumns * self.Object.BeamNrRows <= 1:
+                return os.path.join(_icondir_, 'ray.svg')
+            else:
+                return os.path.join(_icondir_, 'rayarray.svg')
 
     def attach(self, vobj):
         '''Setup the scene sub-graph of the view provider, this method is mandatory'''
@@ -950,7 +969,7 @@ class Beam2D():
         # Generate commands in the FreeCAD python console to create Ray
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand(
-            'OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1)')
+            'OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1, rayBundleType="parallel")')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -982,7 +1001,7 @@ class RadialBeam2D():
         # Generate commands in the FreeCAD python console to create Ray
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand(
-            'OpticsWorkbench.makeRay(beamNrColumns=64, spherical=True)')
+            'OpticsWorkbench.makeRay(beamNrColumns=64, rayBundleType="spherical")')
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -1017,7 +1036,7 @@ class SphericalBeam():
         # Generate commands in the FreeCAD python console to create Ray
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand(
-            'OpticsWorkbench.makeRay(beamNrColumns=8, beamNrRows=8, spherical=True)'
+            'OpticsWorkbench.makeRay(beamNrColumns=8, beamNrRows=8, rayBundleType="spherical")'
         )
 
     def IsActive(self):
@@ -1103,8 +1122,7 @@ class GridToFocalBeam():
 
     def Activated(self):
         Gui.doCommand('import OpticsWorkbench')
-        Gui.doCommand('r = OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=3, beamDistance=1.0)')
-        Gui.doCommand('r.FocalPoint = FreeCAD.Vector(0, 0, 100)')
+        Gui.doCommand('r = OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=3, beamDistance=1.0, rayBundleType="focal", focalPoint=FreeCAD.Vector(0, 0, 100))')
 
     def IsActive(self):
         return activeDocument() is not None
