@@ -109,6 +109,7 @@ class RayWorker:
         self.iter = 0
 
     def addNewProperties(self, fp):
+        # backwards compatiblity
         if not hasattr(fp, 'Base'):
             fp.addProperty(
                 'App::PropertyLinkSub', 'Base', 'Ray',
@@ -129,9 +130,11 @@ class RayWorker:
                     'Shape of ray bundle')
             ).RayBundleType = [ 'parallel', 'spherical', 'focal' ]
 
-        # backwards compatiblity
-        if hasattr(fp, 'Spherical') and fp.Spherical:
-            fp.RayBundleType = 'spherical'
+            if hasattr(fp, 'Spherical') and fp.Spherical:
+                fp.RayBundleType = 'spherical'
+
+    def onDocumentRestored(self, fp):
+        self.addNewProperties(fp)
 
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
@@ -139,8 +142,7 @@ class RayWorker:
 
     def onChanged(self, fp, prop):
         '''Do something when a property has changed'''
-        # for backwards compatiblity
-        self.addNewProperties(fp)
+        pass
 
     def redrawRay(self, fp):
         hitname = 'HitsFrom' + fp.Label
