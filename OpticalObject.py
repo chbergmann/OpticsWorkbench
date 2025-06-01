@@ -32,8 +32,8 @@ class OpticalObjectWorker:
                        translate('Mirror', 'FreeCAD objects to be mirrors or absorbers')).Base = base
 
         self.addNewPoperties(fp)
-        self.Transparency = transparency
-        self.collectStatistics = collectStatistics
+        fp.Transparency = transparency
+        fp.collectStatistics = collectStatistics
         fp.OpticalType = type
         fp.Proxy = self
 
@@ -79,8 +79,8 @@ class LensWorker:
             translate('Lens', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
 
         self.addNewPoperties(fp)
-        self.Transparency = transparency
-        self.collectStatistics = collectStatistics
+        fp.Transparency = transparency
+        fp.collectStatistics = collectStatistics
         fp.OpticalType = 'lens'
 
         material_names = list(getMaterials())
@@ -135,11 +135,6 @@ class LensWorker:
             fp.Material = '?'
             fp.Sellmeier = []
 
-        # backwards compatiblity
-        if not hasattr(fp, 'Transparency'):
-            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
-                           translate('Mirror', 'Percentage of light that passes through the lens. The rest will be mirrored at the outside')).Transparency = 100
-
         self.update = True
 
 
@@ -187,8 +182,8 @@ class GratingWorker:
         fp.addProperty('App::PropertyEnumeration', 'Material',
                        'Grating', '').Material = material_names
         self.addNewPoperties(fp)
-        self.Transparency = transparency
-        self.collectStatistics = collectStatistics
+        fp.Transparency = transparency
+        fp.collectStatistics = collectStatistics
 
         self.update = True
         fp.Proxy = self
