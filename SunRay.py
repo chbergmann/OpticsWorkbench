@@ -88,8 +88,10 @@ class RaySun():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''  
       
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make sun ray")
         Gui.doCommand('import OpticsWorkbench')  
         Gui.doCommand('OpticsWorkbench.makeSunRay()')              
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions

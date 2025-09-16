@@ -911,9 +911,11 @@ class Ray():
 
     def Activated(self):
         '''Will be called when the feature is executed.'''
+        FreeCAD.ActiveDocument.openTransaction("Make ray")
         # Generate commands in the FreeCAD python console to create Ray
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('OpticsWorkbench.makeRay()')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -940,8 +942,10 @@ class RaySun():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
+        FreeCAD.ActiveDocument.openTransaction("Make sun ray")
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('OpticsWorkbench.makeSunRay()')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -973,9 +977,11 @@ class Beam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
+        FreeCAD.ActiveDocument.openTransaction("Make beam 2d")
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand(
             'OpticsWorkbench.makeRay(beamNrColumns=50, beamDistance=0.1, rayBundleType="parallel")')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -1005,9 +1011,11 @@ class RadialBeam2D():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
+        FreeCAD.ActiveDocument.openTransaction("Make radial beam 2d")
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand(
             'OpticsWorkbench.makeRay(beamNrColumns=64, rayBundleType="spherical")')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -1040,10 +1048,12 @@ class SphericalBeam():
     def Activated(self):
         '''Will be called when the feature is executed.'''
         # Generate commands in the FreeCAD python console to create Ray
+        FreeCAD.ActiveDocument.openTransaction("Make spherical beam")
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand(
             'OpticsWorkbench.makeRay(beamNrColumns=8, beamNrRows=8, rayBundleType="spherical")'
         )
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -1127,8 +1137,10 @@ class GridToFocalBeam():
     '''A grid of rays converging toward a focal point'''
 
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make grid to focal beam")
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('r = OpticsWorkbench.makeRay(beamNrColumns=10, beamNrRows=3, beamDistance=1.0, rayBundleType="focal", focalPoint=FreeCAD.Vector(0, 0, 100))')
+        FreeCAD.ActiveDocument.commitTransaction
 
     def IsActive(self):
         return activeDocument() is not None

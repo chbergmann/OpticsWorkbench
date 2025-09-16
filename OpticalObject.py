@@ -333,6 +333,7 @@ class OpticalMirror():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
 
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make mirror")
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
@@ -341,6 +342,7 @@ class OpticalMirror():
                 'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
 
         Gui.doCommand('OpticsWorkbench.makeMirror(objects)')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -362,6 +364,7 @@ class OpticalAbsorber():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
 
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make absorber")
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
@@ -370,6 +373,7 @@ class OpticalAbsorber():
                 'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
 
         Gui.doCommand('OpticsWorkbench.makeAbsorber(objects)')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -391,6 +395,7 @@ class OpticalLens():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
 
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make lens")
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
@@ -399,6 +404,7 @@ class OpticalLens():
                 'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
 
         Gui.doCommand('OpticsWorkbench.makeLens(objects, material="Quartz")')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -420,6 +426,7 @@ class OpticalGrating():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
 
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make grating")
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('objects = []')
@@ -428,6 +435,7 @@ class OpticalGrating():
                 'objects.append(FreeCAD.ActiveDocument.getObject("%s"))' % (sel.ObjectName))
 
         Gui.doCommand('OpticsWorkbench.makeGrating(objects)')
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions
@@ -449,6 +457,7 @@ class OpticalEmitter():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
 
     def Activated(self):
+        FreeCAD.ActiveDocument.openTransaction("Make ray")
         selection = Gui.Selection.getSelectionEx()
         Gui.doCommand('import OpticsWorkbench')
         if len(selection) > 0:
@@ -460,6 +469,7 @@ class OpticalEmitter():
 
             Gui.doCommand(
                 'OpticsWorkbench.makeRay(baseShape=[obj, %s])' % faces)
+        FreeCAD.ActiveDocument.commitTransaction()
 
     def IsActive(self):
         '''Here you can define if the command must be active or not (greyed) if certain conditions

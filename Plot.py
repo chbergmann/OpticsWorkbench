@@ -106,9 +106,11 @@ class RayHits2CSV():
 
     def Activated(self):
         '''Will be called when the feature is executed.'''
-        # Generate commands in the FreeCAD python console to plot ray hits for selected absorber
+        # Generate commands in the FreeCAD python console to write ray hits for selected absorber as csv
+        activeDocument().openTransaction("Ray hit to csv")
         Gui.doCommand('import OpticsWorkbench')
         Gui.doCommand('OpticsWorkbench.Hits2CSV()')
+        activeDocument().commitTransaction()
 
 
     def IsActive(self):
@@ -129,4 +131,3 @@ class RayHits2CSV():
 
 Gui.addCommand('RayHits', PlotRayHits())
 Gui.addCommand('Hits2CSV', RayHits2CSV())
-                
