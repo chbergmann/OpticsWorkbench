@@ -91,6 +91,15 @@ class RayWorker:
             'App::PropertyLinkList', 'IgnoredOpticalElements', 'Ray',
             translate('Ray', 'Optical Objects to ignore in raytracing')
         ).IgnoredOpticalElements = ignoredElements
+        
+        #Startenergie und Abstrahlcharakteristik hinzufügen
+        fp.addProperty('App::PropertyFloat', 'SourceEnergy', 'Ray',
+                       translate('Ray', 'Initial energy of the source')).SourceEnergy = 100.0
+        fp.addProperty('App::PropertyEnumeration', 'RadiationPattern', 'Ray',
+                       translate('Ray', 'Radiation pattern of the source')).RadiationPattern = ['isotropic', 'lambertian', 'dipole']
+        #Schalter für längenabhängige Energie-Visualisierung
+        fp.addProperty('App::PropertyBool', 'ScaleLengthByEnergy', 'Ray',
+                       translate('Ray', 'Scale ray length by energy')).ScaleLengthByEnergy = False
 
         self.addNewProperties(fp)
         fp.Base = baseShape
@@ -132,7 +141,15 @@ class RayWorker:
 
             if hasattr(fp, 'Spherical') and fp.Spherical:
                 fp.RayBundleType = 'spherical'
-
+                
+            if not hasattr(fp, 'SourceEnergy'):
+                fp.addProperty('App::PropertyFloat', 'SourceEnergy', 'Ray', translate('Ray', 'Initial energy of the source')).SourceEnergy = 100.0
+            if not hasattr(fp, 'RadiationPattern'):
+                fp.addProperty('App::PropertyEnumeration', 'RadiationPattern', 'Ray', translate('Ray', 'Radiation pattern of the source')).RadiationPattern = ['isotropic', 'lambertian', 'dipole']
+            #Schalter für längenabhängige Energie-Visualisierung
+            if not hasattr(fp, 'ScaleLengthByEnergy'):
+                fp.addProperty('App::PropertyBool', 'ScaleLengthByEnergy', 'Ray', translate('Ray', 'Scale ray length by energy')).ScaleLengthByEnergy = False
+            
     def onDocumentRestored(self, fp):
         self.addNewProperties(fp)
 
@@ -166,6 +183,8 @@ class RayWorker:
         pl = fp.Placement
         posdirarray = []
         sunObj = None
+        
+        posdir_energy_array = []
 
         if fp.Base:
             fp.Placement = Placement()
@@ -272,7 +291,37 @@ class RayWorker:
                         posdirarray.append((pos, dir))
             
 
-        linearray = self.makeInitialRay(fp, posdirarray)
+        #linearray = self.makeInitialRay(fp, posdirarray)
+        posdir_energy_array = []
+        
+        # Parameter auslesen (mit Fallback)
+        E_start = getattr(fp, 'SourceEnergy', 100.0)
+        pattern = getattr(fp, 'RadiationPattern', 'isotropic')
+        
+        main_dir = Vector(1, 0, 0) if fp.RadiationPattern == 'dipole' else Vector(0, 0, 1)
+
+        for (pos, d) in posdirarray:
+            # Winkel theta zwischen Strahlrichtung und Hauptachse berechnen
+            if d.Length > EPSILON:
+                theta = d.getAngle(main_dir)
+            else:
+                theta = 0.0
+
+            # Charakteristik anwenden
+            if pattern == 'lambertian':
+                # Lambert-Strahler (Cosinus), strahlt primär nach vorne
+                energy = E_start * max(0.0, math.cos(theta))
+            elif pattern == 'dipole':
+                # Antennen-Dipol (z.B. Sinus zum Quadrat), maximal senkrecht zur Hauptachse
+                energy = E_start * (math.sin(theta)**2)
+            else:
+                # Isotrop (gleichmäßige Verteilung)
+                energy = E_start
+                
+            posdir_energy_array.append((pos, d, energy))
+
+        # Array mit Energiewerten übergeben
+        linearray = self.makeInitialRay(fp, posdir_energy_array)
 
         for line in linearray:
             self.substractPlacement(fp, line)
@@ -337,22 +386,45 @@ class RayWorker:
 
         return posdirarray
 
-    def makeInitialRay(self, fp, posdirarray):
+    def makeInitialRay(self, fp, posdir_energy_array):
         # initialize ray in global coordinate
         pl = fp.getGlobalPlacement()
         linearray = []
-        for (pos, dir) in posdirarray:
+   
+        for item in posdir_energy_array:
+            if len(item) == 3:
+                pos, dir, energy = item
+            else:
+                pos, dir = item
+                energy = 100.0 # Fallback für Kompatibilität
+
             ppos = pos + pl.Base
             pdir = pl.Rotation.multVec(dir)
             if fp.Power == True:
                 self.iter = fp.MaxNrReflections
+                
+                # Längenskalierung berechnen
+                max_energy = getattr(fp, 'SourceEnergy', 100.0)
+                scale_factor = 1.0
+                
+                # Wenn der Schalter aktiv ist, berechnen wir das Verhältnis (0.0 bis 1.0)
+                if getattr(fp, 'ScaleLengthByEnergy', False) and max_energy > 0:
+                    scale_factor = energy / max_energy
+                
+                current_length = fp.MaxRayLength * scale_factor
+                
+                # FreeCAD stürzt ab, bei Linie Länge gleich 0
+                if current_length < EPSILON:
+                    current_length = EPSILON
+                    
                 firstLine = Part.makeLine(
-                    ppos, ppos + pdir * fp.MaxRayLength / pdir.Length)
+                    ppos, ppos + pdir * current_length / pdir.Length)
 
                 self.lastRefIdx = []
 
                 try:
-                    tracedLines = self.traceRay(fp, (firstLine, 100))
+                    # energy dynamisch übergeben anstatt fest '100'
+                    tracedLines = self.traceRay(fp, (firstLine, energy, 0.0))
 
                     if fp.HideFirstPart:
                         # Remove/hide first line.
@@ -586,11 +658,27 @@ class RayWorker:
 
         return (g, False)
 
-    def traceRay(self, fp, lineAndEnergy):
+    def traceRay(self, fp, ray_data):
+        # Entpacken von Linie, Energie UND bisher geflogener Distanz
+        if isinstance(ray_data, tuple):
+            line = ray_data[0]
+            current_energy = ray_data[1]
+            if len(ray_data) > 2:
+                total_flown = ray_data[2]
+            else:
+                total_flown = 0.0
+        else:
+            line = ray_data
+            current_energy = getattr(fp, 'SourceEnergy', 100.0)
+            total_flown = 0.0
+            
+        # Wir merken uns den genauen Startpunkt dieses Teil-Strahls, um später die Distanz zu messen
+        old_origin = line.Vertexes[0].Point
+        
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_parts = []
-        line = lineAndEnergy[0]
-        energy = lineAndEnergy[1]
+        line = ray_data[0]
+        energy = ray_data[1]
 
         isec_struct = self.getIntersections(fp, line)
         origin = PointVec(line.Vertexes[0])
@@ -681,11 +769,35 @@ class RayWorker:
                 return ret
 
         newlines = []
+        
+        # Distanz-Tracking und Längenskalierung
+        max_energy = getattr(fp, 'SourceEnergy', 100.0)
+        
+        # Wie weit ist der Strahl in DIESEM Teilstück geflogen? (Abstand alter Ursprung zu neuem Ursprung)
+        step_distance = (neworigin - old_origin).Length
+        new_total_flown = total_flown + step_distance
+        
         for dNewRay in dNewRays:
+            next_energy = dNewRay[1] 
+            
+            # 1. Wie lang darf der Strahl insgesamt (von der Quelle aus betrachtet) maximal sein?
+            allowed_max_length = fp.MaxRayLength
+            if getattr(fp, 'ScaleLengthByEnergy', False) and max_energy > 0:
+                allowed_max_length = fp.MaxRayLength * (next_energy / max_energy)
+                
+            # 2. Die neue Zeichenlänge ist die erlaubte Länge minus der bereits geflogenen Strecke!
+            current_length = allowed_max_length - new_total_flown
+            
+            # Wenn der Strahl seine maximale Reichweite aufgebraucht hat, wird er nicht mehr weitergezeichnet
+            if current_length < EPSILON:
+                continue
+                
             nl = Part.makeLine(
                 neworigin,
-                neworigin - dNewRay[0] * fp.MaxRayLength / dNewRay[0].Length)
-            newlines.append((nl, dNewRay[1]))
+                neworigin - dNewRay[0] * current_length / dNewRay[0].Length)
+                
+            # Den neuen Strahl samt Energie und der neuen aufsummierten Distanz an die Rekursion übergeben
+            newlines.append((nl, next_energy, new_total_flown))
 
         for line in newlines:
             ret.extend(self.traceRay(fp, line))

@@ -28,6 +28,7 @@ class OpticsWorkbench (Workbench):
         import Ray
         import OpticalObject
         import Plot
+        import EnergyDensity
         from examples import example1, example3D, example_dispersion, example_candle, example_semi, example_hierarchy2D, example_hierarchy3D
         from PySide.QtCore import QT_TRANSLATE_NOOP
         
@@ -43,7 +44,7 @@ class OpticsWorkbench (Workbench):
             QT_TRANSLATE_NOOP('Workbench', 'Absorber'), 
             QT_TRANSLATE_NOOP('Workbench', 'Lens')]
         actions = [QT_TRANSLATE_NOOP('Workbench', 'Off'), QT_TRANSLATE_NOOP('Workbench', 'Start')]
-        analysis= [QT_TRANSLATE_NOOP('Workbench', 'RayHits'), QT_TRANSLATE_NOOP('Workbench', 'Hits2CSV')]
+        analysis= [QT_TRANSLATE_NOOP('Workbench', 'RayHits'), QT_TRANSLATE_NOOP('Workbench', 'EnergyDensity'), QT_TRANSLATE_NOOP('Workbench', 'Hits2CSV')]
         separator = ['Separator']
         examples = [QT_TRANSLATE_NOOP('Workbench', 'Example2D'), 
             QT_TRANSLATE_NOOP('Workbench', 'Example3D'),

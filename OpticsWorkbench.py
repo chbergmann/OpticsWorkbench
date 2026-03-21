@@ -8,7 +8,7 @@ import SunRay
 from numpy import linspace
 from importlib import reload
 import Plot
-
+import EnergyDensity
 
 def recompute():
     activeDocument().recompute()
@@ -203,6 +203,9 @@ def drawPlot(selectedObjList):
     ## Create the list of selected absorbers; if none then skip
     Plot.PlotRayHits.plot3D(selectedObjList)
 
+def drawEnergyDensity(selectedObjList):
+    ## Create the list of selected absorbers; if none then skip
+    EnergyDensity.PlotEnergyDensity.plot3D(selectedObjList)
 
 def Hits2CSV():
     
