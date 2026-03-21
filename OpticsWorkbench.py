@@ -201,11 +201,11 @@ def plot_xy(absorber):
 
 def drawPlot(selectedObjList):
     ## Create the list of selected absorbers; if none then skip
-    Plot.PlotRayHits.plot3D(selectedObjList)
+    Plot.PlotRayHits.plot3D(selectedObjList, False)
 
 def drawEnergyDensity(selectedObjList):
     ## Create the list of selected absorbers; if none then skip
-    EnergyDensity.PlotEnergyDensity.plot3D(selectedObjList)
+    Plot.PlotRayHits.plot3D(selectedObjList, True)
 
 def Hits2CSV():
     

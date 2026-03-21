@@ -28,7 +28,6 @@ class OpticsWorkbench (Workbench):
         import Ray
         import OpticalObject
         import Plot
-        import EnergyDensity
         from examples import example1, example3D, example_dispersion, example_candle, example_semi, example_hierarchy2D, example_hierarchy3D
         from PySide.QtCore import QT_TRANSLATE_NOOP
         
