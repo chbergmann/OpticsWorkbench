@@ -169,7 +169,13 @@ Select one or more optical objects with parameter `collectStatistics` = true and
 If coordinates in all 3 dimensions are present, a 3D plot will be shown, otherwise you will see a 2D plot only.
 
 ![screenshot](./examples/plot3Dexample1.png) ![screenshot](./examples/plot3Dexample2.png)
-  
+
+### ![plotEnergy](./icons/scatterEn.svg) Energy Density Plot
+Select one or more optical objects with parameter `collectStatistics` = true and display the location rays hitting them on a energy density graph. It will ignore objects other than absorbers.  
+This plot calculates the energy distribution of all rays hitting a surface. 
+Make sure to have a lot of rays hit your absorber.
+
+![screenshot](./examples/example_energy.png)
 
 ### ![CSVexport](./icons/ExportCSV.svg) CSV Ray Hits Export
 Creates a spreadsheet with the coordinates of all hits of all beams in all optical objects with parameter `collectStatistics` = true.  
@@ -191,6 +197,9 @@ Go to the Spreadsheet workbench for doing further data processing or export the 
 
 ### ![Example](./optics_workbench_icon.svg) Example - Semi transparency
 ![screenshot](./examples/example_semi.png)
+
+### ![Example](./optics_workbench_icon.svg) Example - Energy Density
+![screenshot](./examples/example_energy.png)
 
 ## Issues and Troubleshooting
 see [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)

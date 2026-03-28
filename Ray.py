@@ -47,7 +47,10 @@ class RayWorker:
             ignoredElements=[],
             baseShape=None,
             focalPoint=Vector(0, 0, 100),
-            rayBundleType=''):
+            rayBundleType='',
+            sourceEnergy=100.0,
+            radiationPattern='isotropic',
+            scaleLengthByEnergy=False):
 
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',
                        translate('Ray', 'On or Off')).Power = power
@@ -91,19 +94,13 @@ class RayWorker:
             'App::PropertyLinkList', 'IgnoredOpticalElements', 'Ray',
             translate('Ray', 'Optical Objects to ignore in raytracing')
         ).IgnoredOpticalElements = ignoredElements
-        
-        #Startenergie und Abstrahlcharakteristik hinzufügen
-        fp.addProperty('App::PropertyFloat', 'SourceEnergy', 'Ray',
-                       translate('Ray', 'Initial energy of the source')).SourceEnergy = 100.0
-        fp.addProperty('App::PropertyEnumeration', 'RadiationPattern', 'Ray',
-                       translate('Ray', 'Radiation pattern of the source')).RadiationPattern = ['isotropic', 'lambertian', 'dipole']
-        #Schalter für längenabhängige Energie-Visualisierung
-        fp.addProperty('App::PropertyBool', 'ScaleLengthByEnergy', 'Ray',
-                       translate('Ray', 'Scale ray length by energy')).ScaleLengthByEnergy = False
 
         self.addNewProperties(fp)
         fp.Base = baseShape
-        fp.FocalPoint = focalPoint    
+        fp.FocalPoint = focalPoint   
+        fp.RadiationPattern = radiationPattern
+        fp.SourceEnergy = sourceEnergy
+        fp.ScaleLengthByEnergy = scaleLengthByEnergy
 
         if rayBundleType == '':
             if spherical:
@@ -149,6 +146,7 @@ class RayWorker:
             #Schalter für längenabhängige Energie-Visualisierung
             if not hasattr(fp, 'ScaleLengthByEnergy'):
                 fp.addProperty('App::PropertyBool', 'ScaleLengthByEnergy', 'Ray', translate('Ray', 'Scale ray length by energy')).ScaleLengthByEnergy = False
+#
             
     def onDocumentRestored(self, fp):
         self.addNewProperties(fp)
