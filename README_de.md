@@ -52,6 +52,9 @@ Parameter:
 - `Ignored Optical Elements`: Liste von Ojekten, die ignoriert werden sollen
 - `Base`: Falls vorhanden, wird ein Emitter auf Basis dieses Elements generiert
 - `FocalPoint`: mit `RayBundleType=focal`: schneiden sich alle Lichtstrahlen in diesem Punkt
+- `SourceEnergy`: Energie in Prozent
+- `RadiationPattern`: 'Energieverteilung einer kegelförmigen Lichtquelle. Erlaubte Werte: 'isotropic', 'lambertian' oder 'dipole'
+- `ScaleLengthByEnergy`: Lichtstrahl Länge nach Energielevel skalieren
 
 ### ![SunRayIcon](./icons/raysun.svg) Sonnenstrahl
 Ein Bündel sich überlappender Lichtstrahlen mit verschiedenen Wellenlängen im sichtbaren Bereich.  
@@ -168,6 +171,11 @@ Zeigt eine Graphik mit den Strahl-Treffer Koordinaten von ausgewählten optische
 
 ![screenshot](./examples/plot3Dexample1.png) ![screenshot](./examples/plot3Dexample2.png)
   
+### ![plotEnergy](./icons/scatterEn.svg) Energiedichte Plot
+Zeigt eine Graphik der Energieverteilung von ausgewählten optischen Objekten mit dem Parameter `collectStatistics` = true
+Diese Graphik berechnet die Energiedichte von allen Strahltreffern in einer Ebene. Funktioniert nur mit vielen Lichtstrahlen.
+
+![screenshot](./examples/example_energy.png)
 
 ### ![CSVexport](./icons/ExportCSV.svg) CSV Ray Hits Export
 Exportiert die Statistik von ausgewählten optischen Objekten mit dem Parameter `collectStatistics` = true in eine Tabelle.  
@@ -189,6 +197,9 @@ Weitere Datenverarbeitung und Speichern in Datei ist dann über die Spreadsheet 
 -
 ### ![Example](./optics_workbench_icon.svg) Beispiel - Halb-Transparenz
 ![screenshot](./examples/example_semi.png)
+
+### ![Example](./optics_workbench_icon.svg) Example - Energy Dichte
+![screenshot](./examples/example_energy.png)
 
 ## Fehlersuche und Report (englisch)
 siehe [issues on Github](https://github.com/chbergmann/OpticsWorkbench/issues)

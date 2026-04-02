@@ -164,7 +164,7 @@ class PlotEnergyDensity():
 
     def GetResources(self):
         '''Return the icon which will appear in the tree view. This method is optional and if not defined a default icon is shown.'''
-        return {'Pixmap'  : os.path.join(_icondir_, 'scatter3D.svg'),
+        return {'Pixmap'  : os.path.join(_icondir_, 'scatterEn.svg'),
                 'Accel' : '', # a default shortcut (optional)
                 'MenuText': QT_TRANSLATE_NOOP('RayHits', 'Energy Density Plot'),
                 'ToolTip' : QT_TRANSLATE_NOOP('RayHits', 'Show selected absorbers ray energy density in a 2D plot') }
