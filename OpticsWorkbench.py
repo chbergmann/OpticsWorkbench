@@ -8,7 +8,6 @@ import SunRay
 from numpy import linspace
 from importlib import reload
 import Plot
-import EnergyDensity
 
 def recompute():
     activeDocument().recompute()
