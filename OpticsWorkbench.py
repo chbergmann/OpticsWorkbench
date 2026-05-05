@@ -123,6 +123,7 @@ def makeSunRay(position = Vector(0, 0, 0),
     
 
 def restartAll():
+    allOff()
     for obj in activeDocument().Objects:
         if isRay(obj):
             obj.Power = True

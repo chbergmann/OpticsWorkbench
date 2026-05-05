@@ -53,6 +53,9 @@ Parameters:
 - `Ignored Optical Elements`: List of optical objects that will be ignored by the ray/beam.
 - `Base`: If a shape is selected here, an optical emitter will be created.
 - `FocalPoint`: set RayBundleType to `focal` to direct all rays to this point
+- `SourceEnergy`: Initial energy in percent
+- `RadiationPattern`:'Radiation distribution of a conic light source. Can be 'isotropic', 'lambertian' or 'dipole'
+- `ScaleLengthByEnergy`: Scale ray length by energy
 
 ### ![SunRayIcon](./icons/raysun.svg) Ray (sun light)
 A number of rays with different wavelengths of visible light.  
