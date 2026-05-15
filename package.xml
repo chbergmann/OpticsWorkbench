@@ -9,7 +9,6 @@
   <url type="repository" branch="main">https://github.com/chbergmann/OpticsWorkbench</url>
   <url type="documentation">https://github.com/chbergmann/OpticsWorkbench/README.md</url>
   <icon>optics_workbench_icon.svg</icon>
-  <depend>scipy</depend>
 
   <content>
     <workbench>
@@ -17,6 +16,7 @@
       <classname>OpticsWorkbench</classname>
       <subdirectory>./</subdirectory>
       <freecadmin>0.19.0</freecadmin>
+      <depend>scipy</depend>
     </workbench>
   </content>
 
