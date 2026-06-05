@@ -725,12 +725,8 @@ class RayWorker:
             dRay = neworigin - origin
             ray1 = dRay / dRay.Length
 
-            if hasattr(nearest_obj, 'Transparency'):
-                P_pass = energy * (nearest_obj.Transparency) / 100
-                P_reflect = energy * (100 - nearest_obj.Transparency) / 100
-            else:
-                P_pass = energy
-                P_reflect = 0
+            P_pass = energy * (100 - nearest_obj.ReflectionRate) * (nearest_obj.Transparency) / 10000
+            P_reflect = energy * (nearest_obj.ReflectionRate) / 100
 
             normal = self.getNormal(nearest_obj, nearest_part, origin,
                                     neworigin)
@@ -738,22 +734,22 @@ class RayWorker:
                 print('Cannot determine the normal on ' + nearest_obj.Label)
                 return ret
 
-            if nearest_obj.OpticalType == 'mirror':
-                if nearest_obj.Transparency < 100:
-                    dNewRays.append((self.mirror(dRay, normal), P_reflect))
-
             if nearest_obj.OpticalType == 'mirror' or nearest_obj.OpticalType == 'absorber':
-                if nearest_obj.Transparency > 0:
+                if P_pass > EPSILON:
                     if self.isInsideSolid(origin, nearest_obj):
                         P_pass = energy
                         
                     dNewRays.append((-dRay, P_pass))
 
+                if P_reflect > EPSILON:
+                    dNewRays.append((self.mirror(dRay, normal), P_reflect))
+
             elif nearest_obj.OpticalType == 'lens':
                 (newray, totalReflection) = self.traceLens(fp, nearest_obj, ray1, normal, isec_struct, origin)
                 if self.isInsideLens(isec_struct, origin, nearest_obj):
                     P_pass = energy
-                elif nearest_obj.Transparency < 100 and not totalReflection:
+                    P_reflect = 0
+                elif P_reflect > EPSILON and not totalReflection:
                     dNewRays.append((self.mirror(dRay, normal), P_reflect))
 
                 dNewRays.append((newray, P_pass))            

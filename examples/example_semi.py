@@ -50,7 +50,7 @@ def make_semi():
     doc = App.activeDocument()
 
     Sketch = createSketch_Sketch(doc)
-    Mirror_semi40 = OpticsWorkbench.makeMirror([Sketch], True, 40)
+    Mirror_semi40 = OpticsWorkbench.makeMirror([Sketch], True, 40, 60)
     Mirror_semi40.Label = "Mirror_semi40"
 
     Cube = doc.addObject('Part::Box', 'Cube')
@@ -62,7 +62,7 @@ def make_semi():
     Absorber_semi50.Label = "Absorber_semi50"
 
     Sketch002 = createSketch_Sketch002(doc)
-    Lens_semi80 = OpticsWorkbench.makeLens([Sketch002], material='NBK7/Window glass', collectStatistics=True, transparency=80)
+    Lens_semi80 = OpticsWorkbench.makeLens([Sketch002], material='NBK7/Window glass', collectStatistics=True, transparency=80, reflectionRate=20)
     Lens_semi80.Label = "Lens_semi80"
 
     Sketch003 = createSketch_Sketch003(doc)

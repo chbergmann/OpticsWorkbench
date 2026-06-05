@@ -70,7 +70,7 @@ Parameters:
 Rays coming from one point going to all directions in a 2D plane  
 Parameters: 
 * Ray. `BeamNrColumns` must be > 1 and `BeamNrRows=1` and `RayBundleType=spherical` to get a radial beam
-
+ - nearest_obj.Absorbation
 ### ![Spherical Beam](./icons/sun3D.svg) Spherical Beam
 Rays coming from one point going to all directions  
 Parameters:  

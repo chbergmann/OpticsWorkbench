@@ -25,17 +25,22 @@ class OpticalObjectWorker:
                  base=[],
                  type='mirror',
                  collectStatistics=False,
-                 transparency=0):
+                 transparency=0,
+                 reflectionRate=0):
+        self.update = False
+
         fp.addProperty('App::PropertyEnumeration', 'OpticalType',
-                       'OpticalObject', '').OpticalType = ['mirror', 'absorber']
+                       'OpticalObject', '').OpticalType = ['mirror', 'absorber', 'lens', 'grating']
         fp.addProperty('App::PropertyLinkList',  'Base',   'OpticalObject',
                        translate('Mirror', 'FreeCAD objects to be mirrors or absorbers')).Base = base
 
+        fp.OpticalType = type
         self.addNewPoperties(fp)
         fp.Transparency = transparency
+        fp.ReflectionRate = reflectionRate
         fp.collectStatistics = collectStatistics
-        fp.OpticalType = type
         fp.Proxy = self
+        self.update = True
 
     def execute(self, fp):
         pass
@@ -50,25 +55,29 @@ class OpticalObjectWorker:
     def addNewPoperties(self, fp):
         if not hasattr(fp, 'Transparency'):
             fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
-                           translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = 0
+                           translate('Mirror', 'Percentage of light that passes through the semi transparent object')).Transparency = 0
+            
+        if not hasattr(fp, 'ReflectionRate'):
+            fp.addProperty('App::PropertyPercent',  'ReflectionRate',   'OpticalObject',
+                           translate('Mirror', 'Percentage of light that will be reflected at the surface')).ReflectionRate = 0
+            if fp.OpticalType == 'mirror':
+                fp.ReflectionRate = 100 - fp.Transparency
             
         if not hasattr(fp, 'collectStatistics'):
             fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',
                        translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = False
 
-class LensWorker:
+class LensWorker(OpticalObjectWorker):
     def __init__(self,
                  fp,    # an instance of Part::FeaturePython
                  base=[],
                  RefractionIndex=1,
                  material='',
                  collectStatistics=False,
-                 transparency=100):
+                 transparency=100,
+                 reflectionRate=0):
+        super().__init__(fp, base, 'lens', collectStatistics, transparency, reflectionRate) 
         self.update = False
-        fp.addProperty('App::PropertyEnumeration', 'OpticalType',
-                       'Lens', '').OpticalType = ['lens']
-        fp.addProperty('App::PropertyLinkList',  'Base',   'Lens',
-                       translate('Lens', 'FreeCAD objects to be lenses')).Base = base
         fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Lens',
                        translate('Lens', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
         fp.addProperty(
@@ -77,11 +86,6 @@ class LensWorker:
             'Lens',
             'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
             translate('Lens', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
-
-        self.addNewPoperties(fp)
-        fp.Transparency = transparency
-        fp.collectStatistics = collectStatistics
-        fp.OpticalType = 'lens'
 
         material_names = list(getMaterials())
 
@@ -98,15 +102,6 @@ class LensWorker:
 
     def execute(self, fp):
         pass
-
-    def addNewPoperties(self, fp):
-        if not hasattr(fp, 'Transparency'):
-            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
-                           translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = 0
-            
-        if not hasattr(fp, 'collectStatistics'):
-            fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',
-                       translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = False
 
     def onDocumentRestored(self, fp):   
         # backwards compatiblity
@@ -138,7 +133,7 @@ class LensWorker:
         self.update = True
 
 
-class GratingWorker:
+class GratingWorker(LensWorker):
     def __init__(self,
                  fp,    # an instance of Part::FeaturePython
                  base=[],
@@ -150,20 +145,11 @@ class GratingWorker:
                  order=1,
                  ray_order_override=False,
                  collectStatistics=False,
-                 transparency=100):
+                 transparency=100,
+                 reflectionRate=0):
+        super().__init__(fp, base, RefractionIndex, material, collectStatistics, transparency, reflectionRate) 
+        
         self.update = False
-        fp.addProperty('App::PropertyEnumeration', 'OpticalType',
-                       'Grating', '').OpticalType = ['grating']
-        fp.addProperty('App::PropertyLinkList',  'Base',   'Grating',
-                       translate('Grating', 'FreeCAD objects to be diffraction gratings')).Base = base
-        fp.addProperty('App::PropertyFloat',  'RefractionIndex',   'Grating',
-                       translate('Grating', 'Refractive Index at 580nm (depends on material)')).RefractionIndex = RefractionIndex
-        fp.addProperty(
-            'App::PropertyFloatList',
-            'Sellmeier',
-            'Grating',
-            'Sellmeier coefficients. [B1, B2, B3, C1, C2, C3]\n C1, C2, C3 in (nm)².\n' +
-            translate('Grating', 'Usually noted in (µm)² in literature,') + '\n (µm)²=10⁶(nm)².')
         fp.addProperty('App::PropertyFloat', 'lpm', 'Grating',
                        translate('Grating', 'lines per millimeter')).lpm = lpm
         fp.addProperty('App::PropertyEnumeration', 'GratingType', 'Grating',
@@ -177,33 +163,11 @@ class GratingWorker:
         fp.OpticalType = 'grating'
         fp.GratingType = GratingType
 
-        material_names = list(getMaterials())
-
-        fp.addProperty('App::PropertyEnumeration', 'Material',
-                       'Grating', '').Material = material_names
-        self.addNewPoperties(fp)
-        fp.Transparency = transparency
-        fp.collectStatistics = collectStatistics
-
         self.update = True
         fp.Proxy = self
 
-        if material in material_names:
-            fp.Material = material
-        else:
-            fp.Material = '?'
-
     def execute(self, fp):
         pass
-
-    def addNewPoperties(self, fp):
-        if not hasattr(fp, 'Transparency'):
-            fp.addProperty('App::PropertyPercent',  'Transparency',   'OpticalObject',
-                           translate('Mirror', 'Percentage of light that passes through the semi transparent mirror')).Transparency = 0
-            
-        if not hasattr(fp, 'collectStatistics'):
-            fp.addProperty('App::PropertyBool',  'collectStatistics',   'OpticalObject',
-                       translate('Mirror', 'Count number and coordinates of ray hits')).collectStatistics = False
 
     def onDocumentRestored(self, fp):
         # backwards compatiblity
