@@ -105,6 +105,7 @@ Die FreeCAD Objekte im Parameter Base werden optische Spiegel.
 * Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Spiegel.  
 Parameter:
 - `Transparency`: Prozentsatz des Lichts, das den Spiegel passiert. Der Rest wird an der Oberfläche reflektiert
+- `ReflectionRate`: Prozentsatz des Lichts, der an der Oberfläche reflektiert wird (Default=100%)
 - `collectStatistics` siehe [Statistik](#Statistik)
 
 ### ![Optical Absorber](./icons/absorber.svg) Optischer Absorber
@@ -112,6 +113,7 @@ Die FreeCAD Objekte im Parameter Base verschlucken alle auftreffenden Lichtstrah
 * Wähle ein  oder mehrere FreeCAD Objekte aus, dann Optischer Absorber.
 Parameter:
 - `Transparency`: Prozentsatz des Lichts, das den Absorber passiert
+- `ReflectionRate`: Prozentsatz des Lichts, der an der Oberfläche reflektiert wird (Default=0%)
 - `collectStatistics` siehe [Statistik](#Statistik)
 
 ### ![Diffraction grating](./icons/grating.svg) Optisches Gitter
@@ -151,7 +153,8 @@ Parameter:
 - `RefractionIndex` Brechungsindex
 - `Sellmeier` Brechungsindex in Abhängigkeit der Wellenlänge
 - `Material` Die Auswahl eines Material stellt Brechungsindex und Sellmeier Parameter ein
-- `Transparency`: Prozentsatz des Lichts, das die Linse passiert. Der Rest wird an der Oberfläche reflektiert
+- `Transparency`: Prozentsatz des Lichts, das die Linse passiert. 
+- `ReflectionRate`: Prozentsatz des Lichts, der an der Oberfläche reflektiert wird (Default=0%)
 - `collectStatistics` siehe [Statistik](#Statistik)
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Licht ausschalten
