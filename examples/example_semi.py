@@ -50,7 +50,7 @@ def make_semi():
     doc = App.activeDocument()
 
     Sketch = createSketch_Sketch(doc)
-    Mirror_semi40 = OpticsWorkbench.makeMirror([Sketch], True, 40, 60)
+    Mirror_semi40 = OpticsWorkbench.makeMirror([Sketch], True, 40)
     Mirror_semi40.Label = "Mirror_semi40"
 
     Cube = doc.addObject('Part::Box', 'Cube')
@@ -70,7 +70,7 @@ def make_semi():
     FullAbsorber.Label = "FullAbsorber"
 
     doc.recompute()
-    OpticsWorkbench.makeRay(beamNrColumns=3, beamDistance = 0.2)
+    OpticsWorkbench.makeRay(beamNrColumns=1, beamDistance = 0.2)
     doc.recompute()
     OpticsWorkbench.Hits2CSV()
     doc.recompute()

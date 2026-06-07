@@ -143,10 +143,14 @@ def allOff():
             
     recompute()
 
-def makeMirror(base = [], collectStatistics = False, transparency=0, reflectionRate=100):
+def makeMirror(base = [], collectStatistics = False, transparency=0, reflectionRate=-1):
     #reload(OpticalObject)
     '''All FreeCAD objects in base will be optical mirrors.'''
     fp = activeDocument().addObject('Part::FeaturePython', 'Mirror')
+    if reflectionRate < 0: # backward compatiblity
+        reflectionRate = 100 - transparency
+        transparency = 100
+
     OpticalObject.OpticalObjectWorker(fp, base, type = 'mirror', collectStatistics = collectStatistics, transparency = transparency, reflectionRate = reflectionRate)
     OpticalObject.OpticalObjectViewProvider(fp.ViewObject)
     recompute()

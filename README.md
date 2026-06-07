@@ -101,8 +101,8 @@ Parameters with different meaning for Emitter:
 The FreeCAD objects in parameter Base will act as mirrors  
 * Select some FreeCAD objects, then create Optical Mirror  
 Parameters:  
-- `Transparency`: Percentage of light that passes through the semi transparent mirror
 - `ReflectionRate`: Percentage of light that is reflected at the surface
+- `Transparency`: Percentage of light that passes through the semi transparent mirror. This is applied after ReflectionRate has been substracted
 - `collectStatistics` see [Statistics](#Statistics) 
 
 ### ![Optical Absorber](./icons/absorber.svg) Optical Absorber
@@ -110,8 +110,8 @@ The FreeCAD objects in parameter `Base` will swallow the rays of light.
 * Select some FreeCAD objects
 * Create Optical Absorber  
 Parameters:  
-- `Transparency`: Percentage of light that passes through the semi transparent absorber
 - `ReflectionRate`: Percentage of light that is reflected at the surface
+- `Transparency`: Percentage of light that passes through the semi transparent mirror. This is applied after ReflectionRate has been substracted
 - `collectStatistics` see [Statistics](#Statistics) 
   
 
@@ -154,8 +154,8 @@ Parameters:
 - `Material`: contains a list with pre defined refraction indexes ans Sellmeier coefficients.
 - `Refration Index`: has to be provided if no material is selected
 - `Sellmeier`: wavelength dependent refraction index coefficents
-- `Transparency`: Percentage of light that passes through the lens. The rest will be mirrored at the outside
 - `ReflectionRate`: Percentage of light that is reflected at the surface
+- `Transparency`: Percentage of light that passes through the semi transparent mirror. This is applied after ReflectionRate has been substracted
 - `collectStatistics` see [Statistics](#Statistics) 
 
 ### ![Off](./icons/Anonymous_Lightbulb_Off.svg) Switch off lights

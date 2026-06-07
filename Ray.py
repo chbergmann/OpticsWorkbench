@@ -113,6 +113,7 @@ class RayWorker:
         fp.Proxy = self
         self.lastRefIdx = []
         self.iter = 0
+        self.lastObject = None
 
     def addNewProperties(self, fp):
         # backwards compatiblity
@@ -660,14 +661,14 @@ class RayWorker:
         # Entpacken von Linie, Energie UND bisher geflogener Distanz
         if isinstance(ray_data, tuple):
             line = ray_data[0]
-            current_energy = ray_data[1]
+            energy = ray_data[1]
             if len(ray_data) > 2:
                 total_flown = ray_data[2]
             else:
                 total_flown = 0.0
         else:
             line = ray_data
-            current_energy = getattr(fp, 'SourceEnergy', 100.0)
+            energy = getattr(fp, 'SourceEnergy', 100.0)
             total_flown = 0.0
             
         # Wir merken uns den genauen Startpunkt dieses Teil-Strahls, um später die Distanz zu messen
@@ -675,8 +676,6 @@ class RayWorker:
         
         nearest = Vector(INFINITY, INFINITY, INFINITY)
         nearest_parts = []
-        line = ray_data[0]
-        energy = ray_data[1]
 
         isec_struct = self.getIntersections(fp, line)
         origin = PointVec(line.Vertexes[0])
@@ -736,7 +735,7 @@ class RayWorker:
 
             if nearest_obj.OpticalType == 'mirror' or nearest_obj.OpticalType == 'absorber':
                 if P_pass > EPSILON:
-                    if self.isInsideSolid(origin, nearest_obj):
+                    if self.lastObject == nearest_obj:
                         P_pass = energy
                         
                     dNewRays.append((-dRay, P_pass))
@@ -792,6 +791,8 @@ class RayWorker:
                 
             # Den neuen Strahl samt Energie und der neuen aufsummierten Distanz an die Rekursion übergeben
             newlines.append((nl, next_energy, new_total_flown))
+
+        self.lastObject = nearest_obj
 
         for line in newlines:
             ret.extend(self.traceRay(fp, line))
@@ -905,17 +906,7 @@ class RayWorker:
                 nvec.z = 0
 
         return nvec
-
-    def isInsideSolid(self, origin, lens):
-        lens_placement_matrix = lens.getGlobalPlacement().Matrix
-        origin = lens_placement_matrix.inverse().multVec(origin)
-        for b in lens.Base:
-            for sol in b.Shape.Solids:
-                if sol.isInside(origin, EPSILON, True):
-                    return True
-                
-        return False
-                
+        
     def isInsideLens(self, isec_struct, origin, lens):
         lens_placement_matrix = lens.getGlobalPlacement().Matrix
         origin = lens_placement_matrix.inverse().multVec(origin)
