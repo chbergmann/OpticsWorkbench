@@ -55,6 +55,7 @@ Parameter:
 - `SourceEnergy`: Energie in Prozent
 - `RadiationPattern`: 'Energieverteilung einer kegelförmigen Lichtquelle. Erlaubte Werte: 'isotropic', 'lambertian' oder 'dipole'
 - `ScaleLengthByEnergy`: Lichtstrahl Länge nach Energielevel skalieren
+- `IntensityThreshold`: Ein Lichtstrahl mit weniger Energie als dieser Schwellwert wird nicht weiter simuliert
 
 ### ![SunRayIcon](./icons/raysun.svg) Sonnenstrahl
 Ein Bündel sich überlappender Lichtstrahlen mit verschiedenen Wellenlängen im sichtbaren Bereich.  

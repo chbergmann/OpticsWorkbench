@@ -56,10 +56,20 @@ def make_semi():
     Cube = doc.addObject('Part::Box', 'Cube')
     Cube.Height = 2.0
     Cube.Length = 2.0
+    Cube.Width = 10.0
     Cube.Placement = Placement(Vector(27.0, -5.0, -1.0), Rotation (0.0, 0.0, 0.0, 1.0))
     Cube.ViewObject.Transparency = 50
     Absorber_semi50 = OpticsWorkbench.makeAbsorber([Cube], True, 50)
     Absorber_semi50.Label = "Absorber_semi50"
+
+    Cube2 = doc.addObject('Part::Box', 'Cube2')
+    Cube2.Height = 2.0
+    Cube2.Length = 10.0
+    Cube2.Width = 2.0
+    Cube2.Placement = Placement(Vector(42.0, -21.0, -1.0), Rotation (0.0, 0.0, 0.0, 1.0))
+    Cube2.ViewObject.Transparency = 50
+    Absorber_semi50 = OpticsWorkbench.makeAbsorber([Cube2], True, 1)
+    Absorber_semi50.Label = "Absorber_semi99"
 
     Sketch002 = createSketch_Sketch002(doc)
     Lens_semi80 = OpticsWorkbench.makeLens([Sketch002], material='NBK7/Window glass', collectStatistics=True, transparency=80, reflectionRate=20)
@@ -70,7 +80,7 @@ def make_semi():
     FullAbsorber.Label = "FullAbsorber"
 
     doc.recompute()
-    OpticsWorkbench.makeRay(beamNrColumns=1, beamDistance = 0.2)
+    OpticsWorkbench.makeRay(beamNrColumns=3, beamDistance = 0.2, intensityThreshold=1)
     doc.recompute()
     OpticsWorkbench.Hits2CSV()
     doc.recompute()

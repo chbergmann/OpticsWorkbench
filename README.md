@@ -56,6 +56,7 @@ Parameters:
 - `SourceEnergy`: Initial energy in percent
 - `RadiationPattern`:'Radiation distribution of a conic light source. Can be 'isotropic', 'lambertian' or 'dipole'
 - `ScaleLengthByEnergy`: Scale ray length by energy
+- `IntensityThreshold`: Ray with an intensity below this threshold is no longer simulated
 
 ### ![SunRayIcon](./icons/raysun.svg) Ray (sun light)
 A number of rays with different wavelengths of visible light.  

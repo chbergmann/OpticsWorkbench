@@ -40,8 +40,9 @@ def makeRay(position = Vector(0, 0, 0),
             rayBundleType = '',
             sourceEnergy=100.0,
             radiationPattern='isotropic',
-            scaleLengthByEnergy=False):
-    reload(Ray)
+            scaleLengthByEnergy=False,
+            intensityThreshold=0):
+    #reload(Ray)
     '''Python command to create a light ray.'''
     name = 'Ray'
     if beamNrColumns * beamNrRows > 1:
@@ -52,7 +53,7 @@ def makeRay(position = Vector(0, 0, 0),
     fp = activeDocument().addObject('Part::FeaturePython', name)
     fp.Placement.Base = position
     fp.Placement.Rotation = Rotation(Vector(1, 0, 0), direction)
-    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength, order, coneAngle, ignoredElements, baseShape, focalPoint, rayBundleType, sourceEnergy, radiationPattern, scaleLengthByEnergy)
+    Ray.RayWorker(fp, power, spherical, beamNrColumns, beamNrRows, beamDistance, hideFirst, maxRayLength, maxNrReflections, wavelength, order, coneAngle, ignoredElements, baseShape, focalPoint, rayBundleType, sourceEnergy, radiationPattern, scaleLengthByEnergy, intensityThreshold)
     Ray.RayViewProvider(fp.ViewObject)
     recompute()
     return fp
@@ -73,7 +74,7 @@ def makeSunRay(position = Vector(0, 0, 0),
             num_rays = 70,
             order = 1,
             ignoredElements=[]):
-    reload(SunRay)
+    #reload(SunRay)
     rays = []
     for l in linspace(wavelength_from, wavelength_to, num_rays):
         ray = makeRay(position = position,

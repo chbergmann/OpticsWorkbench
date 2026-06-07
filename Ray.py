@@ -50,7 +50,8 @@ class RayWorker:
             rayBundleType='',
             sourceEnergy=100.0,
             radiationPattern='isotropic',
-            scaleLengthByEnergy=False):
+            scaleLengthByEnergy=False,
+            intensityThreshold=0):
 
         fp.addProperty('App::PropertyBool', 'Power', 'Ray',
                        translate('Ray', 'On or Off')).Power = power
@@ -94,6 +95,10 @@ class RayWorker:
             'App::PropertyLinkList', 'IgnoredOpticalElements', 'Ray',
             translate('Ray', 'Optical Objects to ignore in raytracing')
         ).IgnoredOpticalElements = ignoredElements
+        fp.addProperty(
+            'App::PropertyPercent', 'IntensityThreshold', 'Ray',
+            translate('Ray', 'Ray with an intensity below this threshold is no longer simulated')
+        ).IntensityThreshold = intensityThreshold
 
         self.addNewProperties(fp)
         fp.Base = baseShape
@@ -717,6 +722,9 @@ class RayWorker:
 
             self.iter -= 1
             if self.iter == 0:
+                return ret
+            
+            if energy < fp.IntensityThreshold:
                 return ret
 
             # Compute a new ray that follows --depending on the current optical
