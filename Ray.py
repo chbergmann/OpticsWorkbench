@@ -95,10 +95,6 @@ class RayWorker:
             'App::PropertyLinkList', 'IgnoredOpticalElements', 'Ray',
             translate('Ray', 'Optical Objects to ignore in raytracing')
         ).IgnoredOpticalElements = ignoredElements
-        fp.addProperty(
-            'App::PropertyPercent', 'IntensityThreshold', 'Ray',
-            translate('Ray', 'Ray with an intensity below this threshold is no longer simulated')
-        ).IntensityThreshold = intensityThreshold
 
         self.addNewProperties(fp)
         fp.Base = baseShape
@@ -106,6 +102,7 @@ class RayWorker:
         fp.RadiationPattern = radiationPattern
         fp.SourceEnergy = sourceEnergy
         fp.ScaleLengthByEnergy = scaleLengthByEnergy
+        fp.IntensityThreshold = intensityThreshold
 
         if rayBundleType == '':
             if spherical:
@@ -152,13 +149,19 @@ class RayWorker:
             #Schalter für längenabhängige Energie-Visualisierung
             if not hasattr(fp, 'ScaleLengthByEnergy'):
                 fp.addProperty('App::PropertyBool', 'ScaleLengthByEnergy', 'Ray', translate('Ray', 'Scale ray length by energy')).ScaleLengthByEnergy = False
-#
+
+        if not hasattr(fp, 'IntensityThreshold'):
+            fp.addProperty(
+                'App::PropertyPercent', 'IntensityThreshold', 'Ray',
+                translate('Ray', 'Ray with an intensity below this threshold is no longer simulated')
+            ).IntensityThreshold = 0
             
     def onDocumentRestored(self, fp):
         self.addNewProperties(fp)
 
     def execute(self, fp):
         '''Do something when doing a recomputation, this method is mandatory'''
+        self.addNewProperties(fp)
         self.redrawRay(fp)
 
     def onChanged(self, fp, prop):

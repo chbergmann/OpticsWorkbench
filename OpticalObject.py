@@ -43,7 +43,7 @@ class OpticalObjectWorker:
         self.update = True
 
     def execute(self, fp):
-        pass
+        self.addNewPoperties(fp)
 
     def onChanged(self, fp, prop):
         pass
