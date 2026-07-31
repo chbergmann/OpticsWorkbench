@@ -4,7 +4,6 @@ import FreeCADGui as Gui
 from FreeCAD import activeDocument
 import os
 import Ray
-from scipy.stats import gaussian_kde
 
 from PySide.QtCore import QT_TRANSLATE_NOOP
 
@@ -13,6 +12,7 @@ _icondir_ = os.path.join(os.path.dirname(__file__), 'icons')
 class PlotRayHits():
     '''This class will be loaded when the workbench is activated in FreeCAD. You must restart FreeCAD to apply changes in this class'''
     def plot3D(selectedObjList, showEnergy):
+        from scipy.stats import gaussian_kde
         
         # Figure out the selected absorber; if multiple absorbers selected, or multiple objects then loop through them all
         # and accumulate data from all of them
